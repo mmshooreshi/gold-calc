@@ -764,6 +764,169 @@ background: var(--bg);}
   font-size: .85rem;
   background: var(--bg);
   color: var(--tx);
+  outline: none;
+}
+
+/* ============================================================
+   APPLE-LIKE CUSTOMER ATTACHMENT & PHOTO PREVIEW SYSTEM
+   ============================================================ */
+.cust-card-pill {
+  background: rgba(23, 32, 81, 0.04);
+  border: 1px solid rgba(23, 32, 81, 0.1);
+  border-radius: 12px;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+[data-theme="dark"] .cust-card-pill {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+.cust-pill-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.cust-pill-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(212,160,23,0.18), rgba(212,160,23,0.38));
+  color: var(--warn);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  overflow: hidden;
+  flex-shrink: 0;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border: 1px solid rgba(212,160,23,0.3);
+}
+.cust-pill-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.cust-pill-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.cust-pill-name {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--tx);
+}
+.cust-pill-sub {
+  font-size: 0.68rem;
+  color: var(--tx2);
+}
+.cust-pill-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.cust-act-btn {
+  background: none;
+  border: none;
+  padding: 5px 8px;
+  border-radius: 8px;
+  color: var(--tx2);
+  cursor: pointer;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  transition: all 0.15s ease;
+}
+.cust-act-btn:hover {
+  background: rgba(0,0,0,0.06);
+  color: var(--primary);
+}
+.cust-act-btn.del:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--err);
+}
+
+.add-cust-chip {
+  background: transparent;
+  border: 1px dashed var(--bd);
+  border-radius: 10px;
+  padding: 6px 12px;
+  color: var(--tx2);
+  font-size: 0.74rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  margin-bottom: 6px;
+  width: 100%;
+}
+.add-cust-chip:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: rgba(23, 32, 81, 0.03);
+}
+
+.photo-dropzone {
+  border: 1.5px dashed var(--bd);
+  border-radius: 12px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  background: var(--bg);
+  transition: all 0.2s ease;
+  min-height: 80px;
+  text-align: center;
+}
+.photo-dropzone:hover {
+  border-color: var(--primary);
+  background: rgba(23, 32, 81, 0.02);
+}
+.photo-preview-wrap {
+  width: 100%;
+  height: 120px;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid var(--bd);
+}
+.photo-preview-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.photo-del-btn {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  background: rgba(0,0,0,0.65);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: transform 0.15s ease;
+}
+.photo-del-btn:active {
+  transform: scale(0.9);
+}
+  color: var(--tx);
 }
 .ni i { font-size: 1.35rem; transition: transform .25s var(--bounce); }
 .ni.on { color: var(--primary); }
@@ -1678,17 +1841,40 @@ background: var(--bg);}
   </div>
 </div>
 
-<!-- Customer & Payment Modal -->
+<!-- Customer & Payment & Receipt Photo Modal -->
 <div class="mo" id="m-customer">
   <div class="mc" style="max-width: 440px; text-align: right;">
-    <div class="mt" style="display:flex;align-items:center;gap:6px;color:var(--primary)">
-      <i class="ph-fill ph-user-circle"></i> اطلاعات خریدار و پرداخت
+    <div class="mt" style="display:flex;align-items:center;justify-content:space-between;color:var(--primary)">
+      <div style="display:flex;align-items:center;gap:6px">
+        <i class="ph-fill ph-user-circle"></i>
+        <span id="cust-modal-title">مشخصات خریدار و رسید</span>
+      </div>
+      <button class="ub-close" onclick="closeModal('m-customer')"><i class="ph ph-x"></i></button>
     </div>
+    
     <div style="display:flex;flex-direction:column;gap:10px;margin:12px 0 16px;">
+      <!-- Photo Attachment Zone -->
+      <div>
+        <label style="font-size:.72rem;color:var(--tx2);display:block;margin-bottom:4px">عکس فاکتور / رسید پرداخت (اختیاری)</label>
+        <input type="file" id="cust-photo-file" accept="image/*" style="display:none" onchange="handleCustPhotoSelect(event)">
+        
+        <div id="cust-photo-drop" class="photo-dropzone" onclick="document.getElementById('cust-photo-file').click()">
+          <i class="ph-fill ph-camera" style="font-size:1.4rem;color:var(--warn)"></i>
+          <span style="font-size:0.75rem;font-weight:700;color:var(--tx)">پیوست یا گرفتن عکس رسید</span>
+          <span style="font-size:0.65rem;color:var(--tx2)">کلیک کنید تا از گالری انتخاب یا با دوربین عکس بگیرید</span>
+        </div>
+        
+        <div id="cust-photo-prev" class="photo-preview-wrap" style="display:none">
+          <img id="cust-photo-img" src="" alt="رسید">
+          <button class="photo-del-btn tap" onclick="removeCustPhoto(event)" title="حذف عکس"><i class="ph ph-trash"></i></button>
+        </div>
+      </div>
+
       <div>
         <label style="font-size:.72rem;color:var(--tx2);display:block;margin-bottom:3px">نام و نام خانوادگی خریدار</label>
         <input type="text" id="cust-name" class="minp" placeholder="مثلاً: علی رضایی">
       </div>
+      
       <div style="display:flex;gap:8px">
         <div style="flex:1">
           <label style="font-size:.72rem;color:var(--tx2);display:block;margin-bottom:3px">شماره تماس</label>
@@ -1699,15 +1885,18 @@ background: var(--bg);}
           <input type="text" id="cust-nid" class="minp" placeholder="اختیاری" inputmode="numeric">
         </div>
       </div>
+      
       <div>
         <label style="font-size:.72rem;color:var(--tx2);display:block;margin-bottom:5px">روش پرداخت</label>
         <div class="pay-chips" id="pay-chips">
           <button type="button" class="pay-chip on" onclick="setPayMethod('کارتخوان', this)">کارتخوان</button>
           <button type="button" class="pay-chip" onclick="setPayMethod('نقدی', this)">نقدی</button>
+          <button type="button" class="pay-chip" onclick="setPayMethod('کارت به کارت', this)">کارت به کارت</button>
           <button type="button" class="pay-chip" onclick="setPayMethod('حواله پایا/ساتنا', this)">حواله پایا</button>
           <button type="button" class="pay-chip" onclick="setPayMethod('چک صیادی', this)">چک صیادی</button>
         </div>
       </div>
+      
       <div style="display:flex;gap:8px">
         <div style="flex:1">
           <label style="font-size:.72rem;color:var(--tx2);display:block;margin-bottom:3px">نام بانک</label>
@@ -1718,14 +1907,30 @@ background: var(--bg);}
           <input type="text" id="cust-ref" class="minp" placeholder="کد رهگیری">
         </div>
       </div>
+      
       <div>
         <label style="font-size:.72rem;color:var(--tx2);display:block;margin-bottom:3px">یادداشت</label>
         <input type="text" id="cust-note" class="minp" placeholder="توضیحات اختیاری">
       </div>
     </div>
+    
     <div class="ma" style="display:flex;gap:8px">
       <button class="mb mb-c tap" style="flex:1" onclick="closeModal('m-customer')">انصراف</button>
-      <button class="mb mb-p tap" style="flex:1.4" onclick="saveCustModal()"><i class="ph ph-check"></i> ثبت اطلاعات</button>
+      <button id="cust-del-btn" class="mb tap" style="flex:1;background:rgba(239,68,68,0.1);color:var(--err);border:1px solid rgba(239,68,68,0.3);display:none" onclick="deleteCustomerData()"><i class="ph ph-trash"></i> حذف</button>
+      <button class="mb mb-p tap" style="flex:1.6" onclick="saveCustModal()"><i class="ph ph-check"></i> ذخیره مشخصات</button>
+    </div>
+  </div>
+</div>
+
+<!-- Fullscreen Photo Modal -->
+<div class="mo" id="m-photo-view" onclick="closeModal('m-photo-view')">
+  <div class="mc" style="max-width: 90vw; max-height: 90vh; padding: 12px; background: rgba(15,23,42,0.92); border-radius: 20px; backdrop-filter: blur(20px);" onclick="event.stopPropagation()">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+      <span style="color:#fff; font-size:0.82rem; font-weight:800; display:flex; align-items:center; gap:5px;"><i class="ph-fill ph-receipt" style="color:var(--warn)"></i> تصویر رسید / فاکتور خریدار</span>
+      <button class="ub-close" onclick="closeModal('m-photo-view')"><i class="ph ph-x"></i></button>
+    </div>
+    <div style="border-radius: 12px; overflow: hidden; max-height: 72vh; display: flex; align-items: center; justify-content: center;">
+      <img id="photo-view-img" src="" alt="رسید" style="max-width: 100%; max-height: 72vh; object-fit: contain; border-radius: 10px;">
     </div>
   </div>
 </div>
@@ -1958,15 +2163,6 @@ background: var(--bg);}
           <div class="pwa-txt"><b>نصب مهوا</b><span id="pwa-guide">برای دسترسی سریع نصب کنید</span></div>
           <button class="pwa-install tap" id="pwa-btn" onclick="installPWA()">نصب</button>
           <button class="pwa-close" onclick="dismissPWA()"><i class="ph ph-x"></i></button>
-        </div>
-
-        <!-- Customer Quick Bar -->
-        <div id="calc-cust-bar" class="cust-bar tap" onclick="openCustModal()">
-          <div style="display:flex;align-items:center;gap:6px">
-            <i class="ph ph-user-circle" id="cust-bar-icon" style="font-size:1.15rem;color:var(--tx2)"></i>
-            <span id="cust-bar-name" style="font-size:.78rem;font-weight:700;color:var(--tx2)">ثبت مشخصات مشتری و پرداخت</span>
-          </div>
-          <span id="cust-bar-badge" class="badge" style="display:none;background:rgba(23,32,81,.1);color:var(--primary)"></span>
         </div>
 
         <!-- Form Rows -->
@@ -2547,54 +2743,144 @@ function togglePasscodeSwitch(){
   }
 }
 
-/* Customer Modal Logic */
-function openCustModal(){
-  document.getElementById('cust-name').value = activeCustomer.name||'';
-  document.getElementById('cust-phone').value = activeCustomer.phone||'';
-  document.getElementById('cust-nid').value = activeCustomer.nid||'';
-  document.getElementById('cust-bank').value = activeCustomer.bankName||'';
-  document.getElementById('cust-ref').value = activeCustomer.trackingCode||'';
-  document.getElementById('cust-note').value = activeCustomer.note||'';
-  document.querySelectorAll('#pay-chips .pay-chip').forEach(c=>{
-    c.classList.toggle('on', c.dataset.val === (activeCustomer.paymentMethod||'کارتخوان'));
+/* Customer & Photo Attachment Engine for History */
+let activeModalCustTargetId = null;
+let activeModalCustImage = '';
+let activeModalCustPayment = 'کارتخوان';
+
+window.openCustModalFor = (id) => {
+  activeModalCustTargetId = id;
+  const it = S.history.find(i => i.id === id);
+  const cust = it && it.customer ? it.customer : {};
+  
+  document.getElementById('cust-name').value = cust.name || '';
+  document.getElementById('cust-phone').value = cust.phone || '';
+  document.getElementById('cust-nid').value = cust.nid || '';
+  document.getElementById('cust-bank').value = cust.bankName || '';
+  document.getElementById('cust-ref').value = cust.trackingCode || '';
+  document.getElementById('cust-note').value = cust.note || '';
+  
+  activeModalCustPayment = cust.paymentMethod || 'کارتخوان';
+  document.querySelectorAll('#pay-chips .pay-chip').forEach(c => {
+    const isSel = (c.textContent.trim() === activeModalCustPayment);
+    c.classList.toggle('on', isSel);
   });
-  openModal('m-customer');
-}
-function setPayMethod(val, btn){
-  document.querySelectorAll('#pay-chips .pay-chip').forEach(c=>c.classList.remove('on'));
-  btn.classList.add('on');
-  activeCustomer.paymentMethod = val;
-}
-function saveCustModal(){
-  activeCustomer.name = document.getElementById('cust-name').value.trim();
-  activeCustomer.phone = document.getElementById('cust-phone').value.trim();
-  activeCustomer.nid = document.getElementById('cust-nid').value.trim();
-  activeCustomer.bankName = document.getElementById('cust-bank').value.trim();
-  activeCustomer.trackingCode = document.getElementById('cust-ref').value.trim();
-  activeCustomer.note = document.getElementById('cust-note').value.trim();
   
-  const bar = document.getElementById('calc-cust-bar');
-  const nameEl = document.getElementById('cust-bar-name');
-  const badgeEl = document.getElementById('cust-bar-badge');
-  const iconEl = document.getElementById('cust-bar-icon');
+  activeModalCustImage = cust.image || '';
+  renderCustModalPhoto();
   
-  if(activeCustomer.name){
-    bar.classList.add('active');
-    nameEl.textContent = 'مشتری: ' + activeCustomer.name;
-    nameEl.style.color = 'var(--primary)';
-    iconEl.style.color = 'var(--primary)';
-    badgeEl.style.display = 'inline-block';
-    badgeEl.textContent = activeCustomer.paymentMethod||'کارتخوان';
-  }else{
-    bar.classList.remove('active');
-    nameEl.textContent = 'ثبت مشخصات مشتری و پرداخت';
-    nameEl.style.color = 'var(--tx2)';
-    iconEl.style.color = 'var(--tx2)';
-    badgeEl.style.display = 'none';
+  const delBtn = document.getElementById('cust-del-btn');
+  if (delBtn) {
+    delBtn.style.display = (cust.name || cust.image || cust.phone) ? 'inline-block' : 'none';
   }
-  closeModal('m-customer');
-  if(activeCustomer.name) toast('مشخصات خریدار ثبت شد');
+  
+  const title = document.getElementById('cust-modal-title');
+  if (title) {
+    title.textContent = (cust.name || cust.image) ? 'ویرایش مشخصات و رسید خریدار' : 'ثبت خریدار و رسید پرداخت';
+  }
+  
+  openModal('m-customer');
+};
+
+window.setPayMethod = (val, btn) => {
+  document.querySelectorAll('#pay-chips .pay-chip').forEach(c => c.classList.remove('on'));
+  btn.classList.add('on');
+  activeModalCustPayment = val;
+};
+
+window.handleCustPhotoSelect = (e) => {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const maxDim = 1000;
+      let w = img.width, h = img.height;
+      if (w > maxDim || h > maxDim) {
+        if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+        else { w = Math.round((w * maxDim) / h); h = maxDim; }
+      }
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      activeModalCustImage = canvas.toDataURL('image/jpeg', 0.82);
+      renderCustModalPhoto();
+      toast('عکس پیوست شد ✓');
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+};
+
+window.removeCustPhoto = (e) => {
+  if (e) e.stopPropagation();
+  activeModalCustImage = '';
+  renderCustModalPhoto();
+};
+
+function renderCustModalPhoto() {
+  const drop = document.getElementById('cust-photo-drop');
+  const prev = document.getElementById('cust-photo-prev');
+  const img = document.getElementById('cust-photo-img');
+  if (activeModalCustImage) {
+    if (drop) drop.style.display = 'none';
+    if (prev) prev.style.display = 'block';
+    if (img) img.src = activeModalCustImage;
+  } else {
+    if (drop) drop.style.display = 'flex';
+    if (prev) prev.style.display = 'none';
+    if (img) img.src = '';
+  }
 }
+
+window.saveCustModal = () => {
+  if (!activeModalCustTargetId) { closeModal('m-customer'); return; }
+  const it = S.history.find(i => i.id === activeModalCustTargetId);
+  if (!it) { closeModal('m-customer'); return; }
+  
+  const custObj = {
+    name: document.getElementById('cust-name').value.trim(),
+    phone: document.getElementById('cust-phone').value.trim(),
+    nid: document.getElementById('cust-nid').value.trim(),
+    paymentMethod: activeModalCustPayment,
+    bankName: document.getElementById('cust-bank').value.trim(),
+    trackingCode: document.getElementById('cust-ref').value.trim(),
+    note: document.getElementById('cust-note').value.trim(),
+    image: activeModalCustImage || ''
+  };
+  
+  it.customer = custObj;
+  save();
+  renderH();
+  closeModal('m-customer');
+  toast('مشخصات خریدار و رسید ثبت شد ✓');
+};
+
+window.deleteCustomerData = () => {
+  if (!activeModalCustTargetId) { closeModal('m-customer'); return; }
+  deleteCustomerFrom(activeModalCustTargetId);
+  closeModal('m-customer');
+};
+
+window.deleteCustomerFrom = (id) => {
+  const it = S.history.find(i => i.id === id);
+  if (it) {
+    it.customer = null;
+    save();
+    renderH();
+    toast('مشخصات خریدار حذف شد');
+  }
+};
+
+window.viewCustomerPhoto = (imgSrc) => {
+  const el = document.getElementById('photo-view-img');
+  if (el) el.src = imgSrc;
+  openModal('m-photo-view');
+};
 
 /* Snapshots History Logic */
 function autoUpdateSnapshot(){
@@ -3078,21 +3364,39 @@ const renderH=()=>{
 
     let custBadge = '';
     if(it.customer && it.customer.name){
-      custBadge = `<span class="badge" style="background:rgba(23,32,81,.1);color:var(--primary)">${it.customer.name}</span>`;
+      custBadge = `<span class="badge" style="background:rgba(23,32,81,.1);color:var(--primary)"><i class="ph-fill ph-user" style="font-size:0.65rem"></i> ${it.customer.name}</span>`;
     }
 
     let custCard = '';
-    if(it.customer && (it.customer.name || it.customer.phone || it.customer.paymentMethod)){
+    if(it.customer && (it.customer.name || it.customer.image || it.customer.phone || it.customer.note)){
+      const hasImg = !!it.customer.image;
       custCard = `
-        <div style="background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:8px 10px;margin-bottom:8px;">
-          <div style="font-size:.74rem;font-weight:800;color:var(--primary);margin-bottom:4px;display:flex;align-items:center;gap:4px">
-            <i class="ph-fill ph-user-circle"></i> مشخصات خریدار و پرداخت
+        <div class="cust-card-pill">
+          <div class="cust-pill-left">
+            <div class="cust-pill-avatar tap" onclick="${hasImg ? `viewCustomerPhoto('${it.customer.image}')` : `openCustModalFor(${it.id})`}" title="${hasImg ? 'مشاهده تصویر رسید' : 'ویرایش خریدار'}">
+              ${hasImg ? `<img src="${it.customer.image}" alt="رسید">` : `<i class="ph-fill ph-user"></i>`}
+            </div>
+            <div class="cust-pill-info">
+              <span class="cust-pill-name">${it.customer.name || 'خریدار (ثبت‌شده)'}</span>
+              <span class="cust-pill-sub">
+                ${it.customer.paymentMethod || 'کارتخوان'}
+                ${it.customer.bankName ? ' (' + it.customer.bankName + ')' : ''}
+                ${hasImg ? ' • 📷 عکس رسید' : ''}
+              </span>
+            </div>
           </div>
-          ${it.customer.name ? `<div style="display:flex;justify-content:space-between;font-size:.7rem;margin-bottom:2px"><span style="color:var(--tx2)">نام خریدار:</span><span style="font-weight:700">${it.customer.name}</span></div>` : ''}
-          ${it.customer.phone ? `<div style="display:flex;justify-content:space-between;font-size:.7rem;margin-bottom:2px"><span style="color:var(--tx2)">شماره تماس:</span><span>${e2p(it.customer.phone)}</span></div>` : ''}
-          ${it.customer.paymentMethod ? `<div style="display:flex;justify-content:space-between;font-size:.7rem;margin-bottom:2px"><span style="color:var(--tx2)">روش پرداخت:</span><span>${it.customer.paymentMethod} ${it.customer.bankName ? '('+it.customer.bankName+')' : ''}</span></div>` : ''}
-          ${it.customer.trackingCode ? `<div style="display:flex;justify-content:space-between;font-size:.7rem;"><span style="color:var(--tx2)">کد پیگیری:</span><span>${e2p(it.customer.trackingCode)}</span></div>` : ''}
+          <div class="cust-pill-actions">
+            <button class="cust-act-btn tap" onclick="openCustModalFor(${it.id})" title="ویرایش"><i class="ph-fill ph-pencil-simple"></i></button>
+            <button class="cust-act-btn del tap" onclick="deleteCustomerFrom(${it.id})" title="حذف خریدار"><i class="ph-fill ph-trash"></i></button>
+          </div>
         </div>
+      `;
+    } else {
+      custCard = `
+        <button class="add-cust-chip tap" onclick="openCustModalFor(${it.id})">
+          <i class="ph-fill ph-user-plus" style="color:var(--primary);font-size:0.92rem"></i>
+          <span>+ مشخصات خریدار / فاکتور و رسید</span>
+        </button>
       `;
     }
 
@@ -3952,22 +4256,35 @@ window.showHistoryReceipt = (id, e) => {
   if(navigator.vibrate) navigator.vibrate(15);
   setTimeout(() => {
     btn.classList.remove('filling');
-    buildAndShowReceipt(it.calc, it.date, it.time, it.type === 'sale' ? 'فاکتور فروش' : 'پیش‌فاکتور');
+    buildAndShowReceipt(it.calc, it.date, it.time, it.type === 'sale' ? 'فاکتور فروش' : 'پیش‌فاکتور', it.customer);
   }, 450);
 };
 
-function buildAndShowReceipt(calc, date, time, title) {
+function buildAndShowReceipt(calc, date, time, title, customer=null) {
   const p = document.getElementById('rcpt-paper');
   const e2 = (n) => Number(p2e(n||0));
   const costs = Math.round(e2(calc.E) + e2(calc.G) + e2(calc.I));
   
+  let custHtml = '';
+  if (customer && (customer.name || customer.phone || customer.paymentMethod)) {
+    custHtml = `
+      <div style="background:rgba(0,0,0,0.03); border:1px solid #ddd; border-radius:8px; padding:6px 8px; margin-bottom:10px; font-size:0.75rem;">
+        ${customer.name ? `<div style="display:flex; justify-content:space-between; margin-bottom:2px;"><span>خریدار:</span><b>${customer.name}</b></div>` : ''}
+        ${customer.phone ? `<div style="display:flex; justify-content:space-between; margin-bottom:2px;"><span>تماس:</span><span>${e2p(customer.phone)}</span></div>` : ''}
+        ${customer.paymentMethod ? `<div style="display:flex; justify-content:space-between;"><span>روش پرداخت:</span><span>${customer.paymentMethod} ${customer.bankName ? '('+customer.bankName+')' : ''}</span></div>` : ''}
+      </div>
+    `;
+  }
+  
   p.innerHTML = `
     <div style="font-size:1.55rem; font-weight:900; margin-bottom:4px; font-family:'Vazirmatn',sans-serif; letter-spacing:0 !important; word-spacing:0; direction:rtl; text-align:center;">گالری طلا مهوا</div>
-    <div style="font-size:0.85rem; color:#444; margin-bottom:18px; font-weight:bold; text-align:center;">${title}</div>
-    <div style="display:flex; justify-content:space-between; font-size:0.75rem; border-bottom:1.5px dashed #aaa; padding-bottom:6px; margin-bottom:12px;">
+    <div style="font-size:0.85rem; color:#444; margin-bottom:14px; font-weight:bold; text-align:center;">${title}</div>
+    <div style="display:flex; justify-content:space-between; font-size:0.75rem; border-bottom:1.5px dashed #aaa; padding-bottom:6px; margin-bottom:10px;">
       <span>تاریخ: ${e2p(date)}</span>
       <span>زمان: ${e2p(time)}</span>
     </div>
+    
+    ${custHtml}
     
     <div style="display:flex; justify-content:space-between; font-size:0.9rem; margin-bottom:8px;">
       <span>وزن طلا:</span>

@@ -127,58 +127,6 @@ fun CalculatorScreen(
             }
         }
 
-        // Customer Quick Attachment Bar
-        Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(10.dp))
-                .clickable(onClick = viewModel::openCustomerDialog)
-                .border(1.dp, if (activeCustomer.isNotEmpty) colors.primary else colors.border, RoundedCornerShape(10.dp)),
-            color = if (activeCustomer.isNotEmpty) colors.primary.copy(alpha = 0.08f) else colors.surface
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 10.dp, vertical = 6.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = if (activeCustomer.isNotEmpty) Icons.Filled.Person else Icons.Filled.PersonAdd,
-                        contentDescription = "Customer",
-                        modifier = Modifier.size(16.dp),
-                        tint = if (activeCustomer.isNotEmpty) colors.primary else colors.textMuted
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = if (activeCustomer.name.isNotEmpty()) "مشتری: ${activeCustomer.name}" else "ثبت اطلاعات مشتری و پرداخت",
-                        fontSize = scaledSp(11.5f),
-                        fontFamily = VazirmatnFontFamily,
-                        fontWeight = if (activeCustomer.isNotEmpty) FontWeight.Bold else FontWeight.Medium,
-                        color = if (activeCustomer.isNotEmpty) colors.primary else colors.textMuted
-                    )
-                }
-
-                if (activeCustomer.paymentMethod.isNotEmpty()) {
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(6.dp))
-                            .background(colors.primary.copy(alpha = 0.15f))
-                            .padding(horizontal = 6.dp, vertical = 2.dp)
-                    ) {
-                        Text(
-                            text = activeCustomer.paymentMethod,
-                            fontSize = scaledSp(10f),
-                            fontFamily = VazirmatnFontFamily,
-                            color = colors.primary,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                }
-            }
-        }
-
         // Row 1: Gold Price
         CalculatorInputRow(
             label = "قیمت طلا",
