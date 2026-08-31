@@ -81,6 +81,8 @@ object NumberFormatters {
         return toPersianDigits(formatted)
     }
 
+    fun formatInputWithCommas(input: String): String = formatCurrencyInput(input)
+
     fun formatWeightInput(input: String): String {
         val latin = toLatinDigits(input).replace("[^0-9.]".toRegex(), "")
         if (latin.isEmpty()) return ""
@@ -90,6 +92,21 @@ object NumberFormatters {
             val rest = latin.substring(firstDotIndex + 1).replace(".", "")
             val decimalPart = if (rest.length > 3) rest.substring(0, 3) else rest
             "$integerPart.$decimalPart"
+        } else {
+            latin
+        }
+        return toPersianDigits(result)
+    }
+
+    fun formatDecimalInput(input: String): String {
+        val latin = toLatinDigits(input).replace("[^0-9.]".toRegex(), "")
+        if (latin.isEmpty()) return ""
+        val firstDotIndex = latin.indexOf('.')
+        val result = if (firstDotIndex != -1) {
+            val integerPart = latin.substring(0, firstDotIndex)
+            val decimalPart = latin.substring(firstDotIndex + 1).replace(".", "")
+            val clamped = if (decimalPart.length > 3) decimalPart.substring(0, 3) else decimalPart
+            "$integerPart.$clamped"
         } else {
             latin
         }
