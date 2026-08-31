@@ -119,7 +119,7 @@
   --primary-ll: #334155;
   --bg: #f8fafc;
   --sf: #ffffff;
-  --bd: #e2e8f0;
+  --bd: #f1f5f9;
   --tx: #0f172a;
   --tx2: #64748b;
   --warn: #b45309;
@@ -128,9 +128,9 @@
   --primary: #172051;
   --primary-l: #2a3675;
   --primary-ll: #3d4f96;
-  --bg: #f1f4f9;
+  --bg: #f4f6fa;
   --sf: #ffffff;
-  --bd: #cbd5e1;
+  --bd: #e2e8f0;
   --tx: #0f172a;
   --tx2: #64748b;
   --warn: #d4a017;
@@ -140,11 +140,55 @@
   --primary-l: #eab308;
   --primary-ll: #fde047;
   --bg: #09090b;
-  --sf: #18181b;
-  --bd: #27272a;
+  --sf: #141417;
+  --bd: #202024;
   --tx: #f4f4f5;
   --tx2: #a1a1aa;
   --warn: #d4a017;
+}
+[data-skin="quartz-gold"] {
+  --primary: #b45309;
+  --primary-l: #d97706;
+  --primary-ll: #fbbf24;
+  --bg: #fffbf5;
+  --sf: #ffffff;
+  --bd: #faebd7;
+  --tx: #292524;
+  --tx2: #78716c;
+  --warn: #d97706;
+}
+[data-skin="emerald-gallery"] {
+  --primary: #065f46;
+  --primary-l: #059669;
+  --primary-ll: #10b981;
+  --bg: #f0fdf4;
+  --sf: #ffffff;
+  --bd: #dcfce7;
+  --tx: #064e3b;
+  --tx2: #047857;
+  --warn: #d97706;
+}
+[data-skin="royal-amethyst"] {
+  --primary: #581c87;
+  --primary-l: #7e22ce;
+  --primary-ll: #a855f7;
+  --bg: #faf5ff;
+  --sf: #ffffff;
+  --bd: #f3e8ff;
+  --tx: #3b0764;
+  --tx2: #7e22ce;
+  --warn: #d97706;
+}
+[data-skin="sapphire-azure"] {
+  --primary: #1e40af;
+  --primary-l: #2563eb;
+  --primary-ll: #60a5fa;
+  --bg: #eff6ff;
+  --sf: #ffffff;
+  --bd: #dbeafe;
+  --tx: #1e3a8a;
+  --tx2: #3b82f6;
+  --warn: #d97706;
 }
 [data-theme="dark"] {
   --bg: #0d1526;
@@ -920,32 +964,35 @@ background: var(--bg);}
    ============================================================ */
 .skin-card {
   background: var(--sf);
-  border: 1.5px solid var(--bd);
-  border-radius: 12px;
-  padding: 10px 14px;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  padding: 12px 14px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+}
+.skin-card:hover {
+  transform: translateY(-1px);
 }
 .skin-card.on {
   border-color: var(--primary);
-  background: rgba(23, 32, 81, 0.03);
+  background: rgba(23, 32, 81, 0.04);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.05);
 }
 [data-theme="dark"] .skin-card.on {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .fx-chips {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
   gap: 8px;
   margin-top: 8px;
 }
 .fx-chip {
-  flex: 1;
-  min-width: 100px;
-  padding: 9px 12px;
-  border-radius: 10px;
-  border: 1px solid var(--bd);
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid transparent;
   background: var(--sf);
   color: var(--tx);
   font-family: inherit;
@@ -954,15 +1001,95 @@ background: var(--bg);}
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 6px;
-  justify-content: center;
+  gap: 8px;
+  justify-content: flex-start;
   transition: all 0.18s ease;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.02);
+}
+.fx-chip:hover {
+  transform: translateY(-1px);
 }
 .fx-chip.on {
   background: var(--primary);
   color: #fff;
   border-color: var(--primary);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Fast Micro Floating Tooltip */
+[data-tip] {
+  position: relative;
+}
+[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%) scale(0.85);
+  background: #0f172a;
+  color: #ffffff;
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.1s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.22);
+}
+[data-tip]:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}
+
+/* Color Swatches Grid */
+.color-swatches-grid {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 6px 0;
+}
+.color-swatch-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+.color-swatch-btn:active { transform: scale(0.88); }
+.color-swatch-btn.on {
+  border-color: #ffffff;
+  transform: scale(1.15);
+  box-shadow: 0 0 0 3px var(--primary), 0 4px 10px rgba(0,0,0,0.2);
+}
+.custom-color-picker-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--sf);
+  border-radius: 12px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+.custom-color-input {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 26px;
+  height: 26px;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  border-radius: 50%;
+}
+.custom-color-input::-webkit-color-swatch {
+  border-radius: 50%;
+  border: 1px solid var(--bd);
 }
 
 /* Customer Bar & Chips */
@@ -2726,39 +2853,70 @@ background: var(--bg);}
 
   <!-- ===== STATS VIEW ===== -->
   <main id="v-stats" class="view">
-    <div class="s-hero">
-      <h4>مجموع فروش</h4>
+    <div class="s-hero" style="background: radial-gradient(circle at 100% 0%, rgba(212,160,23,0.18), transparent 70%);">
+      <h4>مجموع کل فروش دوره</h4>
       <div class="sv" id="s-total">۰ <span>تومان</span></div>
     </div>
-    <div class="sec-h">
-      <h3>بازه زمانی</h3>
-      <button class="drb tap" onclick="openDP()"><i class="ph ph-calendar-blank"></i> <span id="rlbl">همه</span></button>
+
+    <!-- Quick Date Filter Chips -->
+    <div class="sec-h" style="margin-bottom:6px;">
+      <h3>بازه تحلیلی</h3>
+      <button class="drb tap" onclick="openDP()" data-tip="انتخاب دقیق بازه با تقویم شمسی"><i class="ph ph-calendar-blank"></i> <span id="rlbl">همه</span></button>
     </div>
-    <div class="sr">
+    <div class="cfb" id="sdate-filters" style="margin-bottom:12px;">
+      <button type="button" class="cfbb on tap" onclick="setQuickStatsFilter('all', this)">همه</button>
+      <button type="button" class="cfbb tap" onclick="setQuickStatsFilter('today', this)">امروز</button>
+      <button type="button" class="cfbb tap" onclick="setQuickStatsFilter('week', this)">این هفته</button>
+      <button type="button" class="cfbb tap" onclick="setQuickStatsFilter('month', this)">این ماه</button>
+    </div>
+
+    <!-- 4 Stats Metric Counters -->
+    <div class="sr" style="display:grid; grid-template-columns:repeat(2, 1fr); gap:8px; margin-bottom:14px;">
       <div class="sm"><div class="sml">تعداد فروش</div><div class="smv" id="s-cnt">۰</div></div>
-      <div class="sm"><div class="sml">میانگین</div><div class="smv" id="s-avg">۰</div></div>
-      <div class="sm"><div class="sml">بیشترین</div><div class="smv" id="s-max">۰</div></div>
+      <div class="sm"><div class="sml">مجموع وزن (گرم)</div><div class="smv" id="s-weight" style="color:var(--ok)">۰</div></div>
+      <div class="sm"><div class="sml">میانگین هر فاکتور</div><div class="smv" id="s-avg">۰</div></div>
+      <div class="sm"><div class="sml">بزرگ‌ترین معامله</div><div class="smv" id="s-max" style="color:var(--warn)">۰</div></div>
     </div>
-    <div class="cfb" id="cfilters">
-      <button class="cfbb on tap" onclick="setCT('bar',this)">ستونی</button>
-      <button class="cfbb tap" onclick="setCT('line',this)">خطی</button>
-      <button class="cfbb tap" onclick="setCT('doughnut',this)">دایره‌ای</button>
+
+    <!-- Metric Comparison Tabs -->
+    <div class="sec-h" style="margin-bottom:6px;">
+      <h3>بعد تحلیل و مقایسه</h3>
     </div>
-    <div class="scard">
-      <div class="scard-t"><i class="ph ph-chart-bar"></i> نمودار فروش</div>
-      <canvas id="ch1"></canvas>
+    <div class="cfb" id="metric-filters" style="margin-bottom:12px; gap:6px;">
+      <button type="button" class="cfbb on tap" onclick="setStatsMetric('sales', this)"><i class="ph-fill ph-trend-up"></i> مبلغ فروش</button>
+      <button type="button" class="cfbb tap" onclick="setStatsMetric('breakdown', this)"><i class="ph-fill ph-chart-pie"></i> سود و اجرت</button>
+      <button type="button" class="cfbb tap" onclick="setStatsMetric('payments', this)"><i class="ph-fill ph-credit-card"></i> روش‌های پرداخت</button>
+      <button type="button" class="cfbb tap" onclick="setStatsMetric('weight', this)"><i class="ph-fill ph-scales"></i> وزن طلا</button>
     </div>
-    <div class="scard">
-      <div class="scard-t"><i class="ph ph-scales"></i> نمودار وزن (گرم)</div>
-      <canvas id="ch2"></canvas>
+
+    <!-- Chart Style Selector -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+      <span style="font-size:0.75rem; font-weight:800; color:var(--tx2);" id="chart-main-title">نمودار تحلیلی</span>
+      <div class="cfb" id="cfilters" style="margin:0; padding:0;">
+        <button type="button" class="cfbb on tap" onclick="setCT('bar',this)" data-tip="ستون‌های نرم و کپسولی"><i class="ph ph-chart-bar"></i> ستونی</button>
+        <button type="button" class="cfbb tap" onclick="setCT('line',this)" data-tip="نمودار منحنی پیوسته"><i class="ph ph-chart-line"></i> خطی</button>
+        <button type="button" class="cfbb tap" onclick="setCT('doughnut',this)" data-tip="نمودار حلقه‌ای سهم"><i class="ph ph-chart-donut"></i> حلقه‌ای</button>
+      </div>
     </div>
-    <div class="scard" style="margin-bottom:4px">
-      <div class="scard-t"><i class="ph ph-export"></i> خروجی گزارش</div>
+
+    <div class="scard" style="border:none; box-shadow: 0 4px 20px rgba(0,0,0,0.04);">
+      <canvas id="ch1" style="max-height:260px;"></canvas>
+    </div>
+
+    <!-- Secondary Breakdown / Hourly Distribution Card -->
+    <div class="scard" id="scard-sec" style="border:none; box-shadow: 0 4px 20px rgba(0,0,0,0.04);">
+      <div class="scard-t"><i class="ph-fill ph-clock-counter-clockwise"></i> <span id="sec-chart-title">توزیع زمانی و ساعتی معاملات</span></div>
+      <canvas id="ch2" style="max-height:200px;"></canvas>
+    </div>
+
+    <!-- Export Reports Bar -->
+    <div class="scard" style="border:none; box-shadow: 0 4px 20px rgba(0,0,0,0.04); margin-bottom:12px;">
+      <div class="scard-t"><i class="ph-fill ph-export"></i> دریافت خروجی از گزارش</div>
       <div class="ebar">
-        <button class="ebtn tap" onclick="expXLSX()"><i class="ph ph-file-xls"></i>XLSX</button>
-        <button class="ebtn tap" onclick="expCSV()"><i class="ph ph-file-csv"></i>CSV</button>
-        <button class="ebtn tap" onclick="openPdfModal()"><i class="ph ph-file-pdf"></i>PDF</button>
-        <button class="ebtn tap" onclick="expJSON()"><i class="ph ph-file-code"></i>JSON</button>
+        <button type="button" class="ebtn tap" onclick="expXLSX()" data-tip="فایل اکسل استاندارد"><i class="ph ph-file-xls"></i> اکسل XLSX</button>
+        <button type="button" class="ebtn tap" onclick="expCSV()" data-tip="فایل متنی جدول‌بندی‌شده"><i class="ph ph-file-csv"></i> CSV</button>
+        <button type="button" class="ebtn tap" onclick="openPdfModal()" data-tip="گزارش رسمی با فرمت PDF"><i class="ph ph-file-pdf"></i> PDF رسمی</button>
+        <button type="button" class="ebtn tap" onclick="expJSON()" data-tip="بکاپ کدنویسی JSON"><i class="ph ph-file-code"></i> JSON</button>
       </div>
     </div>
   </main>
@@ -2767,58 +2925,134 @@ background: var(--bg);}
   <main id="v-skins" class="view">
     <div class="sec-h"><h3>پوسته‌ها و بازخورد لمسی</h3></div>
 
-    <!-- 3 Refined Themes -->
+    <!-- Luxury Palettes -->
     <div class="sg">
-      <div class="sgt"><i class="ph-fill ph-palette"></i> تم رنگی برنامه</div>
-      <div style="display:flex; flex-direction:column; gap:8px; padding:4px 0;">
-        <div class="skin-card tap on" id="skin-pearl-white" onclick="setSkinTheme('pearl-white', this)">
+      <div class="sgt"><i class="ph-fill ph-palette"></i> تم‌های لوکس طلافروشی</div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:10px; padding:4px 0;">
+        
+        <div class="skin-card tap on" id="skin-pearl-white" onclick="setSkinTheme('pearl-white', this)" data-tip="سفید مرواریدی و خاکستری مینیمال">
           <div style="display:flex; align-items:center; justify-content:space-between;">
-            <div style="display:flex; align-items:center; gap:10px;">
-              <div style="width:22px; height:22px; border-radius:50%; background:#ffffff; border:2px solid #cbd5e1; box-shadow:0 1px 3px rgba(0,0,0,0.1);"></div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <div style="width:20px; height:20px; border-radius:50%; background:#ffffff; border:2px solid #cbd5e1; box-shadow:0 1px 3px rgba(0,0,0,0.1);"></div>
               <div>
-                <div style="font-size:0.84rem; font-weight:800; color:var(--tx);">مروارید سفید مینیمال</div>
-                <div style="font-size:0.68rem; color:var(--tx2);">سفید خالص و خاکستری مات آرام</div>
+                <div style="font-size:0.82rem; font-weight:800; color:var(--tx);">مروارید سفید</div>
+                <div style="font-size:0.65rem; color:var(--tx2);">سفید مینیمال</div>
               </div>
             </div>
-            <i class="ph-fill ph-check-circle" style="color:var(--primary); font-size:1.1rem;"></i>
+            <i class="ph-fill ph-check-circle" style="color:var(--primary); font-size:1rem;"></i>
           </div>
         </div>
 
-        <div class="skin-card tap" id="skin-classic-navy" onclick="setSkinTheme('classic-navy', this)">
+        <div class="skin-card tap" id="skin-classic-navy" onclick="setSkinTheme('classic-navy', this)" data-tip="سرمه‌ای سنتی گالری مهوا">
           <div style="display:flex; align-items:center; justify-content:space-between;">
-            <div style="display:flex; align-items:center; gap:10px;">
-              <div style="width:22px; height:22px; border-radius:50%; background:#172051; border:2px solid #d4a017;"></div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <div style="width:20px; height:20px; border-radius:50%; background:#172051; border:2px solid #d4a017;"></div>
               <div>
-                <div style="font-size:0.84rem; font-weight:800; color:var(--tx);">کلاسیک مهوا</div>
-                <div style="font-size:0.68rem; color:var(--tx2);">سرمه‌ای طلافروشی و طلایی</div>
+                <div style="font-size:0.82rem; font-weight:800; color:var(--tx);">کلاسیک مهوا</div>
+                <div style="font-size:0.65rem; color:var(--tx2);">سرمه‌ای و طلا</div>
               </div>
             </div>
-            <i class="ph-fill ph-check-circle" style="display:none; color:var(--primary); font-size:1.1rem;"></i>
+            <i class="ph-fill ph-check-circle" style="display:none; color:var(--primary); font-size:1rem;"></i>
           </div>
         </div>
 
-        <div class="skin-card tap" id="skin-obsidian-dark" onclick="setSkinTheme('obsidian-dark', this)">
+        <div class="skin-card tap" id="skin-obsidian-dark" onclick="setSkinTheme('obsidian-dark', this)" data-tip="مشکی عمیق خالص برای نمایشگرهای OLED">
           <div style="display:flex; align-items:center; justify-content:space-between;">
-            <div style="display:flex; align-items:center; gap:10px;">
-              <div style="width:22px; height:22px; border-radius:50%; background:#09090b; border:2px solid #27272a;"></div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <div style="width:20px; height:20px; border-radius:50%; background:#09090b; border:2px solid #d4a017;"></div>
               <div>
-                <div style="font-size:0.84rem; font-weight:800; color:var(--tx);">مشکی مات ابسیدین</div>
-                <div style="font-size:0.68rem; color:var(--tx2);">تیره عمیق OLED و حاشیه‌های مات</div>
+                <div style="font-size:0.82rem; font-weight:800; color:var(--tx);">مشکی ابسیدین</div>
+                <div style="font-size:0.65rem; color:var(--tx2);">مشکی OLED</div>
               </div>
             </div>
-            <i class="ph-fill ph-check-circle" style="display:none; color:var(--primary); font-size:1.1rem;"></i>
+            <i class="ph-fill ph-check-circle" style="display:none; color:var(--primary); font-size:1rem;"></i>
           </div>
         </div>
+
+        <div class="skin-card tap" id="skin-quartz-gold" onclick="setSkinTheme('quartz-gold', this)" data-tip="طلایی گرم و ماسه‌ای">
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <div style="width:20px; height:20px; border-radius:50%; background:#d97706; border:2px solid #fef3c7;"></div>
+              <div>
+                <div style="font-size:0.82rem; font-weight:800; color:var(--tx);">کوارتز طلایی</div>
+                <div style="font-size:0.65rem; color:var(--tx2);">شامپاینی و طلا</div>
+              </div>
+            </div>
+            <i class="ph-fill ph-check-circle" style="display:none; color:var(--primary); font-size:1rem;"></i>
+          </div>
+        </div>
+
+        <div class="skin-card tap" id="skin-emerald-gallery" onclick="setSkinTheme('emerald-gallery', this)" data-tip="سبز سلطنتی زمرد">
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <div style="width:20px; height:20px; border-radius:50%; background:#065f46; border:2px solid #a7f3d0;"></div>
+              <div>
+                <div style="font-size:0.82rem; font-weight:800; color:var(--tx);">زمردین گالری</div>
+                <div style="font-size:0.65rem; color:var(--tx2);">سبز سلطنتی</div>
+              </div>
+            </div>
+            <i class="ph-fill ph-check-circle" style="display:none; color:var(--primary); font-size:1rem;"></i>
+          </div>
+        </div>
+
+        <div class="skin-card tap" id="skin-royal-amethyst" onclick="setSkinTheme('royal-amethyst', this)" data-tip="ارغوانی و یاقوتی درباری">
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <div style="width:20px; height:20px; border-radius:50%; background:#581c87; border:2px solid #e9d5ff;"></div>
+              <div>
+                <div style="font-size:0.82rem; font-weight:800; color:var(--tx);">ارغوانی شاهانه</div>
+                <div style="font-size:0.65rem; color:var(--tx2);">بنفش یاقوتی</div>
+              </div>
+            </div>
+            <i class="ph-fill ph-check-circle" style="display:none; color:var(--primary); font-size:1rem;"></i>
+          </div>
+        </div>
+
+        <div class="skin-card tap" id="skin-sapphire-azure" onclick="setSkinTheme('sapphire-azure', this)" data-tip="لاجورد درباری و آبی کریستال">
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <div style="width:20px; height:20px; border-radius:50%; background:#1e40af; border:2px solid #bfdbfe;"></div>
+              <div>
+                <div style="font-size:0.82rem; font-weight:800; color:var(--tx);">لاجورد کریستال</div>
+                <div style="font-size:0.65rem; color:var(--tx2);">آبی لاجوردی</div>
+              </div>
+            </div>
+            <i class="ph-fill ph-check-circle" style="display:none; color:var(--primary); font-size:1rem;"></i>
+          </div>
+        </div>
+
       </div>
     </div>
 
-    <!-- Key Sound Feedback Selector -->
+    <!-- Infinite Custom Accent Tint -->
     <div class="sg">
-      <div class="sgt"><i class="ph-fill ph-speaker-high"></i> صدای لمس دکمه‌ها (خیلی ملایم و ضمنی)</div>
+      <div class="sgt"><i class="ph-fill ph-paint-brush-broad"></i> رنگ تأکیدی دلخواه (پالت بی‌نهایت)</div>
+      <div class="color-swatches-grid">
+        <button type="button" class="color-swatch-btn tap" style="background:#0f172a;" onclick="setCustomAccent('#0f172a', this)" data-tip="تیره تیتانیوم"></button>
+        <button type="button" class="color-swatch-btn tap" style="background:#172051;" onclick="setCustomAccent('#172051', this)" data-tip="سرمه‌ای مهوا"></button>
+        <button type="button" class="color-swatch-btn tap" style="background:#d4a017;" onclick="setCustomAccent('#d4a017', this)" data-tip="طلای ۲۴ عیار"></button>
+        <button type="button" class="color-swatch-btn tap" style="background:#059669;" onclick="setCustomAccent('#059669', this)" data-tip="سبز زمرد"></button>
+        <button type="button" class="color-swatch-btn tap" style="background:#2563eb;" onclick="setCustomAccent('#2563eb', this)" data-tip="آبی یاقوت"></button>
+        <button type="button" class="color-swatch-btn tap" style="background:#7c3aed;" onclick="setCustomAccent('#7c3aed', this)" data-tip="ارغوانی"></button>
+        <button type="button" class="color-swatch-btn tap" style="background:#e11d48;" onclick="setCustomAccent('#e11d48', this)" data-tip="یاقوت سرخ"></button>
+        
+        <label class="custom-color-picker-wrap tap" data-tip="انتخاب هر رنگ دلخواه از گردونه">
+          <input type="color" id="custom-color-wheel" class="custom-color-input" onchange="setCustomAccent(this.value)" value="#d4a017">
+          <span style="font-size:0.75rem; font-weight:700; color:var(--tx);">انتخاب رنگ دلخواه</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Acoustic Sound Variants -->
+    <div class="sg">
+      <div class="sgt"><i class="ph-fill ph-speaker-high"></i> تنوع صدای لمس کلیدها (آکوستیک)</div>
       <div class="fx-chips" id="sound-chips">
-        <button class="fx-chip on tap" onclick="setSoundPreset('taptic', this)">تپ لمسی (مشابه اپل)</button>
-        <button class="fx-chip tap" onclick="setSoundPreset('velvet', this)">مخمل ملایم</button>
-        <button class="fx-chip tap" onclick="setSoundPreset('mute', this)">بی‌صدا</button>
+        <button class="fx-chip on tap" onclick="setSoundPreset('taptic', this)" data-tip="کلیک بسیار آرام و خفیف اپل"><i class="ph-fill ph-apple-logo"></i> تپ لمسی اپل</button>
+        <button class="fx-chip tap" onclick="setSoundPreset('velvet', this)" data-tip="پالس بم، مخملی و آرام"><i class="ph-fill ph-waves"></i> مخمل ملایم</button>
+        <button class="fx-chip tap" onclick="setSoundPreset('mechanical', this)" data-tip="کلیک دقیق سوئیچ مکانیکی"><i class="ph-fill ph-keyboard"></i> سوئیچ مکانیکی</button>
+        <button class="fx-chip tap" onclick="setSoundPreset('bubble', this)" data-tip="صدای قطره آب و حباب صوتی"><i class="ph-fill ph-drop"></i> حباب صوتی</button>
+        <button class="fx-chip tap" onclick="setSoundPreset('digital', this)" data-tip="بیپ ملایم و دقیق پوز فروشگاهی"><i class="ph-fill ph-cpu"></i> دیجیتال کوارتز</button>
+        <button class="fx-chip tap" onclick="setSoundPreset('mute', this)" data-tip="بدون صدا"><i class="ph-fill ph-speaker-simple-slash"></i> بی‌صدا</button>
       </div>
     </div>
 
@@ -2826,8 +3060,8 @@ background: var(--bg);}
     <div class="sg">
       <div class="sgt"><i class="ph-fill ph-vibrate"></i> لرزش فیدبک لمسی (Haptic)</div>
       <div class="fx-chips" id="haptic-chips">
-        <button class="fx-chip on tap" onclick="setHapticLevel('on', this)">فعال (ویبره ضربه‌ای)</button>
-        <button class="fx-chip tap" onclick="setHapticLevel('off', this)">غیرفعال</button>
+        <button class="fx-chip on tap" onclick="setHapticLevel('on', this)"><i class="ph-fill ph-check"></i> فعال (ویبره ضربه‌ای)</button>
+        <button class="fx-chip tap" onclick="setHapticLevel('off', this)"><i class="ph-fill ph-x"></i> غیرفعال</button>
       </div>
     </div>
 
@@ -2836,7 +3070,8 @@ background: var(--bg);}
       <div class="sgt"><i class="ph-fill ph-text-aa"></i> قلم و تایپوگرافی</div>
       <div class="fx-chips" id="font-family-chips">
         <button class="fx-chip on tap" onclick="setFontFamily('Peyda', this)">پیدا (Peyda - مدرن)</button>
-        <button class="fx-chip tap" onclick="setFontFamily('Vazirmatn', this)">وزیرمتن (Vazirmatn)</button>
+        <button class="fx-chip tap" onclick="setFontFamily('Vazirmatn', this)">وزیرمتن (استاندارد)</button>
+        <button class="fx-chip tap" onclick="setFontFamily('Vazir', this)">وزیر کلاسیک</button>
       </div>
     </div>
   </main>
@@ -3209,7 +3444,7 @@ function playKeySound(type = null) {
     const now = audioCtx.currentTime;
     
     if (activeType === 'taptic') {
-      // Very gentle Apple-like subtle micro tap
+      // Gentle Apple-like subtle micro tap (Sine 75Hz -> 35Hz, 12ms)
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       osc.type = 'sine';
@@ -3222,7 +3457,7 @@ function playKeySound(type = null) {
       osc.start(now);
       osc.stop(now + 0.012);
     } else if (activeType === 'velvet') {
-      // Gentle warm velvet tap
+      // Gentle warm velvet tap (Sine 180Hz -> 70Hz, 18ms)
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       osc.type = 'sine';
@@ -3234,6 +3469,45 @@ function playKeySound(type = null) {
       gain.connect(audioCtx.destination);
       osc.start(now);
       osc.stop(now + 0.018);
+    } else if (activeType === 'mechanical') {
+      // Crisp tactile mechanical switch click (dual pulse at 420Hz & 180Hz, 14ms)
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(420, now);
+      osc.frequency.exponentialRampToValueAtTime(180, now + 0.014);
+      gain.gain.setValueAtTime(0.03, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.014);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.014);
+    } else if (activeType === 'bubble') {
+      // Acoustic water drop / bubble pop (Sine chirp 320Hz -> 680Hz, 15ms)
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(320, now);
+      osc.frequency.exponentialRampToValueAtTime(680, now + 0.015);
+      gain.gain.setValueAtTime(0.03, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.015);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.015);
+    } else if (activeType === 'digital') {
+      // High-precision quartz POS chime (Sine 1100Hz, 10ms)
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1100, now);
+      osc.frequency.exponentialRampToValueAtTime(950, now + 0.01);
+      gain.gain.setValueAtTime(0.02, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.01);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.01);
     }
   } catch (e) {}
 }
@@ -3258,6 +3532,11 @@ function tactileFeedback() {
 window.setSkinTheme = (skinId, cardEl) => {
   S.skin = skinId;
   document.documentElement.setAttribute('data-skin', skinId);
+  if (S.customAccent) {
+    document.documentElement.style.removeProperty('--primary');
+    document.documentElement.style.removeProperty('--warn');
+    S.customAccent = null;
+  }
   document.querySelectorAll('.skin-card').forEach(c => {
     const isThis = (c.id === 'skin-' + skinId || c === cardEl);
     c.classList.toggle('on', isThis);
@@ -3267,6 +3546,19 @@ window.setSkinTheme = (skinId, cardEl) => {
   save();
   tactileFeedback();
   toast('پوسته اعمال شد ✓');
+};
+
+window.setCustomAccent = (hex, btn) => {
+  S.customAccent = hex;
+  document.documentElement.style.setProperty('--primary', hex);
+  document.documentElement.style.setProperty('--warn', hex);
+  document.querySelectorAll('.color-swatch-btn').forEach(b => b.classList.remove('on'));
+  if (btn) btn.classList.add('on');
+  const wheel = document.getElementById('custom-color-wheel');
+  if (wheel) wheel.value = hex;
+  save();
+  tactileFeedback();
+  toast('رنگ تأکیدی اعمال شد');
 };
 
 window.setSoundPreset = (preset, btn) => {
@@ -3908,14 +4200,26 @@ function applySettings(){
       if (chk) chk.style.display = isThis ? 'inline-block' : 'none';
     });
   }
+  if(S.customAccent){
+    document.documentElement.style.setProperty('--primary', S.customAccent);
+    document.documentElement.style.setProperty('--warn', S.customAccent);
+    const wheel = document.getElementById('custom-color-wheel');
+    if(wheel) wheel.value = S.customAccent;
+    document.querySelectorAll('.color-swatch-btn').forEach(b => {
+      const bg = b.style.backgroundColor || '';
+      b.classList.toggle('on', bg.includes(S.customAccent));
+    });
+  }
   if(S.soundPreset){
     document.querySelectorAll('#sound-chips .fx-chip').forEach(b => {
-      b.classList.toggle('on', b.textContent.includes(S.soundPreset === 'taptic' ? 'تپ لمسی' : S.soundPreset === 'velvet' ? 'مخمل' : 'بی‌صدا'));
+      const fn = b.getAttribute('onclick') || '';
+      b.classList.toggle('on', fn.includes(`'${S.soundPreset}'`));
     });
   }
   if(S.hapticLevel){
     document.querySelectorAll('#haptic-chips .fx-chip').forEach(b => {
-      b.classList.toggle('on', b.textContent.includes(S.hapticLevel === 'on' ? 'فعال' : 'غیرفعال'));
+      const fn = b.getAttribute('onclick') || '';
+      b.classList.toggle('on', fn.includes(`'${S.hapticLevel}'`));
     });
   }
   if(S.dark){
@@ -4774,88 +5078,361 @@ window.applyDP=()=>{
 /* ============================================================
    STATS
    ============================================================ */
+/* ============================================================
+   STATS & ANALYTICS ENGINE — Multi-Dimensional & Hourly Comparison
+   ============================================================ */
+let statsMetric = 'sales'; // 'sales' | 'breakdown' | 'payments' | 'weight'
+let quickStatsFilter = 'all';
+
+window.setStatsMetric = (m, el) => {
+  statsMetric = m;
+  document.querySelectorAll('#metric-filters .cfbb').forEach(b => b.classList.remove('on'));
+  if (el) el.classList.add('on');
+  tactileFeedback();
+  renderCharts();
+};
+
+window.setQuickStatsFilter = (filter, el) => {
+  quickStatsFilter = filter;
+  document.querySelectorAll('#sdate-filters .cfbb').forEach(b => b.classList.remove('on'));
+  if (el) el.classList.add('on');
+
+  const today = todayS();
+  if (filter === 'today') {
+    dRange = { from: today, to: today };
+    document.getElementById('rlbl').textContent = 'امروز (' + e2p(fmtS(today)) + ')';
+  } else if (filter === 'week') {
+    const d = new Date();
+    d.setDate(d.getDate() - 6);
+    const pastS = d2s(d);
+    dRange = { from: pastS, to: today };
+    document.getElementById('rlbl').textContent = `${e2p(fmtS(pastS))} - ${e2p(fmtS(today))}`;
+  } else if (filter === 'month') {
+    const pastS = [today[0], today[1], 1];
+    dRange = { from: pastS, to: today };
+    document.getElementById('rlbl').textContent = `${e2p(fmtS(pastS))} - ${e2p(fmtS(today))}`;
+  } else {
+    dRange = { from: null, to: null };
+    document.getElementById('rlbl').textContent = 'همه';
+  }
+  tactileFeedback();
+  renderStats();
+  renderCharts();
+};
+
 function getFiltered(){
-  let sl=S.history.filter(i=>i.type==='sale');
-  if(dRange.from&&dRange.to){
-    const f=s2d(dRange.from),t=s2d(dRange.to);t.setHours(23,59,59);
-    sl=sl.filter(i=>{
-      if(!i.iso)return true;
-      const p=i.iso.split('-');
-      const d=new Date(+p[0],+p[1]-1,+p[2]);
-      return d>=f&&d<=t;
+  let sl = S.history.filter(i => i.type === 'sale');
+  if(dRange.from && dRange.to){
+    const f = s2d(dRange.from), t = s2d(dRange.to);
+    t.setHours(23,59,59,999);
+    f.setHours(0,0,0,0);
+    sl = sl.filter(i => {
+      if(!i.iso) return true;
+      const p = i.iso.split('-');
+      const d = new Date(+p[0], +p[1]-1, +p[2]);
+      return d >= f && d <= t;
     });
   }
   return sl;
 }
 
 function renderStats(){
-  const sl=getFiltered();
-  let tot=0,mx=0;
-  sl.forEach(s=>{tot+=s.calc.K;if(s.calc.K>mx)mx=s.calc.K;});
-  const av=sl.length?tot/sl.length:0;
-  document.getElementById('s-total').innerHTML=`${fmt(Math.round(tot))} <span>تومان</span>`;
-  document.getElementById('s-cnt').textContent=e2p(sl.length);
-  document.getElementById('s-avg').textContent=fmt(Math.round(av));
-  document.getElementById('s-max').textContent=fmt(Math.round(mx));
+  const sl = getFiltered();
+  let tot = 0, mx = 0, totW = 0;
+  sl.forEach(s => {
+    const k = (s.calc && s.calc.K) || 0;
+    const b = (s.calc && s.calc.B) || 0;
+    tot += k;
+    totW += b;
+    if(k > mx) mx = k;
+  });
+  const av = sl.length ? tot / sl.length : 0;
+  document.getElementById('s-total').innerHTML = `${fmt(Math.round(tot))} <span>تومان</span>`;
+  document.getElementById('s-cnt').textContent = e2p(sl.length);
+  document.getElementById('s-weight').textContent = e2p(totW.toFixed(2)) + ' گرم';
+  document.getElementById('s-avg').textContent = fmt(Math.round(av));
+  document.getElementById('s-max').textContent = fmt(Math.round(mx));
 }
 
-window.setCT=(t,el)=>{
-  cType=t;
-  document.querySelectorAll('.cfbb').forEach(b=>b.classList.remove('on'));
-  el.classList.add('on');
+window.setCT = (t, el) => {
+  cType = t;
+  document.querySelectorAll('#cfilters .cfbb').forEach(b => b.classList.remove('on'));
+  if (el) el.classList.add('on');
+  tactileFeedback();
   renderCharts();
 };
 
 function renderCharts(){
-  const sl=getFiltered();
-  const sMap={},wMap={};
-  [...sl].reverse().forEach(s=>{
-    const d=s.date||'?';
-    sMap[d]=(sMap[d]||0)+s.calc.K;
-    wMap[d]=(wMap[d]||0)+s.calc.B;
-  });
-  const lbl=Object.keys(sMap);
-  const sD=lbl.map(d=>sMap[d]);
-  const wD=lbl.map(d=>wMap[d]);
+  const sl = getFiltered();
+  const fontFam = `'${S.fontFamily||'Peyda'}', 'Vazirmatn', sans-serif`;
+  Chart.defaults.font.family = fontFam;
+  Chart.defaults.color = S.dark ? '#94a3b8' : '#64748b';
 
-  const fontFam=`'${S.fontFamily||'Vazirmatn'}', 'Vazirmatn', sans-serif`;
-  Chart.defaults.font.family=fontFam;
-  const isDark=S.dark;
-  const pC=isDark?'#4c6ef5':'#172051';
+  const isDark = S.dark || S.skin === 'obsidian-dark';
+  const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#172051';
+  const warnColor = getComputedStyle(document.documentElement).getPropertyValue('--warn').trim() || '#d4a017';
 
-  const ctx1=document.getElementById('ch1').getContext('2d');
-  if(ch1)ch1.destroy();
+  // Intraday detection
+  const uniqueDates = [...new Set(sl.map(s => s.date))];
+  const isIntraday = (uniqueDates.length <= 1 && sl.length > 1) || quickStatsFilter === 'today';
 
-  if(cType==='doughnut'){
-    ch1=new Chart(ctx1,{type:'doughnut',data:{
-      labels:lbl.map(l=>l.length>5?l.substring(5):l),
-      datasets:[{data:sD,backgroundColor:sD.map((_,i)=>`hsl(${(i*42+210)%360},58%,55%)`),borderWidth:2,borderColor:isDark?'#1a2540':'#fff'}]
-    },options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:8}}}}});
-  }else{
-    ch1=new Chart(ctx1,{type:cType,data:{
-      labels:lbl.map(l=>l.length>5?l.substring(5):l),
-      datasets:[{data:sD,
-        backgroundColor:cType==='bar'?pC:'rgba(23,32,81,.1)',
-        borderColor:pC,
-        borderWidth:cType==='line'?2.5:0,
-        borderRadius:cType==='bar'?6:0,
-        barPercentage:.52,tension:.42,fill:cType==='line',
-        pointRadius:cType==='line'?4:0,pointBackgroundColor:pC}]
-    },options:{responsive:true,plugins:{legend:{display:false}},scales:{
-      y:{ticks:{callback:v=>fmt(v),font:{size:9}},grid:{color:'rgba(0,0,0,.035)'}},
-      x:{ticks:{font:{size:9}},grid:{display:false}}
-    }}});
+  const ch1El = document.getElementById('ch1');
+  const ch2El = document.getElementById('ch2');
+  if(!ch1El || !ch2El) return;
+
+  const ctx1 = ch1El.getContext('2d');
+  if(ch1) ch1.destroy();
+
+  const ctx2 = ch2El.getContext('2d');
+  if(ch2) ch2.destroy();
+
+  if(!sl.length){
+    // Clean empty state
+    ch1 = new Chart(ctx1, {
+      type: 'doughnut',
+      data: { labels: ['هیچ معامله‌ای در این بازه ثبت نشده'], datasets: [{ data: [1], backgroundColor: ['rgba(100,116,139,0.15)'], borderWidth: 0 }] },
+      options: { responsive: true, plugins: { legend: { position: 'bottom' }, tooltip: { enabled: false } }, cutout: '80%' }
+    });
+    return;
   }
 
-  const ctx2=document.getElementById('ch2').getContext('2d');
-  if(ch2)ch2.destroy();
-  ch2=new Chart(ctx2,{type:'line',data:{
-    labels:lbl.map(l=>l.length>5?l.substring(5):l),
-    datasets:[{data:wD,borderColor:'#10b981',backgroundColor:'rgba(16,185,129,.1)',borderWidth:2.5,tension:.42,fill:true,pointRadius:4,pointBackgroundColor:'#10b981'}]
-  },options:{responsive:true,plugins:{legend:{display:false}},scales:{
-    y:{ticks:{callback:v=>e2p(v.toFixed(1)),font:{size:9}},grid:{color:'rgba(0,0,0,.035)'}},
-    x:{ticks:{font:{size:9}},grid:{display:false}}
-  }}});
+  // Create smooth vertical gradient
+  const createGradient = (ctx, c1, c2) => {
+    const g = ctx.createLinearGradient(0, 0, 0, 240);
+    g.addColorStop(0, c1);
+    g.addColorStop(1, c2);
+    return g;
+  };
+
+  if (statsMetric === 'sales') {
+    document.getElementById('chart-main-title').textContent = isIntraday ? 'روند معاملات در طول روز (تک‌تک ساعات)' : 'روند فروش روزانه';
+    
+    let labels = [], data = [];
+    if(isIntraday){
+      const sorted = [...sl].sort((a,b) => (a.time || '').localeCompare(b.time || ''));
+      labels = sorted.map(s => s.time || 'نامشخص');
+      data = sorted.map(s => s.calc.K);
+    } else {
+      const sMap = {};
+      [...sl].reverse().forEach(s => {
+        const d = s.date || '?';
+        sMap[d] = (sMap[d] || 0) + s.calc.K;
+      });
+      labels = Object.keys(sMap).map(l => l.length > 5 ? l.substring(5) : l);
+      data = Object.values(sMap);
+    }
+
+    const bgGrad = createGradient(ctx1, 'rgba(212,160,23,0.85)', 'rgba(212,160,23,0.15)');
+
+    if (cType === 'doughnut') {
+      ch1 = new Chart(ctx1, {
+        type: 'doughnut',
+        data: {
+          labels,
+          datasets: [{
+            data,
+            backgroundColor: data.map((_, i) => `hsl(${(i * 45 + 38) % 360}, 75%, 52%)`),
+            borderRadius: 8,
+            borderWidth: 2,
+            borderColor: isDark ? '#141417' : '#ffffff'
+          }]
+        },
+        options: {
+          responsive: true,
+          cutout: '72%',
+          animation: { duration: 650, easing: 'easeOutQuart' },
+          plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } }
+        }
+      });
+    } else if (cType === 'line') {
+      ch1 = new Chart(ctx1, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label: 'مبلغ فروش (تومان)',
+            data,
+            borderColor: warnColor,
+            backgroundColor: createGradient(ctx1, 'rgba(212,160,23,0.3)', 'rgba(212,160,23,0.01)'),
+            borderWidth: 3,
+            tension: 0.45,
+            fill: true,
+            pointRadius: 4,
+            pointBackgroundColor: warnColor,
+            pointHoverRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          animation: { duration: 650, easing: 'easeOutQuart' },
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { ticks: { callback: v => fmt(v), font: { size: 9 } }, grid: { color: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)' } },
+            x: { ticks: { font: { size: 9 } }, grid: { display: false } }
+          }
+        }
+      });
+    } else {
+      // Soft Pill Rounded Bar Chart
+      ch1 = new Chart(ctx1, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'مبلغ فروش (تومان)',
+            data,
+            backgroundColor: bgGrad,
+            borderRadius: 14,
+            borderSkipped: false,
+            barThickness: 22
+          }]
+        },
+        options: {
+          responsive: true,
+          animation: { duration: 650, easing: 'easeOutQuart' },
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { ticks: { callback: v => fmt(v), font: { size: 9 } }, grid: { color: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)' } },
+            x: { ticks: { font: { size: 9 } }, grid: { display: false } }
+          }
+        }
+      });
+    }
+
+  } else if (statsMetric === 'breakdown') {
+    document.getElementById('chart-main-title').textContent = 'تفکیک اجزای درآمد و قیمت';
+    let totRaw = 0, totWage = 0, totProfit = 0, totTax = 0;
+    sl.forEach(s => {
+      totRaw += (s.calc.C || (s.calc.A * s.calc.B));
+      totWage += (s.calc.E || 0);
+      totProfit += (s.calc.G || 0);
+      totTax += (s.calc.I || 0);
+    });
+
+    const labels = ['طلای خام', 'اجرت ساخت', 'سود فروشگاه', 'مالیات'];
+    const data = [Math.round(totRaw), Math.round(totWage), Math.round(totProfit), Math.round(totTax)];
+    const colors = ['#d4a017', '#3b82f6', '#10b981', '#f43f5e'];
+
+    ch1 = new Chart(ctx1, {
+      type: cType === 'line' ? 'bar' : cType,
+      data: {
+        labels,
+        datasets: [{
+          data,
+          backgroundColor: colors,
+          borderRadius: 14,
+          borderSkipped: false,
+          barThickness: 26
+        }]
+      },
+      options: {
+        responsive: true,
+        cutout: '70%',
+        animation: { duration: 650, easing: 'easeOutQuart' },
+        plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } },
+        scales: cType !== 'doughnut' ? {
+          y: { ticks: { callback: v => fmt(v), font: { size: 9 } }, grid: { color: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)' } },
+          x: { ticks: { font: { size: 9 } }, grid: { display: false } }
+        } : {}
+      }
+    });
+
+  } else if (statsMetric === 'payments') {
+    document.getElementById('chart-main-title').textContent = 'سهم روش‌های پرداخت';
+    const pMap = { 'کارتخوان': 0, 'نقدی': 0, 'کارت‌به‌کارت': 0, 'چک': 0 };
+    sl.forEach(s => {
+      const pm = (s.customer && s.customer.paymentMethod) || 'کارتخوان';
+      pMap[pm] = (pMap[pm] || 0) + s.calc.K;
+    });
+
+    const labels = Object.keys(pMap).filter(k => pMap[k] > 0);
+    const data = labels.map(k => pMap[k]);
+    const colors = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'];
+
+    ch1 = new Chart(ctx1, {
+      type: 'doughnut',
+      data: {
+        labels,
+        datasets: [{
+          data: data.length ? data : [1],
+          backgroundColor: data.length ? colors : ['#94a3b8'],
+          borderRadius: 8,
+          borderWidth: 2,
+          borderColor: isDark ? '#141417' : '#ffffff'
+        }]
+      },
+      options: {
+        responsive: true,
+        cutout: '72%',
+        animation: { duration: 650, easing: 'easeOutQuart' },
+        plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } }
+      }
+    });
+
+  } else if (statsMetric === 'weight') {
+    document.getElementById('chart-main-title').textContent = 'حجم و وزن طلای معامله‌شده (گرم)';
+    const wMap = {};
+    [...sl].reverse().forEach(s => {
+      const d = isIntraday ? (s.time || 'نامشخص') : (s.date || '?');
+      wMap[d] = (wMap[d] || 0) + s.calc.B;
+    });
+    const labels = Object.keys(wMap).map(l => l.length > 5 ? l.substring(5) : l);
+    const data = Object.values(wMap);
+
+    ch1 = new Chart(ctx1, {
+      type: cType === 'doughnut' ? 'doughnut' : 'bar',
+      data: {
+        labels,
+        datasets: [{
+          label: 'وزن (گرم)',
+          data,
+          backgroundColor: createGradient(ctx1, '#10b981', 'rgba(16,185,129,0.2)'),
+          borderRadius: 14,
+          borderSkipped: false,
+          barThickness: 22
+        }]
+      },
+      options: {
+        responsive: true,
+        animation: { duration: 650, easing: 'easeOutQuart' },
+        plugins: { legend: { display: false } },
+        scales: cType !== 'doughnut' ? {
+          y: { ticks: { callback: v => e2p(v.toFixed(1)) + ' g', font: { size: 9 } }, grid: { color: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)' } },
+          x: { ticks: { font: { size: 9 } }, grid: { display: false } }
+        } : {}
+      }
+    });
+  }
+
+  // Render Secondary Chart (Weight & Volume distribution)
+  const secLabels = sl.slice(-10).map(s => s.time || (s.date ? s.date.substring(5) : ''));
+  const secData = sl.slice(-10).map(s => s.calc.B);
+  ch2 = new Chart(ctx2, {
+    type: 'line',
+    data: {
+      labels: secLabels,
+      datasets: [{
+        label: 'وزن گرمی آخرین معاملات',
+        data: secData,
+        borderColor: '#10b981',
+        backgroundColor: createGradient(ctx2, 'rgba(16,185,129,0.25)', 'rgba(16,185,129,0.02)'),
+        borderWidth: 2.5,
+        tension: 0.45,
+        fill: true,
+        pointRadius: 4,
+        pointBackgroundColor: '#10b981'
+      }]
+    },
+    options: {
+      responsive: true,
+      animation: { duration: 650, easing: 'easeOutQuart' },
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { ticks: { callback: v => e2p(v.toFixed(1)), font: { size: 9 } }, grid: { color: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)' } },
+        x: { ticks: { font: { size: 9 } }, grid: { display: false } }
+      }
+    }
+  });
 }
 
 /* ============================================================
