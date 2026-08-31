@@ -1327,15 +1327,62 @@ background: var(--bg);}
     grid-template-columns: 1fr 1fr;
     gap: 16px;
   }
-  /* Desktop History List (2-column cards) */
+  /* Desktop History List - Horizontal Rows (Single Column) */
   .h-list {
-    display: grid !important;
-    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-    gap: 14px;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    width: 100%;
+  }
+  /* Desktop Quick Action Buttons on History Items */
+  .h-desktop-actions {
+    display: flex !important;
+    gap: 6px;
+    align-items: center;
+  }
+  .h-desk-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--bd);
+    background: var(--bg);
+    font-size: 0.76rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s var(--bounce);
+    font-family: inherit;
+    user-select: none;
+  }
+  .h-desk-btn.edit {
+    color: #d97706;
+    background: rgba(245,158,11,0.08);
+    border-color: rgba(245,158,11,0.25);
+  }
+  .h-desk-btn.edit:hover {
+    background: rgba(245,158,11,0.18);
+    transform: translateY(-1px);
+  }
+  .h-desk-btn.del {
+    color: #ef4444;
+    background: rgba(239,68,68,0.08);
+    border-color: rgba(239,68,68,0.25);
+  }
+  .h-desk-btn.del:hover {
+    background: rgba(239,68,68,0.18);
+    transform: translateY(-1px);
+  }
+  /* Disable swipe back layers on desktop to rely on clean buttons */
+  .sw-bg {
+    display: none !important;
   }
 }
 @media (max-width: 767px) {
   .desktop-nav {
+    display: none !important;
+  }
+  .h-desktop-actions {
     display: none !important;
   }
   .calc-desktop-grid {
@@ -2130,8 +2177,16 @@ const saveH=(type,data)=>{
     cancelEdit();
     toast('تراکنش بروزرسانی شد ✓');
   }else{
-    if(type==='draft'&&S.history.length>0&&S.history[0].type==='draft'){
-      S.history[0]={id:S.history[0].id,type,time:gTime(),date:gDate(),iso:gISO(),calc:{...data},edits:[]};
+    if(type==='draft'){
+      if(S.history.length>0&&S.history[0].type==='draft'){
+        S.history[0]={id:S.history[0].id,type:'draft',time:gTime(),date:gDate(),iso:gISO(),calc:{...data},edits:[]};
+      }else{
+        S.history.unshift({id:Date.now(),type:'draft',time:gTime(),date:gDate(),iso:gISO(),calc:{...data},edits:[]});
+      }
+    }else if(type==='sale'){
+      // Remove any auto-drafts so the sale replaces them cleanly
+      S.history=S.history.filter(i=>i.type!=='draft');
+      S.history.unshift({id:Date.now(),type:'sale',time:gTime(),date:gDate(),iso:gISO(),calc:{...data},edits:[]});
     }else{
       S.history.unshift({id:Date.now(),type,time:gTime(),date:gDate(),iso:gISO(),calc:{...data},edits:[]});
     }
@@ -2141,6 +2196,7 @@ const saveH=(type,data)=>{
 };
 
 document.getElementById('btn-save').addEventListener('click',()=>{
+  clearTimeout(_dbT);
   if(!curCalc){toast('ابتدا مقادیر را وارد کنید');return;}
   if(!curCalc.B||curCalc.B<=0){toast('وزن را وارد کنید');return;}
   logPwa('فروش ثبت شد: ' + Math.round(curCalc.K).toLocaleString() + ' تومان');
@@ -2154,6 +2210,7 @@ document.getElementById('btn-save').addEventListener('click',()=>{
 });
 
 document.getElementById('btn-clr').addEventListener('click',()=>{
+  clearTimeout(_dbT);
   logPwa('فرم پاک‌سازی شد');
   clrForm(true);
 });
@@ -2278,23 +2335,30 @@ const renderH=()=>{
       <div class="sw-bg sw-edit" id="swe-${it.id}">
         <div class="sw-action-inner" id="swai-e-${it.id}">
           <i class="ph-fill ph-pencil-simple"></i>
-          
         </div>
       </div>
       <div class="sw-bg sw-del" id="swd-${it.id}">
         <div class="sw-action-inner" id="swai-d-${it.id}">
           <i class="ph-fill ph-trash"></i>
-          
         </div>
       </div>
       <div class="hc" data-id="${it.id}" id="hc-${it.id}">
         <div class="hh" id="hh-${it.id}">
           <div class="ht">
-            <span class="badge ${it.type}">${it.type==='sale'?'فروش':'محاسبه'}</span>
+            <span class="badge ${it.type}">${it.type==='sale'?'فروش':'پیش‌نویس'}</span>
             ${ed?'<span class="edited-dot"></span>':''}
             ${fmt(it.calc.K)} ت
           </div>
-          <div class="htime"><button class="h-rcpt-btn" onclick="showHistoryReceipt(${it.id}, event)"><i class="ph ph-receipt"></i><div class="rcpt-fill"></div></button><span>${it.time} <i class="ph ph-caret-down caret"></i></div></span>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <div class="h-desktop-actions">
+              <button class="h-desk-btn edit tap" onclick="startEdit(${it.id}); event.stopPropagation();" title="ویرایش"><i class="ph ph-pencil-simple"></i><span>ویرایش</span></button>
+              <button class="h-desk-btn del tap" onclick="confirmDel(${it.id}); event.stopPropagation();" title="حذف"><i class="ph ph-trash"></i><span>حذف</span></button>
+            </div>
+            <div class="htime">
+              <button class="h-rcpt-btn" onclick="showHistoryReceipt(${it.id}, event)"><i class="ph ph-receipt"></i><div class="rcpt-fill"></div></button>
+              <span>${it.time} <i class="ph ph-caret-down caret"></i></span>
+            </div>
+          </div>
         </div>
         <div class="hb-body">
           <div class="hd">
@@ -3044,8 +3108,8 @@ function buildAndShowReceipt(calc, date, time, title) {
   const costs = Math.round(e2(calc.E) + e2(calc.G) + e2(calc.I));
   
   p.innerHTML = `
-    <div style="font-size:1.6rem; font-weight:900; margin-bottom:2px; font-family:'Vazirmatn',sans-serif; letter-spacing:-0.5px;">گالری طلا مهوا</div>
-    <div style="font-size:0.85rem; color:#444; margin-bottom:18px; font-weight:bold;">${title}</div>
+    <div style="font-size:1.55rem; font-weight:900; margin-bottom:4px; font-family:'Vazirmatn',sans-serif; letter-spacing:0 !important; word-spacing:0; direction:rtl; text-align:center;">گالری طلا مهوا</div>
+    <div style="font-size:0.85rem; color:#444; margin-bottom:18px; font-weight:bold; text-align:center;">${title}</div>
     <div style="display:flex; justify-content:space-between; font-size:0.75rem; border-bottom:1.5px dashed #aaa; padding-bottom:6px; margin-bottom:12px;">
       <span>تاریخ: ${e2p(date)}</span>
       <span>زمان: ${e2p(time)}</span>
@@ -3090,7 +3154,7 @@ function buildAndShowReceipt(calc, date, time, title) {
       از حسـن انتخـاب شمـا سپـاسگزاريـم
     </div>
     <div style="height:35px; width:90%; margin:20px auto 0; background: repeating-linear-gradient(90deg, #111, #111 2.5px, transparent 2.5px, transparent 5px, #111 5px, #111 6.5px, transparent 6.5px, transparent 10px); opacity:0.85;"></div>
-    <div style="font-size:0.6rem; color:#888; margin-top:8px;">SYS. MAHVA / ${e2p(Math.floor(Math.random()*90000)+10000)}</div>
+    <div style="font-size:0.6rem; color:#888; margin-top:8px; text-align:center;">SYS. MAHVA / ${e2p(Math.floor(Math.random()*90000)+10000)}</div>
   `;
   openModal('m-receipt');
 }
@@ -3102,7 +3166,16 @@ window.dlReceiptPdf = async () => {
   btn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> در حال ساخت...';
   
   try {
-    const canvas = await html2canvas(el, { scale: 3, useCORS: true, backgroundColor: '#fffdf8' });
+    if (document.fonts && document.fonts.ready) {
+      await document.fonts.ready;
+    }
+    const canvas = await html2canvas(el, {
+      scale: 3,
+      useCORS: true,
+      backgroundColor: '#fffdf8',
+      letterRendering: false,
+      logging: false
+    });
     const imgData = canvas.toDataURL('image/jpeg', 1.0);
     const pdf = new window.jspdf.jsPDF({
       orientation: 'portrait',
