@@ -54,6 +54,15 @@ class AppRepository(context: Context) {
     private val _snapshots = MutableStateFlow<List<BackupSnapshot>>(emptyList())
     val snapshots: StateFlow<List<BackupSnapshot>> = _snapshots.asStateFlow()
 
+    private val _isPasscodeEnabled = MutableStateFlow(false)
+    val isPasscodeEnabled: StateFlow<Boolean> = _isPasscodeEnabled.asStateFlow()
+
+    private val _passcodePin = MutableStateFlow("")
+    val passcodePin: StateFlow<String> = _passcodePin.asStateFlow()
+
+    private val _isAppUnlocked = MutableStateFlow(true)
+    val isAppUnlocked: StateFlow<Boolean> = _isAppUnlocked.asStateFlow()
+
     init {
         loadDataFromStorage()
     }
@@ -93,6 +102,13 @@ class AppRepository(context: Context) {
             _isBoldText.value = prefs.getBoolean("bold_text", false)
             _fontScaleDelta.value = prefs.getInt("font_scale_delta", 0)
 
+            // Load Passcode
+            val isPinOn = prefs.getBoolean("passcode_enabled", false)
+            val pin = prefs.getString("passcode_pin", "") ?: ""
+            _isPasscodeEnabled.value = isPinOn && pin.isNotEmpty()
+            _passcodePin.value = pin
+            _isAppUnlocked.value = !isPinOn || pin.isEmpty()
+
             // Load snapshots
             val snapJson = prefs.getString("snapshots_v1", null)
             if (!snapJson.isNullOrEmpty()) {
@@ -103,7 +119,7 @@ class AppRepository(context: Context) {
                 createInitialSnapshot()
             }
 
-            AppLogger.info("REPO", "Loaded ${_history.value.size} transactions and user settings from storage")
+            AppLogger.info("REPO", "Loaded ${_history.value.size} transactions, passcode & snapshots from storage")
         } catch (e: Exception) {
             AppLogger.error("REPO", "Error loading storage: ${e.message}")
         }
@@ -127,6 +143,38 @@ class AppRepository(context: Context) {
         }
     }
 
+    fun setPasscode(pin: String) {
+        _passcodePin.value = pin
+        _isPasscodeEnabled.value = true
+        _isAppUnlocked.value = true
+        prefs.edit()
+            .putString("passcode_pin", pin)
+            .putBoolean("passcode_enabled", true)
+            .apply()
+        AppLogger.info("AUTH", "Passcode enabled")
+    }
+
+    fun disablePasscode() {
+        _isPasscodeEnabled.value = false
+        _passcodePin.value = ""
+        _isAppUnlocked.value = true
+        prefs.edit()
+            .remove("passcode_pin")
+            .putBoolean("passcode_enabled", false)
+            .apply()
+        AppLogger.info("AUTH", "Passcode disabled")
+    }
+
+    fun unlockApp() {
+        _isAppUnlocked.value = true
+    }
+
+    fun lockApp() {
+        if (_isPasscodeEnabled.value) {
+            _isAppUnlocked.value = false
+        }
+    }
+
     fun createInitialSnapshot() {
         val payload = exportBackupJson()
         val snap = BackupSnapshot(
@@ -138,6 +186,23 @@ class AppRepository(context: Context) {
             jsonPayload = payload
         )
         _snapshots.value = listOf(snap)
+        persistSnapshots()
+    }
+
+    fun autoUpdateCurrentSnapshot() {
+        val payload = exportBackupJson()
+        val currentSnap = _snapshots.value.firstOrNull { it.isCurrent }
+        if (currentSnap != null) {
+            val updatedSnap = currentSnap.copy(
+                date = PersianCalendarHelper.getTodayShamsi().formatPersian(),
+                time = PersianCalendarHelper.getCurrentTimeString(),
+                itemCount = _history.value.size,
+                jsonPayload = payload
+            )
+            _snapshots.value = _snapshots.value.map { if (it.id == currentSnap.id) updatedSnap else it }
+        } else {
+            createSnapshot()
+        }
         persistSnapshots()
     }
 
@@ -348,6 +413,9 @@ class AppRepository(context: Context) {
         _isBoldText.value = false
         _fontScaleDelta.value = 0
         _snapshots.value = emptyList()
+        _isPasscodeEnabled.value = false
+        _passcodePin.value = ""
+        _isAppUnlocked.value = true
         AppLogger.warn("REPO", "All local application data cleared")
     }
 

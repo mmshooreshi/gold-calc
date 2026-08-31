@@ -34,6 +34,8 @@ import androidx.compose.material.icons.filled.FileUpload
 import androidx.compose.material.icons.filled.FormatBold
 import androidx.compose.material.icons.filled.FormatSize
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Key
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Nightlight
 import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material.icons.filled.Save
@@ -50,6 +52,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -69,6 +72,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
 import com.mahvagallery.app.ui.components.DebugLogViewer
+import com.mahvagallery.app.ui.components.PasscodeSetupDialog
 import com.mahvagallery.app.ui.theme.AppTheme
 import com.mahvagallery.app.ui.theme.VazirmatnFontFamily
 import com.mahvagallery.app.ui.theme.scaledSp
@@ -86,6 +90,8 @@ fun SettingsScreen(
     val fontScaleDelta by viewModel.fontScaleDelta.collectAsState()
     val defaults by viewModel.defaults.collectAsState()
     val snapshots by viewModel.snapshots.collectAsState()
+    val isPasscodeOn by viewModel.isPasscodeEnabled.collectAsState()
+    val showPasscodeSetup by viewModel.showPasscodeSetupDialog.collectAsState()
     val logs by viewModel.logs.collectAsState()
     val colors = AppTheme.colors
 
@@ -98,6 +104,11 @@ fun SettingsScreen(
 
     var sliderValue by remember(fontScaleDelta) { mutableFloatStateOf(fontScaleDelta.toFloat()) }
 
+    // Auto-update current snapshot on screen load
+    LaunchedEffect(Unit) {
+        viewModel.repository.autoUpdateCurrentSnapshot()
+    }
+
     // Real JSON File Picker
     val jsonFilePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -105,17 +116,24 @@ fun SettingsScreen(
         uri?.let { viewModel.importBackupFromUri(context, it) }
     }
 
+    if (showPasscodeSetup) {
+        PasscodeSetupDialog(
+            onSetPasscode = viewModel::setPasscode,
+            onDismiss = viewModel::closePasscodeSetup
+        )
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(colors.background)
             .verticalScroll(scrollState)
-            .padding(horizontal = 16.dp, vertical = 10.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+            .padding(horizontal = 14.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         Text(
-            text = "تنظیمات و ظاهر برنامه",
-            fontSize = scaledSp(17f),
+            text = "تنظیمات و امنیت برنامه",
+            fontSize = scaledSp(16.5f),
             fontFamily = VazirmatnFontFamily,
             fontWeight = FontWeight.Bold,
             color = colors.primary,
@@ -125,19 +143,19 @@ fun SettingsScreen(
         // Live Real-Time Interactive Preview Card
         Surface(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(14.dp),
             color = colors.surface,
             border = androidx.compose.foundation.BorderStroke(1.5.dp, colors.primary.copy(alpha = 0.4f)),
             shadowElevation = 2.dp
         ) {
-            Column(modifier = Modifier.padding(14.dp)) {
+            Column(modifier = Modifier.padding(12.dp)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Filled.AutoAwesome, contentDescription = null, tint = colors.warning, modifier = Modifier.size(17.dp))
+                        Icon(Icons.Filled.AutoAwesome, contentDescription = null, tint = colors.warning, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             text = "پیش‌نمایش زنده قلم و اندازه",
@@ -163,7 +181,7 @@ fun SettingsScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -172,21 +190,21 @@ fun SettingsScreen(
                 ) {
                     Text(
                         text = "نمونه قیمت طلا:",
-                        fontSize = scaledSp(13.5f),
+                        fontSize = scaledSp(13f),
                         fontFamily = VazirmatnFontFamily,
                         fontWeight = if (isBold) FontWeight.Bold else FontWeight.Medium,
                         color = colors.textPrimary
                     )
                     Text(
                         text = "${NumberFormatters.toPersianDigits("14,850,000")} تومان",
-                        fontSize = scaledSp(15f),
+                        fontSize = scaledSp(14.5f),
                         fontFamily = VazirmatnFontFamily,
                         fontWeight = FontWeight.Black,
                         color = colors.primary
                     )
                 }
 
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(4.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -195,14 +213,14 @@ fun SettingsScreen(
                 ) {
                     Text(
                         text = "وزن کل (گرم):",
-                        fontSize = scaledSp(12.5f),
+                        fontSize = scaledSp(12f),
                         fontFamily = VazirmatnFontFamily,
                         fontWeight = if (isBold) FontWeight.Bold else FontWeight.Normal,
                         color = colors.textMuted
                     )
                     Text(
                         text = "${NumberFormatters.toPersianDigits("3.420")} گرم",
-                        fontSize = scaledSp(13f),
+                        fontSize = scaledSp(12.5f),
                         fontFamily = VazirmatnFontFamily,
                         fontWeight = FontWeight.Bold,
                         color = colors.textPrimary
@@ -211,21 +229,78 @@ fun SettingsScreen(
             }
         }
 
-        // Group 1: Appearance & Typography
+        // Group 1: Security & Passcode
+        SettingsGroup(title = "امنیت و قفل برنامه (مشابه تلگرام)") {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        if (isPasscodeOn) viewModel.disablePasscode()
+                        else viewModel.openPasscodeSetup()
+                    }
+                    .padding(horizontal = 14.dp, vertical = 11.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Filled.Lock, contentDescription = null, tint = colors.primary, modifier = Modifier.size(20.dp))
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Column {
+                        Text(text = "رمز عبور ورود به برنامه", fontSize = scaledSp(13f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.SemiBold, color = colors.textPrimary)
+                        Text(text = if (isPasscodeOn) "فعال با رمز ۴ رقمی" else "غیرفعال", fontSize = scaledSp(11f), fontFamily = VazirmatnFontFamily, color = colors.textMuted)
+                    }
+                }
+
+                Switch(
+                    checked = isPasscodeOn,
+                    onCheckedChange = { checked ->
+                        if (checked) viewModel.openPasscodeSetup()
+                        else viewModel.disablePasscode()
+                    },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = Color.White,
+                        checkedTrackColor = colors.success,
+                        uncheckedThumbColor = colors.textMuted,
+                        uncheckedTrackColor = colors.inputBorder
+                    )
+                )
+            }
+
+            if (isPasscodeOn) {
+                HorizontalDivider(color = colors.divider)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { viewModel.openPasscodeSetup() }
+                        .padding(horizontal = 14.dp, vertical = 10.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Filled.Key, contentDescription = null, tint = colors.warning, modifier = Modifier.size(18.dp))
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(text = "تغییر رمز عبور", fontSize = scaledSp(12.5f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, color = colors.warning)
+                    }
+                    Text(text = "ویرایش ➔", fontSize = scaledSp(11.5f), fontFamily = VazirmatnFontFamily, color = colors.warning, fontWeight = FontWeight.Bold)
+                }
+            }
+        }
+
+        // Group 2: Appearance & Typography
         SettingsGroup(title = "ظاهر و قلم برنامه") {
             // Dark Mode Toggle
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { viewModel.toggleDarkMode() }
-                    .padding(horizontal = 14.dp, vertical = 12.dp),
+                    .padding(horizontal = 14.dp, vertical = 11.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Filled.Nightlight, contentDescription = null, tint = colors.textMuted, modifier = Modifier.size(20.dp))
+                    Icon(Icons.Filled.Nightlight, contentDescription = null, tint = colors.textMuted, modifier = Modifier.size(19.dp))
                     Spacer(modifier = Modifier.width(10.dp))
-                    Text(text = "حالت تاریک (Dark Mode)", fontSize = scaledSp(13.5f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.SemiBold, color = colors.textPrimary)
+                    Text(text = "حالت تاریک (Dark Mode)", fontSize = scaledSp(13f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.SemiBold, color = colors.textPrimary)
                 }
                 Switch(
                     checked = isDark,
@@ -246,14 +321,14 @@ fun SettingsScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { viewModel.toggleBoldText() }
-                    .padding(horizontal = 14.dp, vertical = 12.dp),
+                    .padding(horizontal = 14.dp, vertical = 11.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Filled.FormatBold, contentDescription = null, tint = colors.textMuted, modifier = Modifier.size(20.dp))
+                    Icon(Icons.Filled.FormatBold, contentDescription = null, tint = colors.textMuted, modifier = Modifier.size(19.dp))
                     Spacer(modifier = Modifier.width(10.dp))
-                    Text(text = "متن ضخیم (Bold)", fontSize = scaledSp(13.5f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.SemiBold, color = colors.textPrimary)
+                    Text(text = "متن ضخیم (Bold)", fontSize = scaledSp(13f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.SemiBold, color = colors.textPrimary)
                 }
                 Switch(
                     checked = isBold,
@@ -273,8 +348,8 @@ fun SettingsScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 14.dp, vertical = 12.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                    .padding(horizontal = 14.dp, vertical = 10.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -282,21 +357,20 @@ fun SettingsScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Filled.FormatSize, contentDescription = null, tint = colors.textMuted, modifier = Modifier.size(20.dp))
+                        Icon(Icons.Filled.FormatSize, contentDescription = null, tint = colors.textMuted, modifier = Modifier.size(19.dp))
                         Spacer(modifier = Modifier.width(10.dp))
-                        Text(text = "نوار اندازه قلم برنامه", fontSize = scaledSp(13.5f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.SemiBold, color = colors.textPrimary)
+                        Text(text = "نوار اندازه قلم برنامه", fontSize = scaledSp(13f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.SemiBold, color = colors.textPrimary)
                     }
 
                     Text(
                         text = "${NumberFormatters.toPersianDigits((14 + sliderValue.roundToInt()).toString())}px",
-                        fontSize = scaledSp(13.5f),
+                        fontSize = scaledSp(13f),
                         fontFamily = VazirmatnFontFamily,
                         fontWeight = FontWeight.Bold,
                         color = colors.primary
                     )
                 }
 
-                // Slider
                 Slider(
                     value = sliderValue,
                     onValueChange = { newVal ->
@@ -340,7 +414,7 @@ fun SettingsScreen(
                         ) {
                             Text(
                                 text = pLabel,
-                                fontSize = scaledSp(11f),
+                                fontSize = scaledSp(10.5f),
                                 fontFamily = VazirmatnFontFamily,
                                 fontWeight = if (fontScaleDelta == pVal) FontWeight.Bold else FontWeight.Normal,
                                 color = if (fontScaleDelta == pVal) colors.primary else colors.textMuted,
@@ -357,29 +431,29 @@ fun SettingsScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 14.dp, vertical = 12.dp),
+                    .padding(horizontal = 14.dp, vertical = 10.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Filled.TextFields, contentDescription = null, tint = colors.textMuted, modifier = Modifier.size(20.dp))
+                    Icon(Icons.Filled.TextFields, contentDescription = null, tint = colors.textMuted, modifier = Modifier.size(19.dp))
                     Spacer(modifier = Modifier.width(10.dp))
-                    Text(text = "قلم اصلی برنامه", fontSize = scaledSp(13.5f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.SemiBold, color = colors.textPrimary)
+                    Text(text = "قلم اصلی برنامه", fontSize = scaledSp(13f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.SemiBold, color = colors.textPrimary)
                 }
                 Box(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(14.dp))
+                        .clip(RoundedCornerShape(12.dp))
                         .background(colors.primary.copy(alpha = 0.12f))
-                        .padding(horizontal = 10.dp, vertical = 4.dp)
+                        .padding(horizontal = 10.dp, vertical = 3.dp)
                 ) {
-                    Text(text = "وزیرمتن (Vazirmatn)", fontSize = scaledSp(11.5f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, color = colors.primary)
+                    Text(text = "وزیرمتن (Vazirmatn)", fontSize = scaledSp(11f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, color = colors.primary)
                 }
             }
         }
 
-        // Group 2: Default Percentages
+        // Group 3: Default Percentages
         SettingsGroup(title = "مقادیر پیش‌فرض درصدها") {
-            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
                 DefaultPercentInputRow(label = "اجرت پیش‌فرض ٪", value = defD, onValueChange = { defD = it }, placeholder = "مثلاً ۷")
                 DefaultPercentInputRow(label = "سود پیش‌فرض ٪", value = defF, onValueChange = { defF = it }, placeholder = "مثلاً ۷")
                 DefaultPercentInputRow(label = "مالیات پیش‌فرض ٪", value = defH, onValueChange = { defH = it }, placeholder = "مثلاً ۹")
@@ -388,41 +462,41 @@ fun SettingsScreen(
                     onClick = { viewModel.saveDefaultPercentages(defD, defF, defH) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 6.dp)
-                        .height(44.dp),
-                    shape = RoundedCornerShape(12.dp),
+                        .padding(top = 4.dp)
+                        .height(42.dp),
+                    shape = RoundedCornerShape(10.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = colors.primary, contentColor = Color.White)
                 ) {
                     Icon(Icons.Filled.Save, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color.White)
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text(text = "ذخیره و اعمال مقادیر پیش‌فرض", fontSize = scaledSp(13f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, color = Color.White)
+                    Text(text = "ذخیره و اعمال مقادیر پیش‌فرض", fontSize = scaledSp(12.5f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, color = Color.White)
                 }
             }
         }
 
-        // Group 3: Snapshot Version History & Backup
+        // Group 4: Snapshot Version History & Backup
         SettingsGroup(title = "نسخه‌های ذخیره‌شده و پشتیبان‌گیری") {
-            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 // Actions row: Export JSON & Import JSON (Real file picker!)
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    OutlinedButton(
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Button(
                         onClick = { viewModel.exportBackupJson(context) },
-                        modifier = Modifier.weight(1f).height(42.dp),
+                        modifier = Modifier.weight(1f).height(40.dp),
                         shape = RoundedCornerShape(10.dp),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, colors.border)
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2A3675), contentColor = Color.White)
                     ) {
-                        Icon(Icons.Filled.FileDownload, contentDescription = null, modifier = Modifier.size(16.dp), tint = colors.primary)
+                        Icon(Icons.Filled.FileDownload, contentDescription = null, modifier = Modifier.size(15.dp), tint = Color.White)
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text(text = "دانلود JSON", fontSize = scaledSp(12f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, color = colors.primary)
+                        Text(text = "دانلود JSON", fontSize = scaledSp(11.5f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, color = Color.White)
                     }
 
                     Button(
                         onClick = { jsonFilePickerLauncher.launch("application/json") },
-                        modifier = Modifier.weight(1f).height(42.dp),
+                        modifier = Modifier.weight(1.1f).height(40.dp),
                         shape = RoundedCornerShape(10.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = colors.primary, contentColor = Color.White)
                     ) {
-                        Icon(Icons.Filled.FileUpload, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color.White)
+                        Icon(Icons.Filled.FileUpload, contentDescription = null, modifier = Modifier.size(15.dp), tint = Color.White)
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(text = "انتخاب و وارد کردن", fontSize = scaledSp(11.5f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, color = Color.White)
                     }
@@ -452,7 +526,7 @@ fun SettingsScreen(
                         Row(modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp), verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Filled.Add, contentDescription = null, modifier = Modifier.size(13.dp), tint = colors.primary)
                             Spacer(modifier = Modifier.width(2.dp))
-                            Text(text = "ثبت نسخه فعلی", fontSize = scaledSp(11f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, color = colors.primary)
+                            Text(text = "ثبت نسخه جدید", fontSize = scaledSp(11f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, color = colors.primary)
                         }
                     }
                 }
@@ -532,21 +606,21 @@ fun SettingsScreen(
                     }
                 }
 
-                // Clear All Data
+                // Clear All Data Button with crisp styling
                 Button(
                     onClick = viewModel::showClearAllDataConfirmation,
-                    modifier = Modifier.fillMaxWidth().padding(top = 4.dp).height(42.dp),
+                    modifier = Modifier.fillMaxWidth().padding(top = 4.dp).height(40.dp),
                     shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = colors.danger.copy(alpha = 0.12f), contentColor = colors.danger)
+                    colors = ButtonDefaults.buttonColors(containerColor = colors.danger, contentColor = Color.White)
                 ) {
-                    Icon(Icons.Filled.Delete, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Icon(Icons.Filled.Delete, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color.White)
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text(text = "پاک‌سازی تمام داده‌ها", fontSize = scaledSp(12.5f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold)
+                    Text(text = "پاک‌سازی تمام داده‌ها", fontSize = scaledSp(12.5f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, color = Color.White)
                 }
             }
         }
 
-        // Group 4: Live Debug Console
+        // Group 5: Live Debug Console
         SettingsGroup(title = "کنسول دیباگ زنده (Debug Logs)") {
             DebugLogViewer(
                 logs = logs,
@@ -559,7 +633,7 @@ fun SettingsScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 12.dp),
+                .padding(vertical = 10.dp),
             contentAlignment = Alignment.Center
         ) {
             Text(
@@ -581,7 +655,7 @@ private fun SettingsGroup(
     val colors = AppTheme.colors
     Column(
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(6.dp)
+        verticalArrangement = Arrangement.spacedBy(5.dp)
     ) {
         Text(
             text = title,
@@ -593,7 +667,7 @@ private fun SettingsGroup(
         )
         Surface(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(14.dp),
+            shape = RoundedCornerShape(12.dp),
             color = colors.surface,
             border = androidx.compose.foundation.BorderStroke(1.dp, colors.border),
             shadowElevation = 1.dp
@@ -622,8 +696,8 @@ private fun DefaultPercentInputRow(
 
         Box(
             modifier = Modifier
-                .width(100.dp)
-                .height(38.dp)
+                .width(96.dp)
+                .height(36.dp)
                 .clip(RoundedCornerShape(8.dp))
                 .background(colors.inputBgDisabled)
                 .border(1.dp, colors.inputBorder, RoundedCornerShape(8.dp))

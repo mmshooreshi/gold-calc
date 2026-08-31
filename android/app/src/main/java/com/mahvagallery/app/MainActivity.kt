@@ -30,6 +30,7 @@ import com.mahvagallery.app.ui.components.ReceiptDialog
 import com.mahvagallery.app.ui.components.TopHeaderBar
 import com.mahvagallery.app.ui.screens.CalculatorScreen
 import com.mahvagallery.app.ui.screens.HistoryScreen
+import com.mahvagallery.app.ui.screens.PasscodeScreen
 import com.mahvagallery.app.ui.screens.SettingsScreen
 import com.mahvagallery.app.ui.screens.StatsScreen
 import com.mahvagallery.app.ui.theme.AppTheme
@@ -48,6 +49,8 @@ class MainActivity : ComponentActivity() {
             val isDark by viewModel.isDarkMode.collectAsState()
             val isBold by viewModel.isBoldText.collectAsState()
             val fontScaleDelta by viewModel.fontScaleDelta.collectAsState()
+            val isAppUnlocked by viewModel.isAppUnlocked.collectAsState()
+            val passcodePin by viewModel.passcodePin.collectAsState()
             val toastMsg by viewModel.toastMessage.collectAsState()
             val context = LocalContext.current
 
@@ -64,10 +67,22 @@ class MainActivity : ComponentActivity() {
                 isBoldText = isBold
             ) {
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-                    MainAppScaffold(viewModel = viewModel)
+                    if (!isAppUnlocked) {
+                        PasscodeScreen(
+                            correctPasscode = passcodePin,
+                            onSuccess = viewModel::unlockApp
+                        )
+                    } else {
+                        MainAppScaffold(viewModel = viewModel)
+                    }
                 }
             }
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.lockApp()
     }
 }
 

@@ -28,10 +28,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import java.io.BufferedReader
 import java.io.InputStreamReader
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Date
-import java.util.Locale
 
 enum class AppTab(val title: String) {
     CALCULATOR("محاسبه"),
@@ -50,9 +46,12 @@ enum class HistoryFilter(val title: String) {
 enum class StatsDatePreset(val title: String) {
     ALL("همه"),
     TODAY("امروز"),
-    WEEK("هفته"),
-    MONTH("ماه"),
-    THREE_MONTHS("۳ ماه")
+    YESTERDAY("دیروز"),
+    WEEK("هفته جاری"),
+    LAST_WEEK("هفته گذشته"),
+    MONTH("ماه جاری"),
+    LAST_MONTH("ماه گذشته"),
+    THREE_MONTHS("۳ ماه اخیر")
 }
 
 enum class ChartType(val title: String) {
@@ -115,7 +114,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val isBoldText: StateFlow<Boolean> = repository.isBoldText
     val fontScaleDelta: StateFlow<Int> = repository.fontScaleDelta
     val snapshots: StateFlow<List<BackupSnapshot>> = repository.snapshots
+    val isPasscodeEnabled: StateFlow<Boolean> = repository.isPasscodeEnabled
+    val passcodePin: StateFlow<String> = repository.passcodePin
+    val isAppUnlocked: StateFlow<Boolean> = repository.isAppUnlocked
     val logs: StateFlow<List<LogEntry>> = AppLogger.logs
+
+    private val _showPasscodeSetupDialog = MutableStateFlow(false)
+    val showPasscodeSetupDialog: StateFlow<Boolean> = _showPasscodeSetupDialog.asStateFlow()
 
     private val _historyFilter = MutableStateFlow(HistoryFilter.ALL)
     val historyFilter: StateFlow<HistoryFilter> = _historyFilter.asStateFlow()
@@ -176,7 +181,37 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun selectTab(tab: AppTab) {
         _currentTab.value = tab
+        if (tab == AppTab.SETTINGS) {
+            repository.autoUpdateCurrentSnapshot()
+        }
         AppLogger.debug("NAV", "Switched to tab: ${tab.name}")
+    }
+
+    fun unlockApp() {
+        repository.unlockApp()
+    }
+
+    fun lockApp() {
+        repository.lockApp()
+    }
+
+    fun openPasscodeSetup() {
+        _showPasscodeSetupDialog.value = true
+    }
+
+    fun closePasscodeSetup() {
+        _showPasscodeSetupDialog.value = false
+    }
+
+    fun setPasscode(pin: String) {
+        repository.setPasscode(pin)
+        _showPasscodeSetupDialog.value = false
+        showToast("رمز عبور برنامه فعال شد ✓")
+    }
+
+    fun disablePasscode() {
+        repository.disablePasscode()
+        showToast("رمز عبور برنامه غیرفعال شد")
     }
 
     fun setHistoryFilter(filter: HistoryFilter) {
