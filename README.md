@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="pwa/logo.png" alt="Mahva Gallery Emblem" width="110" />
+<img src="pwa/logo-dark.png" alt="Mahva Gallery Emblem" width="110" />
 
 # MAHVA GALLERY
 ### 𓋞 Gold Valuation & Atelier Pricing Engine 𓋞
