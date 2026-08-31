@@ -18,7 +18,7 @@ Native Android application for the Mahva Gallery Gold Calculator built with **Ko
   - Final Percentage: $J = \left(\frac{K}{C} - 1\right) \times 100$
 - **Smart Persistence**: Ojrat ($D$), Profit ($F$), and Tax ($H$) default percentages are automatically saved in `SharedPreferences` and restored on app launch.
 - **Recalculate Action**: "محاسبه مجدد" clears raw price and weight while retaining default percentages.
-- **Branded Launcher Icon**: Custom app icon generated from `logo.png`.
+- **Branded Launcher Icon**: Custom app icon generated from `logo-dark.png`.
 
 ---
 
@@ -30,7 +30,7 @@ This repository includes a pre-configured **GitHub Actions workflow** (`.github/
 Push your repository to GitHub:
 ```bash
 git add .
-git commit -m "Add native Android app with Jetpack Compose"
+git commit -m "Update app"
 git push origin main
 ```
 
@@ -38,8 +38,8 @@ git push origin main
 1. Open your repository on GitHub in your browser or phone.
 2. Go to the **Actions** tab.
 3. Click the latest **Build Android APK** run.
-4. Under the **Artifacts** section at the bottom, click `mahva-gallery-debug-apk` to download `app-debug.apk`.
-5. Install `app-debug.apk` directly on your Android phone!
+4. Under the **Artifacts** section at the bottom, click `mahva-gallery-apk` to download `mahva-gallery.apk`.
+5. Install `mahva-gallery.apk` directly on your Android phone!
 
 ---
 
@@ -48,7 +48,7 @@ git push origin main
 If you have JDK 17 installed:
 ```bash
 cd android
-./gradlew assembleDebug
+./gradlew assembleRelease
 ```
 The compiled APK will be located at:
-`android/app/build/outputs/apk/debug/app-debug.apk`
+`android/app/build/outputs/apk/release/mahva-gallery.apk`

@@ -48,12 +48,12 @@ Push to GitHub to automatically trigger the build pipeline:
 ```bash
 git push origin main
 ```
-Download the compiled `app-debug.apk` directly from **GitHub Actions** $\rightarrow$ **Artifacts**.
+Download the compiled `mahva-gallery.apk` directly from **GitHub Actions** $\rightarrow$ **Artifacts**.
 
 ### Local Build
 ```bash
 cd android
-./gradlew assembleDebug
+./gradlew assembleRelease
 ```
 
 ---
