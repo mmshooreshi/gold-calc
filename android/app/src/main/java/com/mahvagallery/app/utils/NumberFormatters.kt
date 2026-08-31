@@ -55,19 +55,19 @@ object NumberFormatters {
         return normalized.toDoubleOrNull() ?: 0.0
     }
 
-    fun formatCurrency(amount: Double, toPersian: Boolean = false): String {
+    fun formatCurrency(amount: Double, toPersian: Boolean = true): String {
         if (amount <= 0.0) return ""
         val formatted = currencyFormatter.format(Math.round(amount))
         return if (toPersian) toPersianDigits(formatted) else formatted
     }
 
-    fun formatWeight(amount: Double, toPersian: Boolean = false): String {
+    fun formatWeight(amount: Double, toPersian: Boolean = true): String {
         if (amount <= 0.0) return ""
         val formatted = weightFormatter.format(amount)
         return if (toPersian) toPersianDigits(formatted) else formatted
     }
 
-    fun formatPercentage(amount: Double, toPersian: Boolean = false): String {
+    fun formatPercentage(amount: Double, toPersian: Boolean = true): String {
         if (amount <= 0.0) return ""
         val formatted = percentageFormatter.format(amount)
         return if (toPersian) toPersianDigits(formatted) else formatted
@@ -77,31 +77,37 @@ object NumberFormatters {
         val latin = toLatinDigits(input).replace("[^0-9]".toRegex(), "")
         if (latin.isEmpty()) return ""
         val num = latin.toLongOrNull() ?: return ""
-        return currencyFormatter.format(num)
+        val formatted = currencyFormatter.format(num)
+        return toPersianDigits(formatted)
     }
 
     fun formatWeightInput(input: String): String {
         val latin = toLatinDigits(input).replace("[^0-9.]".toRegex(), "")
         if (latin.isEmpty()) return ""
         val firstDotIndex = latin.indexOf('.')
-        if (firstDotIndex != -1) {
+        val result = if (firstDotIndex != -1) {
             val integerPart = latin.substring(0, firstDotIndex)
             val rest = latin.substring(firstDotIndex + 1).replace(".", "")
             val decimalPart = if (rest.length > 3) rest.substring(0, 3) else rest
-            return "$integerPart.$decimalPart"
+            "$integerPart.$decimalPart"
+        } else {
+            latin
         }
-        return latin
+        return toPersianDigits(result)
     }
 
     fun formatPercentageInput(input: String): String {
         val latin = toLatinDigits(input).replace("[^0-9.]".toRegex(), "")
         if (latin.isEmpty()) return ""
         val firstDotIndex = latin.indexOf('.')
-        if (firstDotIndex != -1) {
+        val result = if (firstDotIndex != -1) {
             val integerPart = latin.substring(0, firstDotIndex)
             val decimalPart = latin.substring(firstDotIndex + 1).replace(".", "")
-            return "$integerPart.$decimalPart"
+            val clamped = if (decimalPart.length > 2) decimalPart.substring(0, 2) else decimalPart
+            "$integerPart.$clamped"
+        } else {
+            latin
         }
-        return latin
+        return toPersianDigits(result)
     }
 }

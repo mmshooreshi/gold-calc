@@ -25,27 +25,28 @@ class CalculatorLogicTest {
         // C = A * B
         val c = a * b
         assertEquals(8750000L, c.roundToLong())
-        assertEquals("8,750,000", NumberFormatters.formatCurrency(c))
+        assertEquals("8,750,000", NumberFormatters.formatCurrency(c, toPersian = false))
 
         // E = D * C / 100
         val e = (d * c) / 100.0
         assertEquals(612500L, e.roundToLong())
-        assertEquals("612,500", NumberFormatters.formatCurrency(e))
+        assertEquals("612,500", NumberFormatters.formatCurrency(e, toPersian = false))
 
         // G = F * (C + E) / 100 (Profit on raw gold + ojrat)
         val g = (f * (c + e)) / 100.0
         assertEquals(655375L, g.roundToLong())
-        assertEquals("655,375", NumberFormatters.formatCurrency(g))
+        assertEquals("655,375", NumberFormatters.formatCurrency(g, toPersian = false))
 
         // I = (E + G) * H / 100 (Tax on ojrat + profit)
         val i = ((e + g) * h) / 100.0
         assertEquals(114109L, i.roundToLong())
-        assertEquals("114,109", NumberFormatters.formatCurrency(i))
+        assertEquals("114,109", NumberFormatters.formatCurrency(i, toPersian = false))
 
         // K = C + E + G + I
         val k = c + e + g + i
         assertEquals(10131984L, k.roundToLong())
-        assertEquals("10,131,984", NumberFormatters.formatCurrency(k))
+        assertEquals("10,131,984", NumberFormatters.formatCurrency(k, toPersian = false))
+        assertEquals("۱۰,۱۳۱,۹۸۴", NumberFormatters.formatCurrency(k, toPersian = true))
 
         // Total Costs = E + G + I
         val costs = e + g + i
@@ -53,7 +54,8 @@ class CalculatorLogicTest {
 
         // J = ((K / C) - 1) * 100
         val j = ((k / c) - 1.0) * 100.0
-        assertEquals("15.79", NumberFormatters.formatPercentage(j))
+        assertEquals("15.79", NumberFormatters.formatPercentage(j, toPersian = false))
+        assertEquals("۱۵.۷۹", NumberFormatters.formatPercentage(j, toPersian = true))
     }
 
     @Test
