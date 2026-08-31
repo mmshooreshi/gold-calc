@@ -402,26 +402,78 @@ input {
 }
 input:disabled { color: var(--primary); opacity: .85; }
 [data-theme="dark"] input:disabled { color: #93c5fd; }
-input::placeholder { color: #c4cfde; font-weight: 400; }
+/* Cold, Frosted Locked State */
+.ib.locked {
+  background: rgba(30, 58, 138, 0.05) !important;
+  border: 1.5px solid rgba(59, 130, 246, 0.5) !important;
+  box-shadow: inset 0 1px 4px rgba(59, 130, 246, 0.12), 0 0 10px rgba(59, 130, 246, 0.1) !important;
+  position: relative;
+}
+[data-theme="dark"] .ib.locked {
+  background: rgba(30, 58, 138, 0.22) !important;
+  border-color: rgba(96, 165, 250, 0.55) !important;
+  box-shadow: inset 0 1px 6px rgba(0, 0, 0, 0.4), 0 0 12px rgba(96, 165, 250, 0.18) !important;
+}
+.ib.locked input {
+  color: var(--primary);
+  font-weight: 900;
+}
+[data-theme="dark"] .ib.locked input {
+  color: #93c5fd;
+}
 
-.lk {
-  background: transparent;
-  border: none;
-  font-size: 1.08rem;
-  color: #bcc9df;
-  padding: 4px;
+.header-lock-btn {
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff;
+  border-radius: 10px;
+  width: 34px;
+  height: 34px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: color .2s var(--bounce), transform .2s var(--bounce);
+  font-size: 1.15rem;
+  cursor: pointer;
+  transition: all 0.2s var(--bounce);
+  backdrop-filter: blur(8px);
+}
+.header-lock-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(251, 191, 36, 0.6);
+  color: #fbbf24;
+}
+.header-lock-btn:active {
+  transform: scale(0.9);
+}
+
+.lk {
+  background: rgba(0,0,0,0.03);
+  border: 1px solid var(--bd);
+  border-radius: 8px;
+  font-size: 1.15rem;
+  color: var(--tx2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
   cursor: pointer;
   flex-shrink: 0;
-  width: 28px;
-  height: 28px;
+  width: 34px;
+  height: 34px;
 }
-.lk:active { transform: scale(.72); }
-.lk.on { color: var(--primary); }
-[data-theme="dark"] .lk.on { color: #60a5fa; }
+.lk.on {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.6);
+  color: #2563eb;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+  transform: scale(1.05);
+}
+[data-theme="dark"] .lk.on {
+  background: rgba(59, 130, 246, 0.3);
+  border-color: rgba(96, 165, 250, 0.7);
+  color: #60a5fa;
+  box-shadow: 0 2px 10px rgba(96, 165, 250, 0.35);
+}
 
 .ib-info {
   background: none;
@@ -2389,12 +2441,17 @@ background: var(--bg);}
         <span>بروزرسانی جدید</span>
       </div>
     </div>
-    <div class="desktop-nav">
-      <div class="desktop-nav-item on" data-t="calc" onclick="go('calc',this)"><i class="ph ph-calculator"></i><span>محاسبه</span></div>
-      <div class="desktop-nav-item" data-t="history" onclick="go('history',this)"><i class="ph ph-clock-counter-clockwise"></i><span>تاریخچه</span></div>
-      <div class="desktop-nav-item" data-t="skins" onclick="go('skins',this)"><i class="ph ph-palette"></i><span>پوسته‌ها</span></div>
-      <div class="desktop-nav-item" data-t="stats" onclick="go('stats',this)"><i class="ph ph-chart-bar"></i><span>آمار</span></div>
-      <div class="desktop-nav-item" data-t="settings" onclick="go('settings',this)"><i class="ph ph-gear-six"></i><span>تنظیمات</span></div>
+    <div style="display:flex; align-items:center; gap:8px;">
+      <button class="header-lock-btn tap" onclick="quickLockApp()" title="قفل فوری برنامه">
+        <i class="ph-fill ph-lock-key"></i>
+      </button>
+      <div class="desktop-nav">
+        <div class="desktop-nav-item on" data-t="calc" onclick="go('calc',this)"><i class="ph ph-calculator"></i><span>محاسبه</span></div>
+        <div class="desktop-nav-item" data-t="history" onclick="go('history',this)"><i class="ph ph-clock-counter-clockwise"></i><span>تاریخچه</span></div>
+        <div class="desktop-nav-item" data-t="skins" onclick="go('skins',this)"><i class="ph ph-palette"></i><span>پوسته‌ها</span></div>
+        <div class="desktop-nav-item" data-t="stats" onclick="go('stats',this)"><i class="ph ph-chart-bar"></i><span>آمار</span></div>
+        <div class="desktop-nav-item" data-t="settings" onclick="go('settings',this)"><i class="ph ph-gear-six"></i><span>تنظیمات</span></div>
+      </div>
     </div>
   </header>
 
@@ -3244,6 +3301,19 @@ window.switchWeightUnit = (unit) => {
 };
 
 /* Passcode Lock Engine */
+window.quickLockApp = () => {
+  tactileFeedback();
+  if (S.passcode && S.passcode.enabled && S.passcode.pin) {
+    isPassLocked = true;
+    document.getElementById('passcode-overlay').classList.add('on');
+    resetPinDisplay();
+    toast('برنامه قفل شد 🔒');
+  } else {
+    toast('ابتدا رمز عبور ۴ رقمی را تعیین کنید');
+    openPasscodeSetupModal();
+  }
+};
+
 function checkPasscodeRequired(){
   if(S.passcode&&S.passcode.enabled&&S.passcode.pin){
     isPassLocked=true;
@@ -3252,19 +3322,23 @@ function checkPasscodeRequired(){
   }
 }
 function pressPin(d){
+  tactileFeedback();
   if(passPin.length<4){
     passPin+=d;
     updatePinDots();
     if(passPin.length===4){
       if(passPin===S.passcode.pin){
         isPassLocked=false;
-        document.getElementById('passcode-overlay').classList.remove('on');
-        passPin='';
-        resetPinDisplay();
+        setTimeout(()=>{
+          document.getElementById('passcode-overlay').classList.remove('on');
+          passPin='';
+          resetPinDisplay();
+          toast('خوش آمدید ✓');
+        }, 150);
       }else{
         const dots=document.getElementById('pass-dots');
         dots.classList.add('shake');
-        if(navigator.vibrate)navigator.vibrate([10,30,10]);
+        if(navigator.vibrate)navigator.vibrate([20,50,20]);
         setTimeout(()=>{
           dots.classList.remove('shake');
           passPin='';
@@ -3275,6 +3349,7 @@ function pressPin(d){
   }
 }
 function backspacePin(){
+  tactileFeedback();
   if(passPin.length>0){
     passPin=passPin.slice(0,-1);
     updatePinDots();
@@ -3305,6 +3380,7 @@ function updateSetupDots(pin){
   dots.forEach((d,i)=>d.classList.toggle('filled', i<pin.length));
 }
 function pressSetupPin(d){
+  tactileFeedback();
   document.getElementById('pass-setup-err').textContent='';
   if(setupStep===1){
     if(setupPin1.length<4){
@@ -3328,8 +3404,9 @@ function pressSetupPin(d){
           S.passcode={enabled:true, pin:setupPin1};
           save();
           closeModal('m-passcode-setup');
-          document.getElementById('t-passcode').classList.add('on');
-          document.getElementById('row-change-pass').style.display='flex';
+          document.getElementById('t-passcode')?.classList.add('on');
+          const r=document.getElementById('row-change-pass');
+          if(r) r.style.display='flex';
           toast('رمز عبور فعال شد ✓');
         }else{
           document.getElementById('pass-setup-err').textContent='رمز عبور با تکرار آن مطابقت ندارد';
@@ -3345,6 +3422,7 @@ function pressSetupPin(d){
   }
 }
 function backspaceSetupPin(){
+  tactileFeedback();
   if(setupStep===1&&setupPin1.length>0){
     setupPin1=setupPin1.slice(0,-1);
     updateSetupDots(setupPin1);
@@ -3352,6 +3430,73 @@ function backspaceSetupPin(){
     setupPin2=setupPin2.slice(0,-1);
     updateSetupDots(setupPin2);
   }
+}
+
+// Physical Keyboard Listener for Passcode (Laptops & Desktop Keyboards)
+window.addEventListener('keydown', (e) => {
+  const overlay = document.getElementById('passcode-overlay');
+  const isOverlayOn = overlay && overlay.classList.contains('on');
+  
+  const setupModal = document.getElementById('m-passcode-setup');
+  const isSetupOn = setupModal && setupModal.classList.contains('on');
+  
+  if (!isOverlayOn && !isSetupOn) return;
+  
+  let key = e.key;
+  if (key >= '۰' && key <= '۹') {
+    key = String('۰۱۲۳۴۵۶۷۸۹'.indexOf(key));
+  } else if (key >= '٠' && key <= '٩') {
+    key = String('٠١٢٣٤٥٦٧٨٩'.indexOf(key));
+  }
+  
+  if (/^[0-9]$/.test(key)) {
+    e.preventDefault();
+    if (isOverlayOn) {
+      pressPin(key);
+      animateKeypadKey(key);
+    } else if (isSetupOn) {
+      pressSetupPin(key);
+      animateSetupKeypadKey(key);
+    }
+  } else if (key === 'Backspace' || key === 'Delete') {
+    e.preventDefault();
+    if (isOverlayOn) backspacePin();
+    else if (isSetupOn) backspaceSetupPin();
+  } else if (key === 'Escape') {
+    if (isSetupOn) closeModal('m-passcode-setup');
+  }
+});
+
+function animateKeypadKey(digit) {
+  const keys = document.querySelectorAll('#passcode-overlay .pkey');
+  keys.forEach(k => {
+    if (k.textContent.trim() === digit || k.textContent.trim() === e2p(digit)) {
+      k.style.transition = 'none';
+      k.style.transform = 'scale(0.88)';
+      k.style.background = 'rgba(255,255,255,0.45)';
+      setTimeout(() => {
+        k.style.transition = 'all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        k.style.transform = '';
+        k.style.background = '';
+      }, 120);
+    }
+  });
+}
+
+function animateSetupKeypadKey(digit) {
+  const keys = document.querySelectorAll('#m-passcode-setup .pkey');
+  keys.forEach(k => {
+    if (k.textContent.trim() === digit || k.textContent.trim() === e2p(digit)) {
+      k.style.transition = 'none';
+      k.style.transform = 'scale(0.88)';
+      k.style.background = 'rgba(59, 130, 246, 0.25)';
+      setTimeout(() => {
+        k.style.transition = 'all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        k.style.transform = '';
+        k.style.background = '';
+      }, 120);
+    }
+  });
 }
 function togglePasscodeSwitch(){
   if(S.passcode&&S.passcode.enabled){
@@ -3841,11 +3986,26 @@ window.tLock=k=>{
   S.defaults[k]=S.locks[k]?document.getElementById('v'+k).value:'';
   updLock(k,S.locks[k]);
   save();
+  tactileFeedback();
+  if(S.locks[k]) toast('فیلد قفل شد 🔒');
+  else toast('فیلد باز شد 🔓');
 };
 function updLock(k,on){
   const b=document.getElementById('l'+k);
-  if(on){b.classList.add('on');b.innerHTML='<i class="ph-fill ph-lock-key"></i>';}
-  else{b.classList.remove('on');b.innerHTML='<i class="ph ph-lock-key-open"></i>';}
+  const inp=document.getElementById('v'+k);
+  const ib=inp ? inp.closest('.ib') : null;
+  if(b){
+    if(on){
+      b.classList.add('on');
+      b.innerHTML='<i class="ph-fill ph-lock-key"></i>';
+    }else{
+      b.classList.remove('on');
+      b.innerHTML='<i class="ph ph-lock-key-open"></i>';
+    }
+  }
+  if(ib){
+    ib.classList.toggle('locked', on);
+  }
 }
 
 /* ============================================================
