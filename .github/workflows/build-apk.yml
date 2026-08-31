@@ -1,4 +1,4 @@
-name: Build & Release Android APK
+name: Build & Release
 
 on:
   push:
@@ -8,10 +8,16 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
-  build:
-    name: Build & Release Mahva Gallery APK
+  build-apk:
+    name: Build & Release Android APK
     runs-on: ubuntu-latest
 
     steps:
@@ -51,11 +57,33 @@ jobs:
           body: |
             ## 𓋞 Mahva Gallery Gold Calculator
 
-            ### 📱 Download & Install
-            Download **`mahva-gallery.apk`** below directly to your Android device.
+            ### 📱 Android Download
+            Download **`mahva-gallery.apk`** below directly to your device.
 
-            - **Commit**: `${{ github.sha }}`
-            - **Platform**: Android (120Hz Jetpack Compose)
+            ### 🍎 iPhone (iOS) Web App
+            Open [https://mmshooreshi.github.io/gold-calc/](https://mmshooreshi.github.io/gold-calc/) in Safari $\rightarrow$ tap **Share** $\rightarrow$ **Add to Home Screen**.
           files: android/app/build/outputs/apk/release/mahva-gallery.apk
           draft: false
           prerelease: false
+
+  deploy-pwa:
+    name: Deploy PWA for iOS & Web
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'pwa'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,22 @@
+{
+  "name": "مهوا گالری",
+  "short_name": "مهوا گالری",
+  "description": "ماشین حساب طلا و جواهر مهوا گالری",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#172051",
+  "theme_color": "#172051",
+  "icons": [
+    {
+      "src": "logo-dark.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
