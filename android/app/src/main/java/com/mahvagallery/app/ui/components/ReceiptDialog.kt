@@ -27,7 +27,7 @@ import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
@@ -161,7 +161,7 @@ fun ReceiptDialog(
 
                         // Customer info box
                         if (customer.isNotEmpty) {
-                            Divider(color = Color(0xFFAAAAAA), thickness = 1.dp, modifier = Modifier.padding(vertical = 6.dp))
+                            HorizontalDivider(color = Color(0xFFAAAAAA), thickness = 1.dp, modifier = Modifier.padding(vertical = 6.dp))
                             if (customer.name.isNotEmpty()) ReceiptRow("خریدار:", customer.name, isBold = true)
                             if (customer.phone.isNotEmpty()) ReceiptRow("شماره تماس:", NumberFormatters.toPersianDigits(customer.phone))
                             if (customer.paymentMethod.isNotEmpty()) {
@@ -171,7 +171,7 @@ fun ReceiptDialog(
                             if (customer.trackingCode.isNotEmpty()) ReceiptRow("کد پیگیری:", NumberFormatters.toPersianDigits(customer.trackingCode))
                         }
 
-                        Divider(color = Color(0xFFAAAAAA), thickness = 1.dp, modifier = Modifier.padding(vertical = 6.dp))
+                        HorizontalDivider(color = Color(0xFFAAAAAA), thickness = 1.dp, modifier = Modifier.padding(vertical = 6.dp))
                     }
                 }
 
@@ -183,7 +183,7 @@ fun ReceiptDialog(
                     Column {
                         ReceiptRow("وزن طلا:", "$formattedWeight گـرم", isBold = true)
                         ReceiptRow("فی طلا (خام):", "$formattedRaw ت")
-                        Divider(color = Color(0xFFAAAAAA), thickness = 1.dp, modifier = Modifier.padding(vertical = 6.dp))
+                        HorizontalDivider(color = Color(0xFFAAAAAA), thickness = 1.dp, modifier = Modifier.padding(vertical = 6.dp))
                     }
                 }
 
@@ -198,7 +198,7 @@ fun ReceiptDialog(
                         ReceiptRow("مالیات (${NumberFormatters.formatPercentage(calcData.h)}٪):", "$formattedTax ت")
                         Spacer(modifier = Modifier.height(4.dp))
                         ReceiptRow("مجموع هزینه‌ها:", "$formattedCosts ت", isMuted = true)
-                        Divider(color = Color(0xFF222222), thickness = 1.5.dp, modifier = Modifier.padding(vertical = 8.dp))
+                        HorizontalDivider(color = Color(0xFF222222), thickness = 1.5.dp, modifier = Modifier.padding(vertical = 8.dp))
                     }
                 }
 

@@ -40,7 +40,7 @@ import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Slider
@@ -239,7 +239,7 @@ fun SettingsScreen(
                 )
             }
 
-            Divider(color = colors.divider)
+            HorizontalDivider(color = colors.divider)
 
             // Bold Text Toggle
             Row(
@@ -267,7 +267,7 @@ fun SettingsScreen(
                 )
             }
 
-            Divider(color = colors.divider)
+            HorizontalDivider(color = colors.divider)
 
             // Dynamic Font Size Slider (Huge range: -4 to +10)
             Column(
@@ -351,7 +351,7 @@ fun SettingsScreen(
                 }
             }
 
-            Divider(color = colors.divider)
+            HorizontalDivider(color = colors.divider)
 
             // Vazirmatn Typography Badge
             Row(

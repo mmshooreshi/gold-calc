@@ -33,7 +33,7 @@ import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
@@ -251,7 +251,7 @@ fun CalculatorScreen(
             }
         )
 
-        Divider(
+        HorizontalDivider(
             color = colors.divider,
             thickness = 1.dp,
             modifier = Modifier.padding(vertical = 3.dp)

@@ -27,7 +27,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Receipt
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -250,7 +250,7 @@ fun HistoryCard(
 
                     // Edit trace history
                     if (isEdited) {
-                        Divider(modifier = Modifier.padding(vertical = 8.dp), color = colors.divider)
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), color = colors.divider)
                         Text(
                             text = "ویرایش‌های قبلی:",
                             fontSize = scaledSp(11f),
@@ -284,7 +284,7 @@ fun HistoryCard(
                     }
 
                     // Action buttons (Edit & Delete)
-                    Divider(modifier = Modifier.padding(vertical = 8.dp), color = colors.divider)
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), color = colors.divider)
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
