@@ -1330,80 +1330,147 @@ background: var(--bg);}
 .sw-action-inner i { font-size: 1.8rem !important; }
 
 /* ============================
-   UPDATE NOTIFICATION BANNER
+   PREMIUM UPDATE BANNER (Apple / Telegram Glassmorphism)
    ============================ */
 .update-banner {
   position: fixed;
-  top: 14px;
+  top: max(14px, env(safe-area-inset-top, 14px));
   left: 50%;
-  transform: translateX(-50%) translateY(-80px);
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  transform: translateX(-50%) translateY(-120px) scale(0.94);
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(24px) saturate(190%);
+  -webkit-backdrop-filter: blur(24px) saturate(190%);
   color: #fff;
-  padding: 10px 18px;
-  border-radius: 30px;
+  padding: 10px 14px 10px 16px;
+  border-radius: 20px;
   display: flex;
   align-items: center;
   gap: 12px;
-  box-shadow: 0 10px 30px rgba(16,185,129,0.38);
-  z-index: 99999;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(212, 160, 23, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  z-index: 999999;
   opacity: 0;
   pointer-events: none;
-  transition: transform 0.4s var(--bounce), opacity 0.3s;
+  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.35s ease;
   font-family: var(--font-main);
-  font-size: 0.82rem;
-  font-weight: 700;
-  max-width: 92%;
-  border: 1px solid rgba(255,255,255,0.25);
+  max-width: 94%;
+  width: auto;
+  min-width: 320px;
 }
 .update-banner.on {
-  transform: translateX(-50%) translateY(0);
+  transform: translateX(-50%) translateY(0) scale(1);
   opacity: 1;
   pointer-events: all;
+}
+.ub-icon-box {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #d4a017 0%, #b8860b 100%);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  box-shadow: 0 4px 12px rgba(212, 160, 23, 0.45);
+  flex-shrink: 0;
+  animation: ubPulse 2s infinite ease-in-out;
+}
+@keyframes ubPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+.ub-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  text-align: right;
+}
+.ub-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ub-title {
+  font-size: 0.84rem;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -0.2px;
+}
+.ub-ver-badge {
+  background: rgba(212, 160, 23, 0.25);
+  border: 1px solid rgba(212, 160, 23, 0.5);
+  color: #ffd700;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 6px;
+  direction: ltr;
+}
+.ub-subtitle {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.72);
+  font-weight: 500;
+}
+.ub-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ub-btn {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #fff;
+  border: none;
+  padding: 7px 14px;
+  border-radius: 14px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.45);
+  transition: transform 0.15s ease, filter 0.15s ease;
+  white-space: nowrap;
+}
+.ub-btn:active {
+  transform: scale(0.95);
+  filter: brightness(0.92);
+}
+.ub-close {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.ub-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
 }
 .header-update-badge {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(135deg, #d4a017 0%, #b8860b 100%);
   color: #fff;
   font-size: 0.76rem;
   font-weight: 800;
   padding: 4px 11px;
   border-radius: 18px;
   cursor: pointer;
-  box-shadow: 0 0 14px rgba(16, 185, 129, 0.6);
+  box-shadow: 0 0 14px rgba(212, 160, 23, 0.6);
   animation: pulseUpdate 1.8s infinite;
   border: 1px solid rgba(255,255,255,0.35);
   font-family: var(--font-main);
 }
 @keyframes pulseUpdate {
-  0%, 100% { transform: scale(1); box-shadow: 0 0 8px rgba(16, 185, 129, 0.4); }
-  50% { transform: scale(1.06); box-shadow: 0 0 16px rgba(16, 185, 129, 0.85); }
-}
-.ub-text { display: flex; align-items: center; gap: 6px; }
-.ub-text i { font-size: 1.15rem; color: #fef08a; }
-.ub-btn {
-  background: #ffffff;
-  color: #065f46;
-  border: none;
-  padding: 5px 14px;
-  border-radius: 14px;
-  font-size: 0.76rem;
-  font-weight: 800;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-  transition: transform 0.15s, background 0.15s;
-}
-.ub-btn:active { transform: scale(0.92); }
-.ub-close {
-  background: none;
-  border: none;
-  color: rgba(255,255,255,0.85);
-  font-size: 1.1rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  padding: 2px;
+  0%, 100% { transform: scale(1); box-shadow: 0 0 8px rgba(212, 160, 23, 0.4); }
+  50% { transform: scale(1.06); box-shadow: 0 0 16px rgba(212, 160, 23, 0.85); }
 }
 
 /* ============================
@@ -1838,14 +1905,22 @@ background: var(--bg);}
 
 <div class="toast" id="toast"></div>
 
-<!-- ========== UPDATE BANNER ========== -->
+<!-- ========== UPDATE BANNER (APPLE / TELEGRAM GLASSMORPHISM) ========== -->
 <div class="update-banner" id="update-banner">
-  <div class="ub-text">
+  <div class="ub-icon-box">
     <i class="ph-fill ph-sparkle"></i>
-    <span>نسخه جدید مهوا گالری آماده است!</span>
   </div>
-  <button class="ub-btn tap" onclick="applyAppUpdate()">بروزرسانی فوری</button>
-  <button class="ub-close" onclick="dismissUpdateBanner()"><i class="ph ph-x"></i></button>
+  <div class="ub-info">
+    <div class="ub-title-row">
+      <span class="ub-title">نسخه جدید مهوا گالری</span>
+      <span class="ub-ver-badge" id="ub-version-text">v2.1.0</span>
+    </div>
+    <span class="ub-subtitle">بهبود سرعت، پایداری و امکانات جدید</span>
+  </div>
+  <div class="ub-actions">
+    <button class="ub-btn tap" onclick="applyAppUpdate()">بروزرسانی فوری</button>
+    <button class="ub-close tap" onclick="dismissUpdateBanner()"><i class="ph ph-x"></i></button>
+  </div>
 </div>
 
 <!-- ========== APP ========== -->
@@ -2182,7 +2257,7 @@ background: var(--bg);}
     <!-- About -->
     <div class="sg">
       <div class="sgt">درباره</div>
-      <div class="si"><div class="sil"><i class="ph ph-code"></i> نسخه وب‌اپلیکیشن</div><div class="siv">2.0.0 (Gold Release)</div></div>
+      <div class="si"><div class="sil"><i class="ph ph-code"></i> نسخه وب‌اپلیکیشن</div><div class="siv" id="app-ver-val">2.1.0 (Gold Release)</div></div>
     </div>
   </main>
 
@@ -2273,20 +2348,33 @@ function toast(m,dur=2200){
   _toastT=setTimeout(()=>t.classList.remove('on'),dur);
 }
 
-let _pwaLogs = ['[' + new Date().toLocaleTimeString() + '] System initialized.'];
-function logPwa(msg){
-  _pwaLogs.unshift('[' + new Date().toLocaleTimeString() + '] ' + msg);
+let _pwaLogs = ['[' + new Date().toLocaleTimeString('fa-IR') + '] سامانه مهوا راه‌اندازی شد.'];
+function logPwa(msg, isHighlight=false){
+  const timeStr = new Date().toLocaleTimeString('fa-IR');
+  const entry = isHighlight ? `🚀 [${timeStr}] ${msg}` : `[${timeStr}] ${msg}`;
+  _pwaLogs.unshift(entry);
   if(_pwaLogs.length > 200) _pwaLogs.pop();
-  renderPwaLogs();
+  renderPwaLogs(isHighlight);
 }
-function renderPwaLogs(){
+function renderPwaLogs(flash=false){
   const b = document.getElementById('pwa-log-box');
   const c = document.getElementById('pwa-log-count');
-  if(b) b.innerText = _pwaLogs.join('\n');
+  if(b){
+    b.innerText = _pwaLogs.join('\n');
+    b.scrollTop = 0;
+    if(flash){
+      b.style.transition = 'none';
+      b.style.boxShadow = '0 0 16px rgba(212, 160, 23, 0.8)';
+      setTimeout(()=>{
+        b.style.transition = 'box-shadow 0.8s ease';
+        b.style.boxShadow = 'none';
+      }, 300);
+    }
+  }
   if(c) c.innerText = e2p(_pwaLogs.length) + ' رکورد';
 }
 window.clearPwaLogs=()=>{
-  _pwaLogs = ['[' + new Date().toLocaleTimeString() + '] Logs cleared.'];
+  _pwaLogs = ['[' + new Date().toLocaleTimeString('fa-IR') + '] لاگ‌ها پاک شدند.'];
   renderPwaLogs();
   toast('لاگ‌ها پاک شدند');
 };
@@ -2608,6 +2696,167 @@ window.onFontSlider = (val)=>{
   const sl = document.getElementById('fs-slider');
   if(sl) sl.value = val;
   save();
+};
+
+/* Apply persisted settings immediately */
+function applySettings(){
+  checkPasscodeRequired();
+  if(S.dark){
+    document.documentElement.setAttribute('data-theme','dark');
+    document.getElementById('t-dark')?.classList.add('on');
+  }
+  if(S.bold){
+    document.documentElement.style.setProperty('--base-weight','900');
+    document.body.style.fontWeight='700';
+    document.getElementById('t-bold')?.classList.add('on');
+  }
+  if(S.fontSize){
+    document.documentElement.style.setProperty('--font-size',S.fontSize+'px');
+    const fv = document.getElementById('fs-val');
+    if(fv) fv.textContent=e2p(S.fontSize)+'px';
+    const fs = document.getElementById('fs-slider');
+    if(fs) fs.value=S.fontSize;
+    const pb = document.getElementById('preview-badge');
+    if(pb) pb.textContent=e2p(S.fontSize)+'px';
+  }
+  if(S.fontFamily){
+    applyFont(S.fontFamily,false);
+  }
+  if(S.passcode&&S.passcode.enabled){
+    document.getElementById('t-passcode')?.classList.add('on');
+    const r=document.getElementById('row-change-pass');
+    if(r) r.style.display='flex';
+  }
+  ['A','D','F','H'].forEach(k=>{
+    if(S.locks[k]&&S.defaults[k]){
+      const el=document.getElementById('v'+k);
+      if(el) el.value=S.defaults[k];
+      updLock(k,true);
+    }
+  });
+  if(S.savedDefs){
+    ['D','F','H'].forEach(k=>{
+      if(S.savedDefs[k]){
+        const df=document.getElementById('df-'+k);
+        if(df) df.value=S.savedDefs[k];
+      }
+    });
+  }
+}
+applySettings();
+
+// Re-lock on visibility change
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible'){
+    checkPasscodeRequired();
+  }
+});
+
+/* ============================================================
+   ROUTING
+   ============================================================ */
+function initRoute(){
+  const h=location.hash.replace('#','')||'calc';
+  const tabs=['calc','history','stats','settings'];
+  const t=tabs.includes(h)?h:'calc';
+  const n=document.querySelector(`.ni[data-t="${t}"]`);
+  if(n)go(t,n,false);
+}
+
+window.addEventListener('hashchange',()=>{
+  const h=location.hash.replace('#','');
+  const n=document.querySelector(`.ni[data-t="${h}"]`);
+  if(n&&!n.classList.contains('on'))go(h,n,false);
+});
+
+window.go=(id,el,upHash=true)=>{
+  const prev=document.querySelector('.view.active');
+  if(prev&&prev.id!=='v-'+id){
+    prev.classList.remove('visible');
+    setTimeout(()=>prev.classList.remove('active'),55);
+  }
+  setTimeout(()=>{
+    const v=document.getElementById('v-'+id);
+    if(v){
+      v.classList.add('active');
+      v.scrollTop=0;
+      requestAnimationFrame(()=>requestAnimationFrame(()=>v.classList.add('visible')));
+    }
+  },prev&&prev.id!=='v-'+id?85:0);
+  document.querySelectorAll('.ni, .desktop-nav-item').forEach(e=>{
+    e.classList.toggle('on', e.dataset.t === id);
+  });
+  if(upHash)history.pushState(null,null,'#'+id);
+  if(id==='history')renderH();
+  if(id==='stats'){renderStats();renderCharts();}
+  if(id==='settings'){
+    autoUpdateSnapshot();
+    document.getElementById('t-dark')?.classList.toggle('on',S.dark);
+    document.getElementById('t-bold')?.classList.toggle('on',S.bold);
+    document.getElementById('t-passcode')?.classList.toggle('on',!!(S.passcode&&S.passcode.enabled));
+    const r=document.getElementById('row-change-pass');
+    if(r) r.style.display=S.passcode&&S.passcode.enabled?'flex':'none';
+    if(document.getElementById('fs-val')) document.getElementById('fs-val').textContent=e2p(S.fontSize)+'px';
+    if(document.getElementById('preview-badge')) document.getElementById('preview-badge').textContent=e2p(S.fontSize)+'px';
+    if(document.getElementById('fs-slider')) document.getElementById('fs-slider').value=S.fontSize;
+    renderSnapshots();
+  }
+};
+
+/* ============================================================
+   CALCULATION ENGINE
+   ============================================================ */
+let _dbT;
+const calc=()=>{
+  const A=gv('vA'),B=gv('vB'),D=gv('vD'),F=gv('vF'),H=gv('vH');
+  const C=A*B;
+  const E=(D*C)/100;
+  const G=(F*(C+E))/100;
+  const I=((E+G)*H)/100;
+  const K=C+E+G+I;
+
+  const setV=(id,v,dec=0)=>{
+    const el=document.getElementById(id);
+    if(el) el.value=v>0?fmt(Math.round(v*Math.pow(10,dec))/Math.pow(10,dec),dec):'';
+  };
+
+  setV('vC',C);
+  setV('vE',E);
+  setV('vG',G);
+  setV('vI',I);
+  setV('vCosts', E + G + I);
+  setV('vK',K);
+  const vJ=document.getElementById('vJ');
+  if(vJ) vJ.value=C>0?fmt(((K/C)-1)*100,2):'';
+
+  // Update Desktop side live preview panel
+  const sideRaw = document.getElementById('side-raw-price');
+  const sideCosts = document.getElementById('side-costs');
+  const sideFinal = document.getElementById('side-final-percent');
+  const sideTotal = document.getElementById('side-total-price');
+  if(sideRaw) sideRaw.textContent = C > 0 ? fmt(C) + ' تومان' : '۰ تومان';
+  if(sideCosts) sideCosts.textContent = (E + G + I) > 0 ? fmt(E + G + I) + ' تومان' : '۰ تومان';
+  if(sideFinal) sideFinal.textContent = C > 0 ? fmt(((K/C)-1)*100, 2) + '٪' : '۰٪';
+  if(sideTotal) sideTotal.textContent = K > 0 ? fmt(K) + ' تومان' : '۰ تومان';
+
+  // Persist locked values
+  ['A','D','F','H'].forEach(k=>{
+    if(S.locks[k]){
+      const el=document.getElementById('v'+k);
+      if(el) S.defaults[k]=el.value;
+      save();
+    }
+  });
+
+  if(K>0){
+    curCalc={A,B,C,D,E,F,G,H,I,K,J:((K/C)-1)*100};
+    if(!editId){
+      clearTimeout(_dbT);
+      _dbT=setTimeout(()=>saveH('draft',curCalc),1500);
+    }
+  }else{
+    curCalc=null;
+  }
 };
 
 const hInput=(e,mx)=>{
@@ -3557,15 +3806,19 @@ if(!S.pwaDismissed&&!window.matchMedia('(display-mode:standalone)').matches){
 }
 
 /* ============================================================
-   SERVICE WORKER & AUTO-UPDATE ENGINE
+   SERVICE WORKER & SEMVER AUTO-UPDATE ENGINE
    ============================================================ */
 let newWorkerWaiting = null;
+window._currentAppVersion = '2.1.0';
+window._currentBuildNum = 105;
 
-function showUpdateBanner() {
+function showUpdateBanner(ver='2.1.0') {
   const b = document.getElementById('update-banner');
   if (b) b.classList.add('on');
   const badge = document.getElementById('header-update-badge');
   if (badge) badge.style.display = 'inline-flex';
+  const verEl = document.getElementById('ub-version-text');
+  if (verEl) verEl.textContent = 'v' + ver;
 }
 
 window.dismissUpdateBanner = () => {
@@ -3574,6 +3827,8 @@ window.dismissUpdateBanner = () => {
 };
 
 window.applyAppUpdate = async () => {
+  logPwa('در حال پاک‌سازی کش و بارگذاری نسخه جدید...', true);
+  toast('در حال بروزرسانی...');
   try {
     if (newWorkerWaiting) {
       newWorkerWaiting.postMessage({ action: 'skipWaiting' });
@@ -3585,33 +3840,55 @@ window.applyAppUpdate = async () => {
   } catch (e) {
     console.error(e);
   }
-  window.location.reload(true);
+  setTimeout(()=>{
+    window.location.reload(true);
+  }, 400);
 };
+
+// Check for updates against SemVer version.json
+async function checkVersionManifest() {
+  try {
+    const res = await fetch('./version.json?_=' + Date.now(), { cache: 'no-store' });
+    if (res.ok) {
+      const info = await res.json();
+      if (info && info.version) {
+        const vEl = document.getElementById('app-ver-val');
+        if (vEl) vEl.textContent = `${info.version} (Build ${info.build || 1})`;
+        if (!window._knownVersion) {
+          window._knownVersion = info.version;
+          window._knownBuild = info.build || 0;
+          logPwa(`سامانه روی نسخه ${info.version} (بیلد ${info.build || 1}) فعال است.`);
+        } else if (info.version !== window._knownVersion || (info.build && info.build > window._knownBuild)) {
+          logPwa(`نسخه جدید مهوا منتشر شد: v${info.version} (بیلد ${info.build}) 🚀`, true);
+          showUpdateBanner(info.version);
+        }
+      }
+    }
+  } catch(e){}
+}
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.addEventListener('message', (event) => {
     if (event.data && (event.data.type === 'APP_UPDATE_AVAILABLE' || event.data.action === 'update')) {
-      showUpdateBanner();
-      logPwa('نسخه جدید اپلیکیشن دریافت شد');
+      showUpdateBanner(window._knownVersion || '2.1.0');
+      logPwa('نسخه جدید از Service Worker دریافت شد ✓', true);
     }
   });
 
   navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then((reg) => {
-    // If there's an active waiting worker
     if (reg.waiting) {
       newWorkerWaiting = reg.waiting;
-      showUpdateBanner();
+      showUpdateBanner(window._knownVersion || '2.1.0');
     }
 
-    // Triggered whenever a new service worker is installing
     reg.addEventListener('updatefound', () => {
       const newWorker = reg.installing;
       if (newWorker) {
         newWorker.addEventListener('statechange', () => {
           if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
             newWorkerWaiting = newWorker;
-            showUpdateBanner();
-            logPwa('نسخه جدید اپلیکیشن دریافت شد');
+            showUpdateBanner(window._knownVersion || '2.1.0');
+            logPwa('فایل‌های بروزرسانی در پس‌زمینه نصب شدند.', true);
           }
         });
       }
@@ -3619,27 +3896,29 @@ if ('serviceWorker' in navigator) {
 
     const checkUpdatesNow = () => {
       reg.update().catch(() => {});
-      // Direct checksum/version check
+      checkVersionManifest();
       fetch('./sw.js?check=' + Date.now(), { cache: 'no-store' })
         .then(r => r.text())
         .then(content => {
           if (window._cachedSwText && content !== window._cachedSwText) {
-            showUpdateBanner();
+            showUpdateBanner(window._knownVersion || '2.1.0');
+            logPwa('تغییرات جدید در سرویس ورکر شناسایی شد.', true);
           }
           window._cachedSwText = content;
         }).catch(() => {});
     };
 
-    // Check on load, periodically, and on window focus/online
     checkUpdatesNow();
-    setInterval(checkUpdatesNow, 15000);
+    setInterval(checkUpdatesNow, 12000);
     window.addEventListener('focus', checkUpdatesNow);
     window.addEventListener('online', checkUpdatesNow);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') checkUpdatesNow();
+    });
   }).catch((err) => {
     console.log('SW Registration error:', err);
   });
 
-  // Seamless reload when new service worker takes control
   let refreshing = false;
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     if (!refreshing) {

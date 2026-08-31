@@ -79,6 +79,30 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
+      - name: Generate SemVer version.json & Stamp Service Worker Cache
+        run: |
+          BUILD_NUM=${{ github.run_number }}
+          COMMIT_SHA="${{ github.sha }}"
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          SEMVER="2.1.${BUILD_NUM}"
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          
+          # Generate version.json
+          cat <<EOF > pwa/version.json
+          {
+            "version": "${SEMVER}",
+            "build": ${BUILD_NUM},
+            "sha": "${SHORT_SHA}",
+            "fullSha": "${COMMIT_SHA}",
+            "timestamp": "${TIMESTAMP}"
+          }
+          EOF
+          
+          # Stamp CACHE_NAME in sw.js automatically with this exact semver
+          sed -i "s/const CACHE_NAME = .*/const CACHE_NAME = 'mahva-v${SEMVER}';/" pwa/sw.js
+          
+          echo "Generated version.json for Mahva PWA v${SEMVER} (commit ${SHORT_SHA})"
+
       - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v3
         with:
