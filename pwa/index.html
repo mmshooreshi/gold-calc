@@ -33,6 +33,58 @@
 
 
 <style>
+/* ============================================================
+   PEYDA LUXURY PERSIAN TYPOGRAPHY
+   ============================================================ */
+@font-face {
+  font-family: 'Peyda';
+  src: url('./assets/Peyda/PeydaWeb/woff2/PeydaWeb-Regular.woff2') format('woff2'),
+       url('./assets/Peyda/Peyda-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Peyda';
+  src: url('./assets/Peyda/PeydaWeb/woff2/PeydaWeb-Medium.woff2') format('woff2'),
+       url('./assets/Peyda/Peyda-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Peyda';
+  src: url('./assets/Peyda/PeydaWeb/woff2/PeydaWeb-SemiBold.woff2') format('woff2'),
+       url('./assets/Peyda/Peyda-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Peyda';
+  src: url('./assets/Peyda/PeydaWeb/woff2/PeydaWeb-Bold.woff2') format('woff2'),
+       url('./assets/Peyda/Peyda-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Peyda';
+  src: url('./assets/Peyda/PeydaWeb/woff2/PeydaWeb-ExtraBold.woff2') format('woff2'),
+       url('./assets/Peyda/Peyda-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Peyda';
+  src: url('./assets/Peyda/PeydaWeb/woff2/PeydaWeb-Black.woff2') format('woff2'),
+       url('./assets/Peyda/Peyda-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* ============================
    CSS CUSTOM PROPERTIES
    ============================ */
@@ -47,17 +99,70 @@
   --tx2: #64748b;
   --ok: #10b981;
   --err: #ef4444;
-  --warn: #f59e0b;
+  --warn: #d4a017;
   --info: #3b82f6;
   --nav-h: 64px;
   --hdr-h: 52px;
   --ease: cubic-bezier(.25,1,.5,1);
   --bounce: cubic-bezier(.34,1.56,.64,1);
   --smooth: cubic-bezier(.4,0,.2,1);
-  --font-main: 'Vazirmatn', 'Cairo', system-ui, sans-serif;
+  --font-main: 'Peyda', 'Vazirmatn', -apple-system, system-ui, sans-serif;
   --font-size: 14px;
-  --font-family: 'Vazirmatn';
+  --font-family: 'Peyda';
   --radius: 14px;
+}
+
+/* Luxury Skin Palettes & LUTs */
+[data-skin="royal-gold"] {
+  --primary: #d4a017;
+  --primary-l: #eab308;
+  --primary-ll: #fde047;
+  --bg: #0b0f19;
+  --sf: #131b2e;
+  --bd: #22304d;
+  --tx: #fef08a;
+  --tx2: #94a3b8;
+  --warn: #eab308;
+}
+[data-skin="emerald"] {
+  --primary: #059669;
+  --primary-l: #10b981;
+  --primary-ll: #34d399;
+  --bg: #061e16;
+  --sf: #0c2e23;
+  --bd: #164e3f;
+  --tx: #ecfdf5;
+  --tx2: #6ee7b7;
+}
+[data-skin="ruby"] {
+  --primary: #e11d48;
+  --primary-l: #f43f5e;
+  --primary-ll: #fb7185;
+  --bg: #1c0a10;
+  --sf: #2c121b;
+  --bd: #4c1d2e;
+  --tx: #ffe4e6;
+  --tx2: #fda4af;
+}
+[data-skin="midnight-titanium"] {
+  --primary: #64748b;
+  --primary-l: #94a3b8;
+  --primary-ll: #cbd5e1;
+  --bg: #090d16;
+  --sf: #111827;
+  --bd: #1f2937;
+  --tx: #f3f4f6;
+  --tx2: #9ca3af;
+}
+[data-skin="pearl-white"] {
+  --primary: #0f172a;
+  --primary-l: #1e293b;
+  --primary-ll: #334155;
+  --bg: #f8fafc;
+  --sf: #ffffff;
+  --bd: #e2e8f0;
+  --tx: #0f172a;
+  --tx2: #64748b;
 }
 [data-theme="dark"] {
   --bg: #0d1526;
@@ -143,29 +248,24 @@ header img { max-height: 26px; filter: invert(1) brightness(1.2); }
 .view.visible { opacity: 1; transform: translateY(0); }
 
 /* ============================
-   UNIVERSAL BUTTON TAP
+   UNIVERSAL APPLE-LIKE TACTILE TAP
    ============================ */
 .tap {
-  position: relative;
-  overflow: hidden;
   cursor: pointer;
-  transition: transform .18s var(--bounce), filter .15s, box-shadow .2s;
+  transition: transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.16s ease, box-shadow 0.16s ease;
   -webkit-user-select: none;
   user-select: none;
+  will-change: transform;
 }
-.tap::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at var(--rx,50%) var(--ry,50%), rgba(255,255,255,.38) 0%, transparent 65%);
-  opacity: 0;
-  transition: opacity .45s;
-  pointer-events: none;
-  border-radius: inherit;
+.tap:active {
+  transform: scale(0.96) !important;
+  filter: brightness(0.96);
 }
-.tap:active { transform: scale(.91) !important; filter: brightness(.87); transition: transform .06s, filter .06s !important; }
-.tap:active::after { opacity: 1; transition: opacity .02s !important; }
-@media(hover:hover){.tap:hover{transform:translateY(-1px) scale(1.01);filter:brightness(1.06);}}
+@media(hover:hover){
+  .tap:hover {
+    filter: brightness(1.04);
+  }
+}
 
 /* ============================
    EDIT BAR (top of calc)
@@ -702,6 +802,8 @@ background: var(--bg);}
   gap: 14px 20px;
   width: 100%;
   max-width: 280px;
+  direction: ltr;
+  margin: 0 auto;
 }
 .pkey {
   width: 68px; height: 68px;
@@ -719,6 +821,154 @@ background: var(--bg);}
 }
 .pkey:active { background: rgba(255,255,255,.25); transform: scale(0.92); }
 .pkey-txt { font-size: .85rem; font-weight: 600; border: none; background: transparent; }
+
+/* ============================================================
+   WEIGHT UNIT TOGGLE SWITCH (گرم / میلی‌گرم)
+   ============================================================ */
+.weight-unit-toggle {
+  display: flex;
+  background: var(--bg);
+  border: 1px solid var(--bd);
+  border-radius: 20px;
+  padding: 3px;
+  gap: 3px;
+  position: relative;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.06);
+}
+.unit-opt {
+  padding: 4px 12px;
+  border-radius: 16px;
+  border: none;
+  background: transparent;
+  font-family: var(--font-main);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--tx2);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  z-index: 1;
+}
+.unit-opt.on {
+  background: var(--sf);
+  color: var(--primary);
+  font-weight: 900;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transform: scale(1.02);
+}
+
+/* ============================================================
+   SKINS & HAPTICS TAB STYLES
+   ============================================================ */
+.skins-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: 10px;
+}
+.skin-card {
+  background: var(--sf);
+  border: 2px solid var(--bd);
+  border-radius: 16px;
+  padding: 12px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: all 0.25s var(--bounce);
+  position: relative;
+}
+.skin-card.on {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(212, 160, 23, 0.25);
+  transform: scale(1.02);
+}
+.skin-preview-bar {
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+.skin-p-c1 { flex: 2; }
+.skin-p-c2 { flex: 1.5; }
+.skin-p-c3 { flex: 1; }
+.skin-card-title {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--tx);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.skin-card-desc {
+  font-size: 0.68rem;
+  color: var(--tx2);
+}
+
+.fx-chips {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-top: 8px;
+}
+.fx-chip {
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1.5px solid var(--bd);
+  background: var(--sf);
+  color: var(--tx);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: center;
+  transition: all 0.2s var(--bounce);
+}
+.fx-chip.on {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+}
+
+.playground-box {
+  background: var(--sf);
+  border: 1px solid var(--bd);
+  border-radius: 16px;
+  padding: 14px;
+  margin-top: 10px;
+}
+.play-keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  direction: ltr;
+  max-width: 260px;
+  margin: 10px auto 0;
+}
+.play-key {
+  height: 48px;
+  border-radius: 12px;
+  border: 1px solid var(--bd);
+  background: var(--bg);
+  color: var(--tx);
+  font-size: 1.15rem;
+  font-weight: 800;
+  font-family: var(--font-main);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.1s ease, background 0.15s;
+}
+.play-key:active {
+  transform: scale(0.92);
+  background: rgba(0,0,0,0.08);
+}
 
 /* Customer Bar & Chips */
 .cust-bar {
@@ -1944,19 +2194,19 @@ background: var(--bg);}
       <div class="pdot"></div><div class="pdot"></div><div class="pdot"></div><div class="pdot"></div>
     </div>
     <div id="pass-setup-err" style="color:var(--err);font-size:.78rem;font-weight:700;min-height:18px;margin-bottom:8px"></div>
-    <div class="pass-keypad" style="gap:10px;margin:0 auto 10px;">
-      <button class="pkey" style="width:58px;height:58px;background:var(--bg);color:var(--tx);border-color:var(--bd);" onclick="pressSetupPin('1')">۱</button>
-      <button class="pkey" style="width:58px;height:58px;background:var(--bg);color:var(--tx);border-color:var(--bd);" onclick="pressSetupPin('2')">۲</button>
-      <button class="pkey" style="width:58px;height:58px;background:var(--bg);color:var(--tx);border-color:var(--bd);" onclick="pressSetupPin('3')">۳</button>
-      <button class="pkey" style="width:58px;height:58px;background:var(--bg);color:var(--tx);border-color:var(--bd);" onclick="pressSetupPin('4')">۴</button>
-      <button class="pkey" style="width:58px;height:58px;background:var(--bg);color:var(--tx);border-color:var(--bd);" onclick="pressSetupPin('5')">۵</button>
-      <button class="pkey" style="width:58px;height:58px;background:var(--bg);color:var(--tx);border-color:var(--bd);" onclick="pressSetupPin('6')">۶</button>
-      <button class="pkey" style="width:58px;height:58px;background:var(--bg);color:var(--tx);border-color:var(--bd);" onclick="pressSetupPin('7')">۷</button>
-      <button class="pkey" style="width:58px;height:58px;background:var(--bg);color:var(--tx);border-color:var(--bd);" onclick="pressSetupPin('8')">۸</button>
-      <button class="pkey" style="width:58px;height:58px;background:var(--bg);color:var(--tx);border-color:var(--bd);" onclick="pressSetupPin('9')">۹</button>
-      <button class="pkey pkey-txt" style="color:var(--tx2);" onclick="closeModal('m-passcode-setup')">انصراف</button>
-      <button class="pkey" style="width:58px;height:58px;background:var(--bg);color:var(--tx);border-color:var(--bd);" onclick="pressSetupPin('0')">۰</button>
-      <button class="pkey" style="width:58px;height:58px;background:var(--bg);color:var(--tx);border-color:var(--bd);" onclick="backspaceSetupPin()"><i class="ph ph-backspace"></i></button>
+    <div class="pass-keypad" style="gap:10px;margin:0 auto 10px;direction:ltr;">
+      <button class="pkey tap" style="width:58px;height:58px;background:var(--bg);color:var(--tx);border-color:var(--bd);" onclick="pressSetupPin('1')">۱</button>
+      <button class="pkey tap" style="width:58px;height:58px;background:var(--bg);color:var(--tx);border-color:var(--bd);" onclick="pressSetupPin('2')">۲</button>
+      <button class="pkey tap" style="width:58px;height:58px;background:var(--bg);color:var(--tx);border-color:var(--bd);" onclick="pressSetupPin('3')">۳</button>
+      <button class="pkey tap" style="width:58px;height:58px;background:var(--bg);color:var(--tx);border-color:var(--bd);" onclick="pressSetupPin('4')">۴</button>
+      <button class="pkey tap" style="width:58px;height:58px;background:var(--bg);color:var(--tx);border-color:var(--bd);" onclick="pressSetupPin('5')">۵</button>
+      <button class="pkey tap" style="width:58px;height:58px;background:var(--bg);color:var(--tx);border-color:var(--bd);" onclick="pressSetupPin('6')">۶</button>
+      <button class="pkey tap" style="width:58px;height:58px;background:var(--bg);color:var(--tx);border-color:var(--bd);" onclick="pressSetupPin('7')">۷</button>
+      <button class="pkey tap" style="width:58px;height:58px;background:var(--bg);color:var(--tx);border-color:var(--bd);" onclick="pressSetupPin('8')">۸</button>
+      <button class="pkey tap" style="width:58px;height:58px;background:var(--bg);color:var(--tx);border-color:var(--bd);" onclick="pressSetupPin('9')">۹</button>
+      <button class="pkey pkey-txt tap" style="color:var(--tx2);" onclick="closeModal('m-passcode-setup')">انصراف</button>
+      <button class="pkey tap" style="width:58px;height:58px;background:var(--bg);color:var(--tx);border-color:var(--bd);" onclick="pressSetupPin('0')">۰</button>
+      <button class="pkey tap" style="width:58px;height:58px;background:var(--bg);color:var(--tx);border-color:var(--bd);" onclick="backspaceSetupPin()"><i class="ph ph-backspace"></i></button>
     </div>
   </div>
 </div>
@@ -1973,19 +2223,19 @@ background: var(--bg);}
       <div class="pdot"></div>
       <div class="pdot"></div>
     </div>
-    <div class="pass-keypad">
-      <button class="pkey" onclick="pressPin('1')">۱</button>
-      <button class="pkey" onclick="pressPin('2')">۲</button>
-      <button class="pkey" onclick="pressPin('3')">۳</button>
-      <button class="pkey" onclick="pressPin('4')">۴</button>
-      <button class="pkey" onclick="pressPin('5')">۵</button>
-      <button class="pkey" onclick="pressPin('6')">۶</button>
-      <button class="pkey" onclick="pressPin('7')">۷</button>
-      <button class="pkey" onclick="pressPin('8')">۸</button>
-      <button class="pkey" onclick="pressPin('9')">۹</button>
+    <div class="pass-keypad" style="direction:ltr;">
+      <button class="pkey tap" onclick="pressPin('1')">۱</button>
+      <button class="pkey tap" onclick="pressPin('2')">۲</button>
+      <button class="pkey tap" onclick="pressPin('3')">۳</button>
+      <button class="pkey tap" onclick="pressPin('4')">۴</button>
+      <button class="pkey tap" onclick="pressPin('5')">۵</button>
+      <button class="pkey tap" onclick="pressPin('6')">۶</button>
+      <button class="pkey tap" onclick="pressPin('7')">۷</button>
+      <button class="pkey tap" onclick="pressPin('8')">۸</button>
+      <button class="pkey tap" onclick="pressPin('9')">۹</button>
       <div style="width:68px"></div>
-      <button class="pkey" onclick="pressPin('0')">۰</button>
-      <button class="pkey" onclick="backspacePin()"><i class="ph ph-backspace"></i></button>
+      <button class="pkey tap" onclick="pressPin('0')">۰</button>
+      <button class="pkey tap" onclick="backspacePin()"><i class="ph ph-backspace"></i></button>
     </div>
   </div>
 </div>
@@ -2142,6 +2392,7 @@ background: var(--bg);}
     <div class="desktop-nav">
       <div class="desktop-nav-item on" data-t="calc" onclick="go('calc',this)"><i class="ph ph-calculator"></i><span>محاسبه</span></div>
       <div class="desktop-nav-item" data-t="history" onclick="go('history',this)"><i class="ph ph-clock-counter-clockwise"></i><span>تاریخچه</span></div>
+      <div class="desktop-nav-item" data-t="skins" onclick="go('skins',this)"><i class="ph ph-palette"></i><span>پوسته‌ها</span></div>
       <div class="desktop-nav-item" data-t="stats" onclick="go('stats',this)"><i class="ph ph-chart-bar"></i><span>آمار</span></div>
       <div class="desktop-nav-item" data-t="settings" onclick="go('settings',this)"><i class="ph ph-gear-six"></i><span>تنظیمات</span></div>
     </div>
@@ -2174,10 +2425,19 @@ background: var(--bg);}
           </div>
         </div>
 
-        <div class="row">
-          <div class="rl">وزن</div>
-          <div class="rw">
-            <div class="ib bt"><span class="u">گرم</span><input type="text" id="vB" inputmode="decimal" placeholder="۰.۰۰۰"></div>
+        <div class="row" style="flex-direction: column; align-items: stretch; gap: 8px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div class="rl">وزن طلا</div>
+            <div class="weight-unit-toggle">
+              <button type="button" class="unit-opt on tap" id="unit-g" onclick="switchWeightUnit('g')">گرم (g)</button>
+              <button type="button" class="unit-opt tap" id="unit-mg" onclick="switchWeightUnit('mg')">میلی‌گرم (mg)</button>
+            </div>
+          </div>
+          <div class="rw" style="width:100%">
+            <div class="ib bt" style="flex:1">
+              <span class="u" id="weight-unit-label">گرم</span>
+              <input type="text" id="vB" inputmode="decimal" placeholder="۰.۰۰۰">
+            </div>
             <div style="width:26px"></div>
           </div>
         </div>
@@ -2332,6 +2592,152 @@ background: var(--bg);}
     </div>
   </main>
 
+  <!-- ===== SKINS & HAPTICS VIEW ===== -->
+  <main id="v-skins" class="view">
+    <div class="sec-h"><h3>پوسته‌ها، صدا و حسگرهای لمسی</h3></div>
+
+    <!-- Luxury Skin Palettes -->
+    <div class="sg">
+      <div class="sgt"><i class="ph-fill ph-palette"></i> انتخاب تم و پالت رنگی (LUTs)</div>
+      <div class="skins-grid">
+        <div class="skin-card on tap" id="skin-classic-navy" onclick="setSkinTheme('classic-navy', this)">
+          <div class="skin-preview-bar">
+            <div class="skin-p-c1" style="background:#172051"></div>
+            <div class="skin-p-c2" style="background:#f0f3f8"></div>
+            <div class="skin-p-c3" style="background:#d4a017"></div>
+          </div>
+          <div class="skin-card-title">
+            <span>کلاسیک مهوا</span>
+            <i class="ph-fill ph-check-circle" style="color:var(--primary)"></i>
+          </div>
+          <div class="skin-card-desc">سورمه‌ای درباری و طلا</div>
+        </div>
+
+        <div class="skin-card tap" id="skin-royal-gold" onclick="setSkinTheme('royal-gold', this)">
+          <div class="skin-preview-bar">
+            <div class="skin-p-c1" style="background:#0b0f19"></div>
+            <div class="skin-p-c2" style="background:#131b2e"></div>
+            <div class="skin-p-c3" style="background:#d4a017"></div>
+          </div>
+          <div class="skin-card-title">
+            <span>طلای سلطنتی</span>
+            <i class="ph-fill ph-check-circle" style="display:none;color:var(--warn)"></i>
+          </div>
+          <div class="skin-card-desc">مشکی آبسیدین و طلای براق</div>
+        </div>
+
+        <div class="skin-card tap" id="skin-emerald" onclick="setSkinTheme('emerald', this)">
+          <div class="skin-preview-bar">
+            <div class="skin-p-c1" style="background:#061e16"></div>
+            <div class="skin-p-c2" style="background:#0c2e23"></div>
+            <div class="skin-p-c3" style="background:#10b981"></div>
+          </div>
+          <div class="skin-card-title">
+            <span>زمرد سبز</span>
+            <i class="ph-fill ph-check-circle" style="display:none;color:var(--ok)"></i>
+          </div>
+          <div class="skin-card-desc">سبز زمردی و طلای نفیس</div>
+        </div>
+
+        <div class="skin-card tap" id="skin-ruby" onclick="setSkinTheme('ruby', this)">
+          <div class="skin-preview-bar">
+            <div class="skin-p-c1" style="background:#1c0a10"></div>
+            <div class="skin-p-c2" style="background:#2c121b"></div>
+            <div class="skin-p-c3" style="background:#f43f5e"></div>
+          </div>
+          <div class="skin-card-title">
+            <span>یاقوت سرخ</span>
+            <i class="ph-fill ph-check-circle" style="display:none;color:var(--err)"></i>
+          </div>
+          <div class="skin-card-desc">یاقوتی لوکس و طلایی</div>
+        </div>
+
+        <div class="skin-card tap" id="skin-midnight-titanium" onclick="setSkinTheme('midnight-titanium', this)">
+          <div class="skin-preview-bar">
+            <div class="skin-p-c1" style="background:#090d16"></div>
+            <div class="skin-p-c2" style="background:#111827"></div>
+            <div class="skin-p-c3" style="background:#94a3b8"></div>
+          </div>
+          <div class="skin-card-title">
+            <span>تیتانیوم شب</span>
+            <i class="ph-fill ph-check-circle" style="display:none;"></i>
+          </div>
+          <div class="skin-card-desc">مات تیره صنعتی</div>
+        </div>
+
+        <div class="skin-card tap" id="skin-pearl-white" onclick="setSkinTheme('pearl-white', this)">
+          <div class="skin-preview-bar">
+            <div class="skin-p-c1" style="background:#f8fafc"></div>
+            <div class="skin-p-c2" style="background:#ffffff"></div>
+            <div class="skin-p-c3" style="background:#0f172a"></div>
+          </div>
+          <div class="skin-card-title">
+            <span>مروارید سفید</span>
+            <i class="ph-fill ph-check-circle" style="display:none;"></i>
+          </div>
+          <div class="skin-card-desc">سفید صدفی فوق‌العاده تمیز</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Key Sound Feedback Selector -->
+    <div class="sg">
+      <div class="sgt"><i class="ph-fill ph-speaker-high"></i> صدای کلیدها و افکت لمسی (Web Audio)</div>
+      <div class="fx-chips" id="sound-chips">
+        <button class="fx-chip on tap" onclick="setSoundPreset('mechanical', this)"><i class="ph-fill ph-keyboard"></i> مکانیکی لوکس</button>
+        <button class="fx-chip tap" onclick="setSoundPreset('bubble', this)"><i class="ph-fill ph-drop"></i> حباب نرم</button>
+        <button class="fx-chip tap" onclick="setSoundPreset('digital', this)"><i class="ph-fill ph-lightning"></i> تیک دیجیتال</button>
+        <button class="fx-chip tap" onclick="setSoundPreset('mute', this)"><i class="ph-fill ph-speaker-slash"></i> بی‌صدا</button>
+      </div>
+    </div>
+
+    <!-- Tactile Haptics Selector -->
+    <div class="sg">
+      <div class="sgt"><i class="ph-fill ph-vibrate"></i> قدرت لرزش لمسی (Haptic Feedback)</div>
+      <div class="fx-chips" id="haptic-chips">
+        <button class="fx-chip tap" onclick="setHapticLevel('soft', this)">ملایم (اپل)</button>
+        <button class="fx-chip on tap" onclick="setHapticLevel('medium', this)">استاندارد</button>
+        <button class="fx-chip tap" onclick="setHapticLevel('strong', this)">قوی</button>
+        <button class="fx-chip tap" onclick="setHapticLevel('off', this)">خاموش</button>
+      </div>
+    </div>
+
+    <!-- Typography Font Selector -->
+    <div class="sg">
+      <div class="sgt"><i class="ph-fill ph-text-aa"></i> فونت و تایپوگرافی اختصاصی</div>
+      <div class="fx-chips" id="font-family-chips">
+        <button class="fx-chip on tap" onclick="setFontFamily('Peyda', this)">پیدا (Peyda - لوکس)</button>
+        <button class="fx-chip tap" onclick="setFontFamily('Vazirmatn', this)">وزیرمتن (Vazirmatn)</button>
+      </div>
+    </div>
+
+    <!-- Interactive Sound & Tactile Playground -->
+    <div class="playground-box">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+        <span style="font-size:0.82rem; font-weight:800; color:var(--primary); display:flex; align-items:center; gap:5px;">
+          <i class="ph-fill ph-hand-tap" style="color:var(--warn)"></i> پلی‌گراند تست لمس، صدا و لرزش
+        </span>
+        <span id="play-screen-val" style="font-family:var(--font-main); font-weight:900; font-size:0.95rem; color:var(--primary);">۱۲۳,۴۵۶</span>
+      </div>
+      <div style="font-size:0.68rem; color:var(--tx2); margin-bottom:8px;">کلیدهای زیر را لمس کنید تا حس صدا، لرزش و پاسخ لمسی را امتحان نمایید:</div>
+      
+      <div class="play-keypad">
+        <button class="play-key tap" onclick="playKeypadPress('1')">1</button>
+        <button class="play-key tap" onclick="playKeypadPress('2')">2</button>
+        <button class="play-key tap" onclick="playKeypadPress('3')">3</button>
+        <button class="play-key tap" onclick="playKeypadPress('4')">4</button>
+        <button class="play-key tap" onclick="playKeypadPress('5')">5</button>
+        <button class="play-key tap" onclick="playKeypadPress('6')">6</button>
+        <button class="play-key tap" onclick="playKeypadPress('7')">7</button>
+        <button class="play-key tap" onclick="playKeypadPress('8')">8</button>
+        <button class="play-key tap" onclick="playKeypadPress('9')">9</button>
+        <button class="play-key tap" style="font-size:0.8rem;" onclick="playKeypadPress('C')">C</button>
+        <button class="play-key tap" onclick="playKeypadPress('0')">0</button>
+        <button class="play-key tap" style="font-size:0.85rem;" onclick="playKeypadPress('DEL')">⌫</button>
+      </div>
+    </div>
+  </main>
+
   <!-- ===== SETTINGS VIEW ===== -->
   <main id="v-settings" class="view">
     <div class="sec-h"><h3>تنظیمات و امنیت برنامه</h3></div>
@@ -2461,9 +2867,11 @@ background: var(--bg);}
   <nav class="bnav">
     <div class="ni on" data-t="calc" onclick="go('calc',this)"><i class="ph ph-calculator"></i><span>محاسبه</span></div>
     <div class="ni" data-t="history" onclick="go('history',this)"><i class="ph ph-clock-counter-clockwise"></i><span>تاریخچه</span></div>
+    <div class="ni" data-t="skins" onclick="go('skins',this)"><i class="ph ph-palette"></i><span>پوسته‌ها</span></div>
     <div class="ni" data-t="stats" onclick="go('stats',this)"><i class="ph ph-chart-bar"></i><span>آمار</span></div>
     <div class="ni" data-t="settings" onclick="go('settings',this)"><i class="ph ph-gear-six"></i><span>تنظیمات</span></div>
   </nav>
+</div>
 </div>
 
 <input type="file" id="imp-f" accept=".json" style="display:none" onchange="doImp(event)">
@@ -2600,7 +3008,10 @@ let S={
   dark:false,
   bold:false,
   fontSize:14,
-  fontFamily:'Vazirmatn',
+  fontFamily:'Peyda',
+  skin:'classic-navy',
+  soundPreset:'mechanical',
+  hapticLevel:'medium',
   passcode:{enabled:false, pin:''},
   snapshots:[],
   pwaDismissed:false
@@ -2611,15 +3022,226 @@ let dRange={from:null,to:null},dpF='from',calY,calM;
 let activeCustomer={name:'',phone:'',nid:'',paymentMethod:'کارتخوان',bankName:'',trackingCode:'',note:''};
 let passPin='', setupPin1='', setupPin2='', setupStep=1;
 let isPassLocked=false;
+let currentWeightUnit='g'; // 'g' or 'mg'
 
 try{
   const sv=localStorage.getItem('mahva_v6');
   if(sv){const p=JSON.parse(sv);S={...S,...p};}
-  if(!S.fontFamily)S.fontFamily='Vazirmatn';
+  if(!S.fontFamily)S.fontFamily='Peyda';
+  if(!S.skin)S.skin='classic-navy';
+  if(!S.soundPreset)S.soundPreset='mechanical';
+  if(!S.hapticLevel)S.hapticLevel='medium';
   if(!S.snapshots)S.snapshots=[];
 }catch(e){}
 
 const save=()=>localStorage.setItem('mahva_v6',JSON.stringify(S));
+
+/* ============================================================
+   HIFI AUDIO SYNTHESIZER & TACTILE HAPTICS ENGINE
+   ============================================================ */
+let audioCtx = null;
+
+function initAudioContext() {
+  if (!audioCtx && (window.AudioContext || window.webkitAudioContext)) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+}
+
+function playKeySound(type = null) {
+  const soundPref = S.soundPreset || 'mechanical';
+  if (soundPref === 'mute') return;
+  const activeType = type || soundPref;
+  
+  try {
+    initAudioContext();
+    if (!audioCtx) return;
+    const now = audioCtx.currentTime;
+    
+    if (activeType === 'mechanical') {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(140, now);
+      osc.frequency.exponentialRampToValueAtTime(45, now + 0.04);
+      gain.gain.setValueAtTime(0.35, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.04);
+
+      const oscHigh = audioCtx.createOscillator();
+      const gainHigh = audioCtx.createGain();
+      oscHigh.type = 'sine';
+      oscHigh.frequency.setValueAtTime(1800, now);
+      oscHigh.frequency.exponentialRampToValueAtTime(600, now + 0.02);
+      gainHigh.gain.setValueAtTime(0.2, now);
+      gainHigh.gain.exponentialRampToValueAtTime(0.001, now + 0.02);
+      oscHigh.connect(gainHigh);
+      gainHigh.connect(audioCtx.destination);
+      oscHigh.start(now);
+      oscHigh.stop(now + 0.02);
+    } else if (activeType === 'bubble') {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(480, now);
+      osc.frequency.exponentialRampToValueAtTime(860, now + 0.035);
+      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.035);
+    } else if (activeType === 'digital') {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(1200, now);
+      gain.gain.setValueAtTime(0.08, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.015);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.015);
+    }
+  } catch (e) {}
+}
+
+function triggerHaptic(level = null) {
+  const pref = S.hapticLevel || 'medium';
+  if (pref === 'off') return;
+  const activeLevel = level || pref;
+  if (!navigator.vibrate) return;
+  
+  if (activeLevel === 'soft') {
+    navigator.vibrate(8);
+  } else if (activeLevel === 'medium') {
+    navigator.vibrate(15);
+  } else if (activeLevel === 'strong') {
+    navigator.vibrate([20, 15, 20]);
+  }
+}
+
+function tactileFeedback() {
+  playKeySound();
+  triggerHaptic();
+}
+
+/* ============================================================
+   SKINS, SOUNDS & HAPTICS ENGINE
+   ============================================================ */
+window.setSkinTheme = (skinId, cardEl) => {
+  S.skin = skinId;
+  document.documentElement.setAttribute('data-skin', skinId);
+  document.querySelectorAll('.skin-card').forEach(c => {
+    const isThis = (c.id === 'skin-' + skinId || c === cardEl);
+    c.classList.toggle('on', isThis);
+    const chk = c.querySelector('.ph-check-circle');
+    if (chk) chk.style.display = isThis ? 'inline-block' : 'none';
+  });
+  save();
+  tactileFeedback();
+  toast('پوسته اعمال شد ✓');
+};
+
+window.setSoundPreset = (preset, btn) => {
+  S.soundPreset = preset;
+  document.querySelectorAll('#sound-chips .fx-chip').forEach(b => b.classList.remove('on'));
+  if (btn) btn.classList.add('on');
+  save();
+  playKeySound(preset);
+  triggerHaptic();
+  toast('صدای کلیدها تغییر کرد');
+};
+
+window.setHapticLevel = (lvl, btn) => {
+  S.hapticLevel = lvl;
+  document.querySelectorAll('#haptic-chips .fx-chip').forEach(b => b.classList.remove('on'));
+  if (btn) btn.classList.add('on');
+  save();
+  triggerHaptic(lvl);
+  playKeySound();
+  toast('قدرت لرزش تنظیم شد');
+};
+
+window.setFontFamily = (font, btn) => {
+  S.fontFamily = font;
+  document.querySelectorAll('#font-family-chips .fx-chip').forEach(b => b.classList.remove('on'));
+  if (btn) btn.classList.add('on');
+  applyFont(font);
+  save();
+  tactileFeedback();
+  toast('فونت بروزرسانی شد ✓');
+};
+
+function applyFont(fontName, notify=true) {
+  document.documentElement.style.setProperty('--font-main', `'${fontName}', 'Vazirmatn', -apple-system, sans-serif`);
+  document.documentElement.style.setProperty('--font-family', fontName);
+  document.body.style.fontFamily = `'${fontName}', 'Vazirmatn', -apple-system, sans-serif`;
+}
+
+// Playground Keypad
+let playScreenText = '۱۲۳,۴۵۶';
+window.playKeypadPress = (k) => {
+  tactileFeedback();
+  const screen = document.getElementById('play-screen-val');
+  if (!screen) return;
+  
+  if (k === 'C') {
+    playScreenText = '۰';
+  } else if (k === 'DEL') {
+    let clean = p2e(playScreenText).replace(/[^0-9]/g, '');
+    clean = clean.slice(0, -1);
+    playScreenText = clean ? e2p(Number(clean).toLocaleString('en-US')) : '۰';
+  } else {
+    let clean = p2e(playScreenText).replace(/[^0-9]/g, '');
+    if (clean === '0') clean = '';
+    clean += k;
+    if (clean.length > 9) clean = clean.slice(0, 9);
+    playScreenText = e2p(Number(clean).toLocaleString('en-US'));
+  }
+  screen.textContent = playScreenText;
+};
+
+/* ============================================================
+   WEIGHT UNIT SWITCHER (گرم / میلی‌گرم)
+   ============================================================ */
+window.switchWeightUnit = (unit) => {
+  if (currentWeightUnit === unit) return;
+  currentWeightUnit = unit;
+  
+  const gBtn = document.getElementById('unit-g');
+  const mgBtn = document.getElementById('unit-mg');
+  const uLbl = document.getElementById('weight-unit-label');
+  const vB = document.getElementById('vB');
+  
+  if (unit === 'g') {
+    if (gBtn) gBtn.classList.add('on');
+    if (mgBtn) mgBtn.classList.remove('on');
+    if (uLbl) uLbl.textContent = 'گرم';
+    
+    let curVal = Number(p2e(vB.value.replace(/,/g, ''))) || 0;
+    if (curVal > 0) {
+      vB.value = e2p((curVal / 1000).toFixed(3));
+    }
+  } else {
+    if (gBtn) gBtn.classList.remove('on');
+    if (mgBtn) mgBtn.classList.add('on');
+    if (uLbl) uLbl.textContent = 'میلی‌گرم';
+    
+    let curVal = Number(p2e(vB.value.replace(/,/g, ''))) || 0;
+    if (curVal > 0) {
+      vB.value = e2p(Math.round(curVal * 1000).toLocaleString('en-US'));
+    }
+  }
+  
+  tactileFeedback();
+  calc();
+};
 
 /* Passcode Lock Engine */
 function checkPasscodeRequired(){
@@ -2987,6 +3609,25 @@ window.onFontSlider = (val)=>{
 /* Apply persisted settings immediately */
 function applySettings(){
   checkPasscodeRequired();
+  if(S.skin){
+    document.documentElement.setAttribute('data-skin', S.skin);
+    document.querySelectorAll('.skin-card').forEach(c => {
+      const isThis = (c.id === 'skin-' + S.skin);
+      c.classList.toggle('on', isThis);
+      const chk = c.querySelector('.ph-check-circle');
+      if (chk) chk.style.display = isThis ? 'inline-block' : 'none';
+    });
+  }
+  if(S.soundPreset){
+    document.querySelectorAll('#sound-chips .fx-chip').forEach(b => {
+      b.classList.toggle('on', b.textContent.includes(S.soundPreset === 'mechanical' ? 'مکانیکی' : S.soundPreset === 'bubble' ? 'حباب' : S.soundPreset === 'digital' ? 'دیجیتال' : 'بی‌صدا'));
+    });
+  }
+  if(S.hapticLevel){
+    document.querySelectorAll('#haptic-chips .fx-chip').forEach(b => {
+      b.classList.toggle('on', b.textContent.includes(S.hapticLevel === 'soft' ? 'ملایم' : S.hapticLevel === 'medium' ? 'استاندارد' : S.hapticLevel === 'strong' ? 'قوی' : 'خاموش'));
+    });
+  }
   if(S.dark){
     document.documentElement.setAttribute('data-theme','dark');
     document.getElementById('t-dark')?.classList.add('on');
@@ -3007,6 +3648,9 @@ function applySettings(){
   }
   if(S.fontFamily){
     applyFont(S.fontFamily,false);
+    document.querySelectorAll('#font-family-chips .fx-chip').forEach(b => {
+      b.classList.toggle('on', b.textContent.includes(S.fontFamily));
+    });
   }
   if(S.passcode&&S.passcode.enabled){
     document.getElementById('t-passcode')?.classList.add('on');
@@ -3043,7 +3687,7 @@ document.addEventListener('visibilitychange',()=>{
    ============================================================ */
 function initRoute(){
   const h=location.hash.replace('#','')||'calc';
-  const tabs=['calc','history','stats','settings'];
+  const tabs=['calc','history','skins','stats','settings'];
   const t=tabs.includes(h)?h:'calc';
   const n=document.querySelector(`.ni[data-t="${t}"]`);
   if(n)go(t,n,false);
@@ -3074,6 +3718,9 @@ window.go=(id,el,upHash=true)=>{
   });
   if(upHash)history.pushState(null,null,'#'+id);
   if(id==='history')renderH();
+  if(id==='skins'){
+    initTaps();
+  }
   if(id==='stats'){renderStats();renderCharts();}
   if(id==='settings'){
     autoUpdateSnapshot();
@@ -3094,7 +3741,10 @@ window.go=(id,el,upHash=true)=>{
    ============================================================ */
 let _dbT;
 const calc=()=>{
-  const A=gv('vA'),B=gv('vB'),D=gv('vD'),F=gv('vF'),H=gv('vH');
+  const A=gv('vA');
+  const rawB=gv('vB');
+  const B = (currentWeightUnit === 'mg') ? (rawB / 1000) : rawB;
+  const D=gv('vD'),F=gv('vF'),H=gv('vH');
   const C=A*B;
   const E=(D*C)/100;
   const G=(F*(C+E))/100;
@@ -4051,24 +4701,22 @@ window.doImp=e=>{
 };
 
 /* ============================================================
-   TAP FEEDBACK — Ripple origin tracking
+   HAPTIC & AUDIO TACTILE FEEDBACK
    ============================================================ */
 function initTaps(){
-  const sel='.tap,.btn,.mb,.ebtn,.cnb,.dp-prb,.cfbb,.drb,.fs-btn,.font-opt,.si,.sil';
+  const sel='.tap, .btn, .mb, .ebtn, .cnb, .dp-prb, .cfbb, .drb, .fs-btn, .font-opt, .si, .sil, .pkey, .unit-opt, .fx-chip, .skin-card, .lk, .play-key, .pay-chip, .ni, .desktop-nav-item';
   document.querySelectorAll(sel).forEach(el=>{
-    const h=e=>{
-      const r=el.getBoundingClientRect();
-      const tx=e.touches?e.touches[0].clientX:e.clientX;
-      const ty=e.touches?e.touches[0].clientY:e.clientY;
-      const x=((tx-r.left)/r.width)*100;
-      const y=((ty-r.top)/r.height)*100;
-      el.style.setProperty('--rx',x+'%');
-      el.style.setProperty('--ry',y+'%');
-    };
-    el.addEventListener('touchstart',h,{passive:true});
-    el.addEventListener('mousedown',h);
+    if(el._tapBound) return;
+    el._tapBound = true;
+    el.addEventListener('pointerdown', e => {
+      tactileFeedback();
+    }, { passive: true });
   });
 }
+window.addEventListener('DOMContentLoaded', () => {
+  initTaps();
+});
+setTimeout(initTaps, 200);
 
 /* ============================================================
    PWA INSTALL
