@@ -3130,12 +3130,13 @@ try{
   const sv=localStorage.getItem('mahva_v6');
   if(sv){
     const p=JSON.parse(sv);
+    // Sanitize any previous bloated snapshots
     if(p.snapshots && Array.isArray(p.snapshots)){
-      p.snapshots = p.snapshots.slice(0, 4).map(s => {
+      p.snapshots = p.snapshots.slice(0, 3).map(s => {
         try {
           const d = JSON.parse(s.data);
           delete d.snapshots;
-          return { ...s, data: JSON.stringify(d) };
+          return { id: s.id, date: s.date, time: s.time, count: s.count, isCurrent: !!s.isCurrent, data: JSON.stringify(d) };
         } catch(err) {
           return null;
         }
@@ -3148,21 +3149,34 @@ try{
   if(!S.soundPreset || ['mechanical','bubble','digital'].includes(S.soundPreset))S.soundPreset='taptic';
   if(!S.hapticLevel || ['soft','medium','strong'].includes(S.hapticLevel))S.hapticLevel='on';
   if(!S.snapshots)S.snapshots=[];
-}catch(e){}
+}catch(e){
+  try { localStorage.removeItem('mahva_v6'); } catch(err) {}
+}
 
 const save=()=>{
+  const getCleanStr=()=>{
+    const copy={...S};
+    if(copy.snapshots){
+      copy.snapshots=copy.snapshots.slice(0,3).map(s=>({
+        id:s.id,date:s.date,time:s.time,count:s.count,isCurrent:s.isCurrent,data:s.data
+      }));
+    }
+    return JSON.stringify(copy);
+  };
   try {
-    localStorage.setItem('mahva_v6', JSON.stringify(S));
+    localStorage.setItem('mahva_v6', getCleanStr());
   } catch (err) {
     try {
-      if (S.snapshots && S.snapshots.length > 2) {
-        S.snapshots = S.snapshots.slice(0, 2);
+      localStorage.removeItem('mahva_v6');
+      if (S.snapshots && S.snapshots.length > 1) {
+        S.snapshots = S.snapshots.slice(0, 1);
       }
-      localStorage.setItem('mahva_v6', JSON.stringify(S));
+      localStorage.setItem('mahva_v6', getCleanStr());
     } catch (err2) {
       try {
+        localStorage.removeItem('mahva_v6');
         S.snapshots = [];
-        localStorage.setItem('mahva_v6', JSON.stringify(S));
+        localStorage.setItem('mahva_v6', getCleanStr());
       } catch (err3) {
         console.warn('Storage quota limit reached');
       }

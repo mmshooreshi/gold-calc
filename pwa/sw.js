@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mahva-gold-calc-v9.2';
+const CACHE_NAME = 'mahva-gold-calc-v9.3';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
