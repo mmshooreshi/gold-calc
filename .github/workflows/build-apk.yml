@@ -1,15 +1,17 @@
-name: Build Android APK
+name: Build & Release Android APK
 
 on:
   push:
-    branches: [ "**" ]
-  pull_request:
-    branches: [ "**" ]
+    branches: [ "main" ]
+    tags: [ "v*" ]
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
-    name: Build Mahva Gallery APK
+    name: Build & Release Mahva Gallery APK
     runs-on: ubuntu-latest
 
     steps:
@@ -39,3 +41,21 @@ jobs:
           name: mahva-gallery-apk
           path: android/app/build/outputs/apk/release/mahva-gallery.apk
           if-no-files-found: error
+
+      - name: Publish to GitHub Releases
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
+        with:
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'latest' }}
+          name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'Mahva Gallery (Latest Build)' }}
+          body: |
+            ## 𓋞 Mahva Gallery Gold Calculator
+
+            ### 📱 Download & Install
+            Download **`mahva-gallery.apk`** below directly to your Android device.
+
+            - **Commit**: `${{ github.sha }}`
+            - **Platform**: Android (120Hz Jetpack Compose)
+          files: android/app/build/outputs/apk/release/mahva-gallery.apk
+          draft: false
+          prerelease: false

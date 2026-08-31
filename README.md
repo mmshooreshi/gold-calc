@@ -43,12 +43,10 @@ A dedicated valuation suite engineered for jewelry ateliers and bullion trading.
 
 ## Build & Installation
 
-### Cloud APK (Zero Local Setup)
-Push to GitHub to automatically trigger the build pipeline:
-```bash
-git push origin main
-```
-Download the compiled `mahva-gallery.apk` directly from **GitHub Actions** $\rightarrow$ **Artifacts**.
+### Download APK
+Download the latest ready-to-install **`mahva-gallery.apk`** from [**Releases**](https://github.com/mmshooreshi/gold-calc/releases).
+
+Every push to `main` automatically builds and updates the release.
 
 ### Local Build
 ```bash
