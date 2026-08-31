@@ -1023,71 +1023,95 @@ background: var(--bg);}
    OLED / LCD LUXURY CALCULATOR SCREEN
    ============================================================ */
 .calc-oled-screen {
-  background: #0f172a;
+  background: radial-gradient(circle at 100% 0%, #1e293b, #090d16 80%);
   color: #f8fafc;
-  border-radius: 16px;
-  padding: 12px 16px;
-  margin-bottom: 14px;
-  box-shadow: inset 0 2px 6px rgba(0,0,0,0.5), 0 4px 14px rgba(15,23,42,0.12);
-  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 18px;
+  padding: 14px 18px;
+  margin-bottom: 12px;
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.6), 0 6px 20px rgba(15,23,42,0.18);
+  border: 1.5px solid rgba(255,255,255,0.1);
   position: relative;
   overflow: hidden;
+  transition: all 0.3s ease;
+}
+[data-skin="pearl-white"] .calc-oled-screen {
+  background: radial-gradient(circle at 100% 0%, #1e293b, #0f172a 85%);
+}
+[data-skin="classic-navy"] .calc-oled-screen {
+  background: radial-gradient(circle at 100% 0%, #172051, #0a0e27 85%);
+  border-color: rgba(212,160,23,0.3);
+}
+[data-skin="obsidian-dark"] .calc-oled-screen {
+  background: radial-gradient(circle at 100% 0%, #18181b, #09090b 85%);
+  border-color: rgba(255,255,255,0.12);
 }
 .calc-oled-screen::after {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0; height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
 }
 .oled-top-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.72rem;
+  font-size: 0.76rem;
   color: #94a3b8;
-  margin-bottom: 2px;
+  margin-bottom: 4px;
 }
 .oled-formula {
   font-family: var(--font-main);
+  font-weight: 700;
+  letter-spacing: -0.2px;
   direction: ltr;
 }
 .oled-badge {
-  background: rgba(212,160,23,0.2);
-  color: #fbbf24;
-  padding: 1px 7px;
-  border-radius: 6px;
+  background: rgba(212,160,23,0.22);
+  color: #facc15;
+  padding: 2px 8px;
+  border-radius: 8px;
   font-weight: 800;
-  font-size: 0.68rem;
+  font-size: 0.72rem;
+  border: 1px solid rgba(212,160,23,0.35);
 }
 .oled-main-val {
   display: flex;
   align-items: baseline;
   justify-content: flex-end;
-  gap: 6px;
-  margin: 4px 0 6px;
+  gap: 8px;
+  margin: 6px 0 10px;
 }
 .oled-num {
   font-family: var(--font-main);
-  font-size: 1.65rem;
+  font-size: 2.1rem;
   font-weight: 900;
   color: #ffffff;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.8px;
+  text-shadow: 0 0 16px rgba(255,255,255,0.25);
+  transition: transform 0.15s ease;
 }
 .oled-unit {
-  font-size: 0.75rem;
-  color: #94a3b8;
-  font-weight: 700;
+  font-size: 0.82rem;
+  color: #cbd5e1;
+  font-weight: 800;
 }
 .oled-bottom-row {
   display: flex;
   justify-content: space-between;
-  font-size: 0.7rem;
-  color: #64748b;
-  border-top: 1px solid rgba(255,255,255,0.08);
-  padding-top: 5px;
+  align-items: center;
+  font-size: 0.74rem;
+  color: #94a3b8;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding-top: 8px;
+}
+.oled-bottom-row span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 .oled-bottom-row b {
-  color: #cbd5e1;
+  color: #f1f5f9;
+  font-weight: 800;
 }
 
 /* ============================================================
@@ -2614,14 +2638,6 @@ background: var(--bg);}
         </div>
 
         <div class="row">
-          <div class="rl">قیمت خام</div>
-          <div class="rw">
-            <div class="ib bt off"><span class="u">تومان</span><input type="text" id="vC" disabled></div>
-            <div style="width:26px"></div>
-          </div>
-        </div>
-
-        <div class="row">
           <div class="rl">اجرت <button class="ib-info tap" onclick="showInfo('اجرت ساخت','درصد اجرت ساخت طلا روی قیمت خام محاسبه می‌شود.')"><i class="ph ph-info"></i></button></div>
           <div class="rw">
             <div class="ib bp"><span class="u">٪</span><input type="text" id="vD" inputmode="decimal"></div>
@@ -2648,33 +2664,7 @@ background: var(--bg);}
           </div>
         </div>
 
-        <div class="dash-divider"></div>
-
-        <div class="row" style="margin-top:4px">
-          <div class="rl hl">قیمت کل</div>
-          <div class="rw">
-            <div class="ib bt hb off"><span class="u" style="color:var(--primary)">تومان</span><input type="text" id="vK" disabled style="color:var(--primary);font-size:1.08rem;font-weight:900;"></div>
-            <div style="width:26px"></div>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="rl">مجموع هزینه‌ها</div>
-          <div class="rw">
-            <div class="ib bt off"><span class="u">تومان</span><input type="text" id="vCosts" disabled></div>
-            <div style="width:26px"></div>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="rl">درصد نهایی</div>
-          <div class="rw">
-            <div class="ib bt off"><span class="u">٪</span><input type="text" id="vJ" disabled></div>
-            <div style="width:26px"></div>
-          </div>
-        </div>
-
-        <div class="acts">
+        <div class="acts" style="margin-top: 14px;">
           <button class="rcpt-btn tap" id="btn-rcpt" onclick="showFormReceipt()"><i class="ph ph-receipt"></i><div class="rcpt-fill"></div></button>
           <button class="btn btn-o tap" id="btn-clr"><i class="ph ph-eraser"></i> پاک کردن</button>
           <button class="btn btn-p tap" id="btn-save"><i class="ph ph-check-circle"></i> ثبت فروش</button>
@@ -2683,9 +2673,12 @@ background: var(--bg);}
 
       <!-- Desktop Side Live Invoice Summary -->
       <div class="calc-side-panel">
-        <div style="font-size: 1.05rem; font-weight: 800; color: var(--primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
-          <i class="ph-fill ph-receipt"></i>
-          <span>پیش‌نمایش زنده محاسبه</span>
+        <div style="font-size: 1.05rem; font-weight: 800; color: var(--primary); margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <i class="ph-fill ph-receipt" style="color:var(--warn)"></i>
+            <span>فاکتور زنده معامله</span>
+          </div>
+          <span class="badge sale" style="font-size:0.68rem;">محاسبه لحظه‌ای</span>
         </div>
         <div style="background: var(--bg); border-radius: 14px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--bd);">
           <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.82rem;">
@@ -2693,20 +2686,27 @@ background: var(--bg);}
             <span id="side-raw-price" style="font-weight: 700;">۰ تومان</span>
           </div>
           <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.82rem;">
-            <span style="color: var(--tx2);">اجرت + سود + مالیات:</span>
-            <span id="side-costs" style="font-weight: 700; color: var(--warn);">۰ تومان</span>
+            <span style="color: var(--tx2);">اجرت ساخت:</span>
+            <span id="side-wage-price" style="font-weight: 700;">۰ تومان</span>
           </div>
           <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.82rem;">
-            <span style="color: var(--tx2);">درصد نهایی مؤثر:</span>
-            <span id="side-final-percent" style="font-weight: 800; color: var(--primary);">۰٪</span>
+            <span style="color: var(--tx2);">سود فروشگاه:</span>
+            <span id="side-profit-price" style="font-weight: 700;">۰ تومان</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.82rem;">
+            <span style="color: var(--tx2);">مالیات بر ارزش افزوده:</span>
+            <span id="side-tax-price" style="font-weight: 700;">۰ تومان</span>
           </div>
           <div style="border-top: 1.5px dashed var(--bd); padding-top: 10px; margin-top: 10px; display: flex; justify-content: space-between; align-items: baseline;">
-            <span style="font-weight: 800; font-size: 0.95rem;">مبلغ نهایی:</span>
+            <div>
+              <span style="font-weight: 800; font-size: 0.92rem; display:block;">مبلغ نهایی فاکتور:</span>
+              <span id="side-final-percent" style="font-size: 0.72rem; color: var(--warn); font-weight: 700;">درصد مؤثر: ۰٪</span>
+            </div>
             <span id="side-total-price" style="font-weight: 900; font-size: 1.3rem; color: var(--primary);">۰ تومان</span>
           </div>
         </div>
         <button class="btn btn-p tap" style="width: 100%; height: 42px;" onclick="showFormReceipt()">
-          <i class="ph ph-printer"></i> مشاهده و چاپ فاکتور
+          <i class="ph ph-printer"></i> مشاهده و چاپ رسمی فاکتور
         </button>
       </div>
     </div>
@@ -4066,12 +4066,16 @@ const calc=()=>{
 
   // Update Desktop side live preview panel
   const sideRaw = document.getElementById('side-raw-price');
-  const sideCosts = document.getElementById('side-costs');
+  const sideWage = document.getElementById('side-wage-price');
+  const sideProfit = document.getElementById('side-profit-price');
+  const sideTax = document.getElementById('side-tax-price');
   const sideFinal = document.getElementById('side-final-percent');
   const sideTotal = document.getElementById('side-total-price');
   if(sideRaw) sideRaw.textContent = C > 0 ? fmt(C) + ' تومان' : '۰ تومان';
-  if(sideCosts) sideCosts.textContent = (E + G + I) > 0 ? fmt(E + G + I) + ' تومان' : '۰ تومان';
-  if(sideFinal) sideFinal.textContent = C > 0 ? fmt(((K/C)-1)*100, 2) + '٪' : '۰٪';
+  if(sideWage) sideWage.textContent = E > 0 ? fmt(E) + ' تومان' : '۰ تومان';
+  if(sideProfit) sideProfit.textContent = G > 0 ? fmt(G) + ' تومان' : '۰ تومان';
+  if(sideTax) sideTax.textContent = I > 0 ? fmt(I) + ' تومان' : '۰ تومان';
+  if(sideFinal) sideFinal.textContent = C > 0 ? 'درصد مؤثر: ' + fmt(((K/C)-1)*100, 2) + '٪' : 'درصد مؤثر: ۰٪';
   if(sideTotal) sideTotal.textContent = K > 0 ? fmt(K) + ' تومان' : '۰ تومان';
 
   // Persist locked values
