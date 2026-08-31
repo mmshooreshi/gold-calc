@@ -208,36 +208,31 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun onGoldPriceChange(value: String) {
-        val formatted = NumberFormatters.formatInputWithCommas(value)
-        _calcState.update { it.copy(goldPrice = formatted) }
-        if (locks.value.lockA) repository.updateLockedValue("A", formatted)
+        _calcState.update { it.copy(goldPrice = value) }
+        if (locks.value.lockA) repository.updateLockedValue("A", value)
         recalculate()
     }
 
     fun onWeightChange(value: String) {
-        val formatted = NumberFormatters.formatDecimalInput(value)
-        _calcState.update { it.copy(weight = formatted) }
+        _calcState.update { it.copy(weight = value) }
         recalculate()
     }
 
     fun onOjratPercentChange(value: String) {
-        val formatted = NumberFormatters.formatDecimalInput(value)
-        _calcState.update { it.copy(ojratPercent = formatted) }
-        if (locks.value.lockD) repository.updateLockedValue("D", formatted)
+        _calcState.update { it.copy(ojratPercent = value) }
+        if (locks.value.lockD) repository.updateLockedValue("D", value)
         recalculate()
     }
 
     fun onProfitPercentChange(value: String) {
-        val formatted = NumberFormatters.formatDecimalInput(value)
-        _calcState.update { it.copy(profitPercent = formatted) }
-        if (locks.value.lockF) repository.updateLockedValue("F", formatted)
+        _calcState.update { it.copy(profitPercent = value) }
+        if (locks.value.lockF) repository.updateLockedValue("F", value)
         recalculate()
     }
 
     fun onTaxPercentChange(value: String) {
-        val formatted = NumberFormatters.formatDecimalInput(value)
-        _calcState.update { it.copy(taxPercent = formatted) }
-        if (locks.value.lockH) repository.updateLockedValue("H", formatted)
+        _calcState.update { it.copy(taxPercent = value) }
+        if (locks.value.lockH) repository.updateLockedValue("H", value)
         recalculate()
     }
 

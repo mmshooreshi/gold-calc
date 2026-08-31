@@ -98,20 +98,7 @@ object NumberFormatters {
         return toPersianDigits(result)
     }
 
-    fun formatDecimalInput(input: String): String {
-        val latin = toLatinDigits(input).replace("[^0-9.]".toRegex(), "")
-        if (latin.isEmpty()) return ""
-        val firstDotIndex = latin.indexOf('.')
-        val result = if (firstDotIndex != -1) {
-            val integerPart = latin.substring(0, firstDotIndex)
-            val decimalPart = latin.substring(firstDotIndex + 1).replace(".", "")
-            val clamped = if (decimalPart.length > 3) decimalPart.substring(0, 3) else decimalPart
-            "$integerPart.$clamped"
-        } else {
-            latin
-        }
-        return toPersianDigits(result)
-    }
+    fun formatDecimalInput(input: String): String = formatWeightInput(input)
 
     fun formatPercentageInput(input: String): String {
         val latin = toLatinDigits(input).replace("[^0-9.]".toRegex(), "")
@@ -126,5 +113,29 @@ object NumberFormatters {
             latin
         }
         return toPersianDigits(result)
+    }
+
+    fun calculateCursorPosition(
+        newRawText: String,
+        rawCursor: Int,
+        formattedText: String
+    ): Int {
+        val unformattedBeforeCursor = newRawText
+            .take(rawCursor.coerceIn(0, newRawText.length))
+            .count { it.isDigit() || it in '۰'..'۹' || it == '.' || it == '٫' }
+
+        if (unformattedBeforeCursor == 0) return 0
+
+        var count = 0
+        for (i in formattedText.indices) {
+            val c = formattedText[i]
+            if (c.isDigit() || c in '۰'..'۹' || c == '.' || c == '٫') {
+                count++
+                if (count == unformattedBeforeCursor) {
+                    return i + 1
+                }
+            }
+        }
+        return formattedText.length
     }
 }

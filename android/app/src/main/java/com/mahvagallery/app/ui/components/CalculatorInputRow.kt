@@ -22,6 +22,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import com.mahvagallery.app.ui.theme.AppTheme
 import com.mahvagallery.app.ui.theme.VazirmatnFontFamily
 import com.mahvagallery.app.ui.theme.scaledSp
+import com.mahvagallery.app.utils.NumberFormatters
 
 @Composable
 fun CalculatorInputRow(
@@ -62,9 +64,16 @@ fun CalculatorInputRow(
     val colors = AppTheme.colors
     val isItemLocked = isLocked == true
 
-    var tfvState by remember(value) {
-        val cursor = if (value.isNotEmpty()) value.length else 0
-        mutableStateOf(TextFieldValue(text = value, selection = TextRange(cursor)))
+    var tfvState by remember {
+        mutableStateOf(TextFieldValue(text = value, selection = TextRange(value.length)))
+    }
+
+    // Keep tfvState in sync when value changes externally (e.g. clear form, edit history)
+    LaunchedEffect(value) {
+        if (value != tfvState.text) {
+            val cursor = if (value.isNotEmpty()) value.length else 0
+            tfvState = TextFieldValue(text = value, selection = TextRange(cursor))
+        }
     }
 
     Row(
@@ -144,14 +153,32 @@ fun CalculatorInputRow(
                         else -> colors.textPrimary
                     }
 
-                    // Number Input Field in LTR so typing flows left-to-right and cursor stays at right!
+                    // Number Input Field in LTR with preserved cursor positioning!
                     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
                         BasicTextField(
                             value = if (isReadOnly) TextFieldValue(value) else tfvState,
                             onValueChange = { newTfv ->
-                                tfvState = newTfv
-                                if (newTfv.text != value) {
-                                    onValueChange(newTfv.text)
+                                if (isReadOnly) return@BasicTextField
+
+                                if (newTfv.text == tfvState.text) {
+                                    // Only selection / cursor changed by user tapping
+                                    tfvState = newTfv
+                                } else {
+                                    // User edited text - format and preserve cursor at the exact edit position!
+                                    val formatted = when (keyboardType) {
+                                        KeyboardType.Decimal -> NumberFormatters.formatWeightInput(newTfv.text)
+                                        else -> NumberFormatters.formatCurrencyInput(newTfv.text)
+                                    }
+                                    val newCursorPos = NumberFormatters.calculateCursorPosition(
+                                        newRawText = newTfv.text,
+                                        rawCursor = newTfv.selection.end,
+                                        formattedText = formatted
+                                    )
+                                    tfvState = TextFieldValue(
+                                        text = formatted,
+                                        selection = TextRange(newCursorPos)
+                                    )
+                                    onValueChange(formatted)
                                 }
                             },
                             modifier = Modifier

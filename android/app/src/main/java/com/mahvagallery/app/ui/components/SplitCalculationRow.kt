@@ -23,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import com.mahvagallery.app.ui.theme.AppTheme
 import com.mahvagallery.app.ui.theme.VazirmatnFontFamily
 import com.mahvagallery.app.ui.theme.scaledSp
+import com.mahvagallery.app.utils.NumberFormatters
 
 @Composable
 fun SplitCalculationRow(
@@ -58,9 +60,15 @@ fun SplitCalculationRow(
 ) {
     val colors = AppTheme.colors
 
-    var tfvState by remember(percentValue) {
-        val cursor = if (percentValue.isNotEmpty()) percentValue.length else 0
-        mutableStateOf(TextFieldValue(text = percentValue, selection = TextRange(cursor)))
+    var tfvState by remember {
+        mutableStateOf(TextFieldValue(text = percentValue, selection = TextRange(percentValue.length)))
+    }
+
+    LaunchedEffect(percentValue) {
+        if (percentValue != tfvState.text) {
+            val cursor = if (percentValue.isNotEmpty()) percentValue.length else 0
+            tfvState = TextFieldValue(text = percentValue, selection = TextRange(cursor))
+        }
     }
 
     Row(
@@ -98,7 +106,7 @@ fun SplitCalculationRow(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
-            // Box 1: Percentage input (LTR)
+            // Box 1: Percentage input (LTR with preserved cursor!)
             val percentBg = if (isLocked) colors.lockedBg else colors.inputBg
             val percentBorder = if (isLocked) colors.lockedBorder else colors.inputBorder
             val percentTextColor = if (isLocked) colors.lockedText else colors.textPrimary
@@ -121,9 +129,20 @@ fun SplitCalculationRow(
                         BasicTextField(
                             value = tfvState,
                             onValueChange = { newTfv ->
-                                tfvState = newTfv
-                                if (newTfv.text != percentValue) {
-                                    onPercentChange(newTfv.text)
+                                if (newTfv.text == tfvState.text) {
+                                    tfvState = newTfv
+                                } else {
+                                    val formatted = NumberFormatters.formatPercentageInput(newTfv.text)
+                                    val newCursorPos = NumberFormatters.calculateCursorPosition(
+                                        newRawText = newTfv.text,
+                                        rawCursor = newTfv.selection.end,
+                                        formattedText = formatted
+                                    )
+                                    tfvState = TextFieldValue(
+                                        text = formatted,
+                                        selection = TextRange(newCursorPos)
+                                    )
+                                    onPercentChange(formatted)
                                 }
                             },
                             modifier = Modifier
