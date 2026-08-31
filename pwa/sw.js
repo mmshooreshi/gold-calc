@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mahva-gold-calc-v9.1';
+const CACHE_NAME = 'mahva-gold-calc-v9.2';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -15,7 +15,8 @@ const ASSETS_TO_CACHE = [
   'https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'
+  'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',
+  'https://cdn.jsdelivr.net/npm/eruda'
 ];
 
 self.addEventListener('install', (event) => {
@@ -58,6 +59,16 @@ self.addEventListener('message', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  // Only handle http and https requests (ignore chrome-extension://, moz-extension://, data:, etc.)
+  if (!event.request.url.startsWith('http://') && !event.request.url.startsWith('https://')) {
+    return;
+  }
+
+  // Only handle GET requests
+  if (event.request.method !== 'GET') {
+    return;
+  }
+
   const url = new URL(event.request.url);
 
   // Network-first for HTML pages so changes are noticed immediately
@@ -83,7 +94,7 @@ self.addEventListener('fetch', (event) => {
         return cachedResponse;
       }
       return fetch(event.request).then((networkResponse) => {
-        if (networkResponse && networkResponse.status === 200 && event.request.method === 'GET') {
+        if (networkResponse && networkResponse.status === 200) {
           const responseClone = networkResponse.clone();
           caches.open(CACHE_NAME).then((cache) => {
             cache.put(event.request, responseClone);
