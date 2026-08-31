@@ -1003,19 +1003,155 @@ background: var(--bg);}
 }
 .minp {
   width: 100%;
-  height: 38px;
+  height: 40px;
   border: 1px solid var(--bd);
-  border-radius: 8px;
-  padding: 0 10px;
-  font-family: inherit;
-  font-size: .85rem;
-  background: var(--bg);
+  border-radius: 10px;
+  padding: 0 12px;
+  font-family: var(--font-main) !important;
+  font-size: .88rem;
+  font-weight: 700;
+  background: var(--sf);
   color: var(--tx);
   outline: none;
+  text-align: right;
+  direction: rtl;
+  transition: border-color .2s;
+}
+.minp:focus {
+  border-color: var(--primary);
 }
 
 /* ============================================================
-   APPLE-LIKE CUSTOMER ATTACHMENT & PHOTO PREVIEW SYSTEM
+   OLED / LCD LUXURY CALCULATOR SCREEN
+   ============================================================ */
+.calc-oled-screen {
+  background: #0f172a;
+  color: #f8fafc;
+  border-radius: 16px;
+  padding: 12px 16px;
+  margin-bottom: 14px;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.5), 0 4px 14px rgba(15,23,42,0.12);
+  border: 1px solid rgba(255,255,255,0.08);
+  position: relative;
+  overflow: hidden;
+}
+.calc-oled-screen::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+}
+.oled-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.72rem;
+  color: #94a3b8;
+  margin-bottom: 2px;
+}
+.oled-formula {
+  font-family: var(--font-main);
+  direction: ltr;
+}
+.oled-badge {
+  background: rgba(212,160,23,0.2);
+  color: #fbbf24;
+  padding: 1px 7px;
+  border-radius: 6px;
+  font-weight: 800;
+  font-size: 0.68rem;
+}
+.oled-main-val {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 6px;
+  margin: 4px 0 6px;
+}
+.oled-num {
+  font-family: var(--font-main);
+  font-size: 1.65rem;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+}
+.oled-unit {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  font-weight: 700;
+}
+.oled-bottom-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: #64748b;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding-top: 5px;
+}
+.oled-bottom-row b {
+  color: #cbd5e1;
+}
+
+/* ============================================================
+   CLOUD INLINE DELETE POPOVER
+   ============================================================ */
+.cloud-popover {
+  position: fixed;
+  z-index: 10000;
+  background: var(--sf);
+  color: var(--tx);
+  border: 1px solid var(--bd);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18), 0 2px 6px rgba(0,0,0,0.08);
+  border-radius: 18px;
+  padding: 5px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-main);
+  opacity: 0;
+  transform: scale(0.88) translateY(4px);
+  transition: all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
+}
+.cloud-popover.on {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  pointer-events: auto;
+}
+.cloud-msg {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--err);
+  white-space: nowrap;
+}
+.cloud-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.cloud-btn {
+  border: none;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+.cloud-btn:active { transform: scale(0.9); }
+.cloud-yes {
+  background: var(--err);
+  color: #fff;
+}
+.cloud-no {
+  background: var(--bg);
+  color: var(--tx2);
+  border: 1px solid var(--bd);
+}
+
+/* ============================================================
+   CUSTOMER CARD & MULTI-PHOTO SYSTEM
    ============================================================ */
 .cust-card-pill {
   background: rgba(23, 32, 81, 0.04);
@@ -1024,39 +1160,36 @@ background: var(--bg);}
   padding: 8px 12px;
   margin-bottom: 8px;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 8px;
   transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 [data-theme="dark"] .cust-card-pill {
   background: rgba(255, 255, 255, 0.05);
   border-color: rgba(255, 255, 255, 0.1);
 }
+.cust-pill-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 .cust-pill-left {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 .cust-pill-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
   background: linear-gradient(135deg, rgba(212,160,23,0.18), rgba(212,160,23,0.38));
   color: var(--warn);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.15rem;
+  font-size: 1rem;
   overflow: hidden;
   flex-shrink: 0;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  border: 1px solid rgba(212,160,23,0.3);
-}
-.cust-pill-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
 }
 .cust-pill-info {
   display: flex;
@@ -1080,7 +1213,7 @@ background: var(--bg);}
 .cust-act-btn {
   background: none;
   border: none;
-  padding: 5px 8px;
+  padding: 4px 7px;
   border-radius: 8px;
   color: var(--tx2);
   cursor: pointer;
@@ -1098,6 +1231,25 @@ background: var(--bg);}
   color: var(--err);
 }
 
+.cust-thumbs-row {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+.cust-thumb-pill {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--bd);
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+.cust-thumb-pill:active { transform: scale(0.92); }
+.cust-thumb-pill img { width: 100%; height: 100%; object-fit: cover; }
+
 .add-cust-chip {
   background: transparent;
   border: 1px dashed var(--bd);
@@ -1114,6 +1266,7 @@ background: var(--bg);}
   transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
   margin-bottom: 6px;
   width: 100%;
+  font-family: inherit;
 }
 .add-cust-chip:hover {
   border-color: var(--primary);
@@ -1121,60 +1274,66 @@ background: var(--bg);}
   background: rgba(23, 32, 81, 0.03);
 }
 
-.photo-dropzone {
-  border: 1.5px dashed var(--bd);
-  border-radius: 12px;
-  padding: 10px;
+.modal-photos-strip {
   display: flex;
-  flex-direction: column;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 0;
   align-items: center;
-  justify-content: center;
-  gap: 4px;
-  cursor: pointer;
-  background: var(--bg);
-  transition: all 0.2s ease;
-  min-height: 80px;
-  text-align: center;
 }
-.photo-dropzone:hover {
-  border-color: var(--primary);
-  background: rgba(23, 32, 81, 0.02);
-}
-.photo-preview-wrap {
-  width: 100%;
-  height: 120px;
+.modal-photo-item {
+  width: 64px;
+  height: 64px;
   border-radius: 10px;
   overflow: hidden;
   position: relative;
-  border: 1px solid var(--bd);
+  border: 1.5px solid var(--bd);
+  flex-shrink: 0;
 }
-.photo-preview-wrap img {
+.modal-photo-item img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
-.photo-del-btn {
+.modal-photo-del {
   position: absolute;
-  top: 6px;
-  left: 6px;
-  background: rgba(0,0,0,0.65);
+  top: 3px;
+  left: 3px;
+  background: rgba(0,0,0,0.75);
   color: #fff;
   border: none;
   border-radius: 50%;
-  width: 28px;
-  height: 28px;
+  width: 20px;
+  height: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 0.65rem;
   cursor: pointer;
-  backdrop-filter: blur(4px);
-  transition: transform 0.15s ease;
 }
-.photo-del-btn:active {
-  transform: scale(0.9);
+.modal-photo-add {
+  width: 64px;
+  height: 64px;
+  border-radius: 10px;
+  border: 1.5px dashed var(--bd);
+  background: var(--bg);
+  color: var(--tx2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  cursor: pointer;
+  flex-shrink: 0;
+  font-size: 0.65rem;
+  font-weight: 700;
+  transition: all 0.15s;
 }
-  color: var(--tx);
+.modal-photo-add:hover {
+  border-color: var(--primary);
+  color: var(--primary);
 }
+
 .ni i { font-size: 1.35rem; transition: transform .25s var(--bounce); }
 .ni.on { color: var(--primary); }
 [data-theme="dark"] .ni.on { color: #60a5fa; }
@@ -2100,20 +2259,16 @@ background: var(--bg);}
     </div>
     
     <div style="display:flex;flex-direction:column;gap:10px;margin:12px 0 16px;">
-      <!-- Photo Attachment Zone -->
+      <!-- Photo Attachment Zone (Multi-Photo) -->
       <div>
-        <label style="font-size:.72rem;color:var(--tx2);display:block;margin-bottom:4px">عکس فاکتور / رسید پرداخت (اختیاری)</label>
-        <input type="file" id="cust-photo-file" accept="image/*" style="display:none" onchange="handleCustPhotoSelect(event)">
+        <label style="font-size:.72rem;color:var(--tx2);display:block;margin-bottom:4px">عکس فاکتورها / رسیدهای پرداخت (چندتایی)</label>
+        <input type="file" id="cust-photo-file" accept="image/*" multiple style="display:none" onchange="handleCustPhotoSelect(event)">
         
-        <div id="cust-photo-drop" class="photo-dropzone" onclick="document.getElementById('cust-photo-file').click()">
-          <i class="ph-fill ph-camera" style="font-size:1.4rem;color:var(--warn)"></i>
-          <span style="font-size:0.75rem;font-weight:700;color:var(--tx)">پیوست یا گرفتن عکس رسید</span>
-          <span style="font-size:0.65rem;color:var(--tx2)">کلیک کنید تا از گالری انتخاب یا با دوربین عکس بگیرید</span>
-        </div>
-        
-        <div id="cust-photo-prev" class="photo-preview-wrap" style="display:none">
-          <img id="cust-photo-img" src="" alt="رسید">
-          <button class="photo-del-btn tap" onclick="removeCustPhoto(event)" title="حذف عکس"><i class="ph ph-trash"></i></button>
+        <div class="modal-photos-strip" id="modal-photos-strip">
+          <div class="modal-photo-add tap" onclick="document.getElementById('cust-photo-file').click()">
+            <i class="ph-fill ph-camera-plus" style="font-size:1.25rem;color:var(--warn)"></i>
+            <span>+ عکس</span>
+          </div>
         </div>
       </div>
 
@@ -2416,6 +2571,22 @@ background: var(--bg);}
           <div class="pwa-txt"><b>نصب مهوا</b><span id="pwa-guide">برای دسترسی سریع نصب کنید</span></div>
           <button class="pwa-install tap" id="pwa-btn" onclick="installPWA()">نصب</button>
           <button class="pwa-close" onclick="dismissPWA()"><i class="ph ph-x"></i></button>
+        </div>
+
+        <!-- OLED Live Calculator Screen -->
+        <div class="calc-oled-screen">
+          <div class="oled-top-row">
+            <span class="oled-formula" id="oled-formula">۰ گرم × ۰ تومان</span>
+            <span class="oled-badge" id="oled-percent">۰.۰۰٪</span>
+          </div>
+          <div class="oled-main-val">
+            <span class="oled-num" id="oled-total">۰</span>
+            <span class="oled-unit">تومان</span>
+          </div>
+          <div class="oled-bottom-row">
+            <span>قیمت خام: <b id="oled-raw">۰</b> ت</span>
+            <span>هزینه‌ها: <b id="oled-costs">۰</b> ت</span>
+          </div>
         </div>
 
         <!-- Form Rows -->
@@ -2787,7 +2958,7 @@ background: var(--bg);}
 
     <!-- Clear All Data -->
     <div class="sg">
-      <div class="si tap" onclick="openModal('m-clear')"><div class="sil" style="color:var(--err)"><i class="ph ph-trash" style="color:var(--err)"></i> پاک‌سازی کامل تمام داده‌ها</div><div class="siv"><i class="ph ph-caret-left"></i></div></div>
+      <div class="si tap" onclick="confirmCloud(this, 'پاک‌سازی تمام داده‌ها؟', () => doClear())"><div class="sil" style="color:var(--err)"><i class="ph ph-trash" style="color:var(--err)"></i> پاک‌سازی کامل تمام داده‌ها</div><div class="siv"><i class="ph ph-caret-left"></i></div></div>
     </div>
 
     <!-- About -->
@@ -3319,9 +3490,9 @@ function togglePasscodeSwitch(){
   }
 }
 
-/* Customer & Photo Attachment Engine for History */
+/* Customer & Photo Attachment Engine for History (Multi-Photo) */
 let activeModalCustTargetId = null;
-let activeModalCustImage = '';
+let activeModalCustImages = [];
 let activeModalCustPayment = 'کارتخوان';
 
 window.openCustModalFor = (id) => {
@@ -3342,17 +3513,23 @@ window.openCustModalFor = (id) => {
     c.classList.toggle('on', isSel);
   });
   
-  activeModalCustImage = cust.image || '';
-  renderCustModalPhoto();
+  if (cust.images && Array.isArray(cust.images)) {
+    activeModalCustImages = [...cust.images];
+  } else if (cust.image) {
+    activeModalCustImages = [cust.image];
+  } else {
+    activeModalCustImages = [];
+  }
+  renderCustModalPhotos();
   
   const delBtn = document.getElementById('cust-del-btn');
   if (delBtn) {
-    delBtn.style.display = (cust.name || cust.image || cust.phone) ? 'inline-block' : 'none';
+    delBtn.style.display = (cust.name || (activeModalCustImages && activeModalCustImages.length > 0) || cust.phone) ? 'inline-block' : 'none';
   }
   
   const title = document.getElementById('cust-modal-title');
   if (title) {
-    title.textContent = (cust.name || cust.image) ? 'ویرایش مشخصات و رسید خریدار' : 'ثبت خریدار و رسید پرداخت';
+    title.textContent = (cust.name || (activeModalCustImages && activeModalCustImages.length > 0)) ? 'ویرایش مشخصات و رسیدهای خریدار' : 'ثبت خریدار و رسید پرداخت';
   }
   
   openModal('m-customer');
@@ -3365,52 +3542,70 @@ window.setPayMethod = (val, btn) => {
 };
 
 window.handleCustPhotoSelect = (e) => {
-  const file = e.target.files && e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (ev) => {
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      const maxDim = 1000;
-      let w = img.width, h = img.height;
-      if (w > maxDim || h > maxDim) {
-        if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
-        else { w = Math.round((w * maxDim) / h); h = maxDim; }
-      }
-      canvas.width = w;
-      canvas.height = h;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, w, h);
-      activeModalCustImage = canvas.toDataURL('image/jpeg', 0.82);
-      renderCustModalPhoto();
-      toast('عکس پیوست شد ✓');
+  const files = e.target.files;
+  if (!files || !files.length) return;
+  
+  const maxDim = 1000;
+  Array.from(files).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let w = img.width, h = img.height;
+        if (w > maxDim || h > maxDim) {
+          if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+          else { w = Math.round((w * maxDim) / h); h = maxDim; }
+        }
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+        activeModalCustImages.push(dataUrl);
+        renderCustModalPhotos();
+        toast('عکس رسید اضافه شد ✓');
+      };
+      img.src = ev.target.result;
     };
-    img.src = ev.target.result;
-  };
-  reader.readAsDataURL(file);
+    reader.readAsDataURL(file);
+  });
   e.target.value = '';
 };
 
-window.removeCustPhoto = (e) => {
+window.removeCustPhotoAt = (idx, e) => {
   if (e) e.stopPropagation();
-  activeModalCustImage = '';
-  renderCustModalPhoto();
+  activeModalCustImages.splice(idx, 1);
+  renderCustModalPhotos();
 };
 
-function renderCustModalPhoto() {
-  const drop = document.getElementById('cust-photo-drop');
-  const prev = document.getElementById('cust-photo-prev');
-  const img = document.getElementById('cust-photo-img');
-  if (activeModalCustImage) {
-    if (drop) drop.style.display = 'none';
-    if (prev) prev.style.display = 'block';
-    if (img) img.src = activeModalCustImage;
-  } else {
-    if (drop) drop.style.display = 'flex';
-    if (prev) prev.style.display = 'none';
-    if (img) img.src = '';
-  }
+function renderCustModalPhotos() {
+  const strip = document.getElementById('modal-photos-strip');
+  if (!strip) return;
+  strip.innerHTML = '';
+  
+  activeModalCustImages.forEach((imgSrc, i) => {
+    const item = document.createElement('div');
+    item.className = 'modal-photo-item tap';
+    item.innerHTML = `
+      <img src="${imgSrc}" alt="رسید ${i+1}">
+      <button type="button" class="modal-photo-del" onclick="removeCustPhotoAt(${i}, event)" title="حذف عکس">✕</button>
+    `;
+    item.onclick = (e) => {
+      if (e.target.classList.contains('modal-photo-del')) return;
+      viewCustomerPhoto(imgSrc);
+    };
+    strip.appendChild(item);
+  });
+  
+  const addBtn = document.createElement('div');
+  addBtn.className = 'modal-photo-add tap';
+  addBtn.onclick = () => document.getElementById('cust-photo-file').click();
+  addBtn.innerHTML = `
+    <i class="ph-fill ph-camera-plus" style="font-size:1.25rem;color:var(--warn)"></i>
+    <span>+ عکس</span>
+  `;
+  strip.appendChild(addBtn);
 }
 
 window.saveCustModal = () => {
@@ -3426,14 +3621,15 @@ window.saveCustModal = () => {
     bankName: document.getElementById('cust-bank').value.trim(),
     trackingCode: document.getElementById('cust-ref').value.trim(),
     note: document.getElementById('cust-note').value.trim(),
-    image: activeModalCustImage || ''
+    images: [...activeModalCustImages],
+    image: activeModalCustImages[0] || ''
   };
   
   it.customer = custObj;
   save();
   renderH();
   closeModal('m-customer');
-  toast('مشخصات خریدار و رسید ثبت شد ✓');
+  toast('مشخصات خریدار و رسیدها ثبت شد ✓');
 };
 
 window.deleteCustomerData = () => {
@@ -3456,6 +3652,73 @@ window.viewCustomerPhoto = (imgSrc) => {
   const el = document.getElementById('photo-view-img');
   if (el) el.src = imgSrc;
   openModal('m-photo-view');
+};
+
+/* ============================================================
+   INLINE CLOUD DELETE POPOVER HELPER
+   ============================================================ */
+window.confirmCloud = (targetEl, message, onConfirm) => {
+  if (!targetEl) return;
+  tactileFeedback();
+  
+  document.querySelectorAll('.cloud-popover').forEach(p => p.remove());
+  
+  const pop = document.createElement('div');
+  pop.className = 'cloud-popover';
+  pop.innerHTML = `
+    <span class="cloud-msg">${message || 'حذف شود؟'}</span>
+    <div class="cloud-actions">
+      <button type="button" class="cloud-btn cloud-yes">✓ حذف</button>
+      <button type="button" class="cloud-btn cloud-no">✕</button>
+    </div>
+  `;
+  
+  document.body.appendChild(pop);
+  
+  const rect = targetEl.getBoundingClientRect();
+  const popW = 145;
+  let left = rect.left + (rect.width / 2) - (popW / 2);
+  if (left < 10) left = 10;
+  if (left + popW > window.innerWidth - 10) left = window.innerWidth - popW - 10;
+  
+  let top = rect.top - 42;
+  if (top < 10) top = rect.bottom + 8;
+  
+  pop.style.left = left + 'px';
+  pop.style.top = top + 'px';
+  
+  requestAnimationFrame(() => pop.classList.add('on'));
+  
+  const close = () => {
+    pop.classList.remove('on');
+    setTimeout(() => {
+      pop.remove();
+    }, 180);
+    document.removeEventListener('pointerdown', outsideClick);
+  };
+  
+  const outsideClick = (e) => {
+    if (!pop.contains(e.target) && !targetEl.contains(e.target)) {
+      close();
+    }
+  };
+  
+  pop.querySelector('.cloud-yes').addEventListener('click', (e) => {
+    e.stopPropagation();
+    tactileFeedback();
+    close();
+    onConfirm();
+  });
+  
+  pop.querySelector('.cloud-no').addEventListener('click', (e) => {
+    e.stopPropagation();
+    tactileFeedback();
+    close();
+  });
+  
+  setTimeout(() => {
+    document.addEventListener('pointerdown', outsideClick);
+  }, 60);
 };
 
 /* Snapshots History Logic */
@@ -3521,6 +3784,14 @@ function restorePwaSnapshot(id){
     toast('خطا در بازیابی پشتیبان');
   }
 }
+function deletePwaSnapshot(id, targetEl){
+  confirmCloud(targetEl, 'حذف نسخه؟', () => {
+    S.snapshots = S.snapshots.filter(s => s.id !== id);
+    save();
+    renderSnapshots();
+    toast('نسخه حذف شد');
+  });
+}
 function renderSnapshots(){
   const cont = document.getElementById('pwa-snapshots-list');
   if(!cont) return;
@@ -3540,8 +3811,11 @@ function renderSnapshots(){
           <div style="font-size:0.68rem; color:var(--tx2);">${e2p(snap.count)} تراکنش</div>
         </div>
       </div>
-      <div>
-        ${snap.isCurrent ? '<span class="badge sale" style="font-size:0.65rem;">نسخه فعلی ✓</span>' : `<button class="pay-chip tap" style="font-size:0.68rem; color:var(--primary);" onclick="restorePwaSnapshot('${snap.id}')"><i class="ph ph-arrow-counter-clockwise"></i> بازیابی</button>`}
+      <div style="display:flex; align-items:center; gap:6px;">
+        ${snap.isCurrent ? '<span class="badge sale" style="font-size:0.65rem;">نسخه فعلی ✓</span>' : `
+          <button class="pay-chip tap" style="font-size:0.68rem; color:var(--primary);" onclick="restorePwaSnapshot('${snap.id}')"><i class="ph ph-arrow-counter-clockwise"></i> بازیابی</button>
+          <button class="cust-act-btn del tap" style="padding:2px 5px;" onclick="deletePwaSnapshot('${snap.id}', this)" title="حذف نسخه"><i class="ph-fill ph-trash"></i></button>
+        `}
       </div>
     `;
     cont.appendChild(el);
@@ -3715,6 +3989,18 @@ const calc=()=>{
   setV('vK',K);
   const vJ=document.getElementById('vJ');
   if(vJ) vJ.value=C>0?fmt(((K/C)-1)*100,2):'';
+
+  // Update OLED Calculator Screen
+  const oledTot = document.getElementById('oled-total');
+  const oledForm = document.getElementById('oled-formula');
+  const oledPct = document.getElementById('oled-percent');
+  const oledRaw = document.getElementById('oled-raw');
+  const oledCosts = document.getElementById('oled-costs');
+  if (oledTot) oledTot.textContent = K > 0 ? fmt(K) : '۰';
+  if (oledForm) oledForm.textContent = `${fmt(B, 3) || '۰'} گرم × ${fmt(A) || '۰'}`;
+  if (oledPct) oledPct.textContent = C > 0 ? fmt(((K/C)-1)*100, 2) + '٪' : '۰.۰۰٪';
+  if (oledRaw) oledRaw.textContent = C > 0 ? fmt(C) : '۰';
+  if (oledCosts) oledCosts.textContent = (E + G + I) > 0 ? fmt(E + G + I) : '۰';
 
   // Update Desktop side live preview panel
   const sideRaw = document.getElementById('side-raw-price');
@@ -3984,32 +4270,52 @@ const renderH=()=>{
     }
 
     let custCard = '';
-    if(it.customer && (it.customer.name || it.customer.image || it.customer.phone || it.customer.note)){
-      const hasImg = !!it.customer.image;
+    const custImages = (it.customer && it.customer.images && it.customer.images.length > 0)
+      ? it.customer.images
+      : (it.customer && it.customer.image ? [it.customer.image] : []);
+    
+    if(it.customer && (it.customer.name || custImages.length > 0 || it.customer.phone || it.customer.note)){
+      const hasImg = custImages.length > 0;
+      let thumbsHtml = '';
+      if (hasImg) {
+        thumbsHtml = `
+          <div class="cust-thumbs-row">
+            ${custImages.map((imgSrc, idx) => `
+              <div class="cust-thumb-pill tap" onclick="viewCustomerPhoto('${imgSrc}')" title="مشاهده تصویر ${idx+1}">
+                <img src="${imgSrc}" alt="رسید">
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
       custCard = `
         <div class="cust-card-pill">
-          <div class="cust-pill-left">
-            <div class="cust-pill-avatar tap" onclick="${hasImg ? `viewCustomerPhoto('${it.customer.image}')` : `openCustModalFor(${it.id})`}" title="${hasImg ? 'مشاهده تصویر رسید' : 'ویرایش خریدار'}">
-              ${hasImg ? `<img src="${it.customer.image}" alt="رسید">` : `<i class="ph-fill ph-user"></i>`}
+          <div class="cust-pill-header">
+            <div class="cust-pill-left">
+              <div class="cust-pill-avatar">
+                <i class="ph-fill ph-user"></i>
+              </div>
+              <div class="cust-pill-info">
+                <span class="cust-pill-name">${it.customer.name || 'خریدار (ثبت‌شده)'}</span>
+                <span class="cust-pill-sub">
+                  ${it.customer.paymentMethod || 'کارتخوان'}
+                  ${it.customer.bankName ? ' (' + it.customer.bankName + ')' : ''}
+                  ${hasImg ? ` • 📷 ${e2p(custImages.length)} تصویر پیوست` : ''}
+                </span>
+              </div>
             </div>
-            <div class="cust-pill-info">
-              <span class="cust-pill-name">${it.customer.name || 'خریدار (ثبت‌شده)'}</span>
-              <span class="cust-pill-sub">
-                ${it.customer.paymentMethod || 'کارتخوان'}
-                ${it.customer.bankName ? ' (' + it.customer.bankName + ')' : ''}
-                ${hasImg ? ' • 📷 عکس رسید' : ''}
-              </span>
+            <div class="cust-pill-actions">
+              <button type="button" class="cust-act-btn tap" onclick="openCustModalFor(${it.id})" title="ویرایش"><i class="ph-fill ph-pencil-simple"></i></button>
+              <button type="button" class="cust-act-btn del tap" onclick="confirmCloud(this, 'حذف خریدار؟', () => deleteCustomerFrom(${it.id}))" title="حذف خریدار"><i class="ph-fill ph-trash"></i></button>
             </div>
           </div>
-          <div class="cust-pill-actions">
-            <button class="cust-act-btn tap" onclick="openCustModalFor(${it.id})" title="ویرایش"><i class="ph-fill ph-pencil-simple"></i></button>
-            <button class="cust-act-btn del tap" onclick="deleteCustomerFrom(${it.id})" title="حذف خریدار"><i class="ph-fill ph-trash"></i></button>
-          </div>
+          ${thumbsHtml}
         </div>
       `;
     } else {
       custCard = `
-        <button class="add-cust-chip tap" onclick="openCustModalFor(${it.id})">
+        <button type="button" class="add-cust-chip tap" onclick="openCustModalFor(${it.id})">
           <i class="ph-fill ph-user-plus" style="color:var(--primary);font-size:0.92rem"></i>
           <span>+ مشخصات خریدار / فاکتور و رسید</span>
         </button>
@@ -4062,7 +4368,7 @@ const renderH=()=>{
           <div style="display:flex; align-items:center; gap:8px;">
             <div class="h-desktop-actions">
               <button class="h-desk-btn edit tap" onclick="startEdit(${it.id}); event.stopPropagation();" title="ویرایش"><i class="ph ph-pencil-simple"></i><span>ویرایش</span></button>
-              <button class="h-desk-btn del tap" onclick="confirmDel(${it.id}); event.stopPropagation();" title="حذف"><i class="ph ph-trash"></i><span>حذف</span></button>
+              <button class="h-desk-btn del tap" onclick="confirmCloud(this, 'حذف تراکنش؟', () => { S.history = S.history.filter(i => i.id !== ${it.id}); save(); renderH(); toast('تراکنش حذف شد'); }); event.stopPropagation();" title="حذف"><i class="ph ph-trash"></i><span>حذف</span></button>
             </div>
             <div class="htime">
               <button class="h-rcpt-btn" onclick="showHistoryReceipt(${it.id}, event)"><i class="ph ph-receipt"></i><div class="rcpt-fill"></div></button>
@@ -4223,7 +4529,7 @@ function initSwipe(container, itemId){
 
       setTimeout(()=>{
         if(dir>0)startEdit(itemId);
-        else confirmDel(itemId);
+        else confirmCloud(header, 'حذف تراکنش؟', () => { S.history = S.history.filter(i => i.id !== itemId); save(); renderH(); toast('تراکنش حذف شد'); });
         setTimeout(()=>fullReset(true),120);
       },240);
     }else{
