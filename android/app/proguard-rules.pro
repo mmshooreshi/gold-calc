@@ -1,1 +1,3 @@
-# Add project specific ProGuard rules here.
+# Keep data models for Gson serialization
+-keepclassmembers class com.mahvagallery.app.model.** { *; }
+-keep class com.mahvagallery.app.model.** { *; }

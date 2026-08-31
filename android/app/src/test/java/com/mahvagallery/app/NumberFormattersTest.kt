@@ -10,8 +10,9 @@ class NumberFormattersTest {
     fun testNormalizePersianAndArabicDigits() {
         val persian = "۱۲۳۴۵۶۷۸۹۰"
         val arabic = "١٢٣٤٥٦٧٨٩٠"
-        assertEquals("1234567890", NumberFormatters.normalizeDigits(persian))
-        assertEquals("1234567890", NumberFormatters.normalizeDigits(arabic))
+        assertEquals("1234567890", NumberFormatters.toLatinDigits(persian))
+        assertEquals("1234567890", NumberFormatters.toLatinDigits(arabic))
+        assertEquals("۱۲۳۴۵۶۷۸۹۰", NumberFormatters.toPersianDigits("1234567890"))
     }
 
     @Test
@@ -25,7 +26,7 @@ class NumberFormattersTest {
     @Test
     fun testFormatCurrency() {
         assertEquals("3,500,000", NumberFormatters.formatCurrency(3500000.0))
-        assertEquals("8,750,000", NumberFormatters.formatCurrency(8750000L))
+        assertEquals("۳,۵۰۰,۰۰۰", NumberFormatters.formatCurrency(3500000.0, toPersian = true))
         assertEquals("", NumberFormatters.formatCurrency(0.0))
     }
 
@@ -37,14 +38,14 @@ class NumberFormattersTest {
 
     @Test
     fun testFormatWeightInput() {
-        assertEquals("4.250", NumberFormatters.formatWeightInput("4.250"))
-        assertEquals("4.250", NumberFormatters.formatWeightInput("۴.۲۵۰"))
+        assertEquals("4.25", NumberFormatters.formatWeightInput("4.25"))
+        assertEquals("4.25", NumberFormatters.formatWeightInput("۴.۲۵"))
         assertEquals("4.250", NumberFormatters.formatWeightInput("4.2509")) // Truncates after 3 decimals
     }
 
     @Test
-    fun testFormatFinalPercentage() {
-        assertEquals("8.16", NumberFormatters.formatFinalPercentage(8.1612))
-        assertEquals("10.00", NumberFormatters.formatFinalPercentage(10.0))
+    fun testFormatPercentage() {
+        assertEquals("8.16", NumberFormatters.formatPercentage(8.1612))
+        assertEquals("10.00", NumberFormatters.formatPercentage(10.0))
     }
 }
