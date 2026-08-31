@@ -53,6 +53,9 @@ import com.mahvagallery.app.ui.theme.TextDark
 import com.mahvagallery.app.ui.theme.White
 import com.mahvagallery.app.viewmodel.MainViewModel
 
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.border
+
 @Composable
 fun CalculatorScreen(
     viewModel: MainViewModel,
@@ -65,6 +68,7 @@ fun CalculatorScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
+            .imePadding()
             .verticalScroll(scrollState)
             .padding(horizontal = 16.dp, vertical = 10.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -236,18 +240,22 @@ fun CalculatorScreen(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             // Receipt Button
-            OutlinedButton(
-                onClick = viewModel::openReceiptForCurrentForm,
+            Surface(
                 modifier = Modifier
-                    .size(width = 52.dp, height = 48.dp),
-                shape = RoundedCornerShape(12.dp)
+                    .size(width = 52.dp, height = 48.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .clickable(onClick = viewModel::openReceiptForCurrentForm)
+                    .border(1.2.dp, BorderColor, RoundedCornerShape(12.dp)),
+                color = White
             ) {
-                Icon(
-                    imageVector = Icons.Filled.Receipt,
-                    contentDescription = "Receipt",
-                    modifier = Modifier.size(20.dp),
-                    tint = PrimaryDark
-                )
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = Icons.Filled.Receipt,
+                        contentDescription = "Receipt",
+                        modifier = Modifier.size(26.dp),
+                        tint = PrimaryDark
+                    )
+                }
             }
 
             // Clear Button

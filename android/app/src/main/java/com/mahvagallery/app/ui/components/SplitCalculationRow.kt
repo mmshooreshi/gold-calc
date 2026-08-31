@@ -23,18 +23,21 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mahvagallery.app.ui.theme.BorderColor
@@ -42,6 +45,7 @@ import com.mahvagallery.app.ui.theme.DisabledBg
 import com.mahvagallery.app.ui.theme.PrimaryDark
 import com.mahvagallery.app.ui.theme.TextDark
 import com.mahvagallery.app.ui.theme.TextMuted
+import com.mahvagallery.app.ui.theme.VazirmatnFontFamily
 import com.mahvagallery.app.ui.theme.White
 
 @Composable
@@ -55,13 +59,17 @@ fun SplitCalculationRow(
     onInfoClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var textFieldValueState by remember(percentValue) {
+        mutableStateOf(TextFieldValue(text = percentValue, selection = TextRange(percentValue.length)))
+    }
+
     Row(
         modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 3.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Label with info icon
+        // Label with info
         Row(
             modifier = Modifier.weight(0.32f),
             verticalAlignment = Alignment.CenterVertically
@@ -70,6 +78,7 @@ fun SplitCalculationRow(
                 text = label,
                 color = TextDark,
                 fontSize = 13.5.sp,
+                fontFamily = VazirmatnFontFamily,
                 fontWeight = FontWeight.SemiBold
             )
             Spacer(modifier = Modifier.width(3.dp))
@@ -108,28 +117,34 @@ fun SplitCalculationRow(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-                        BasicTextField(
-                            value = percentValue,
-                            onValueChange = onPercentChange,
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(horizontal = 2.dp),
-                            singleLine = true,
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                            textStyle = TextStyle(
-                                color = TextDark,
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Bold,
-                                textAlign = TextAlign.Start
-                            ),
-                            cursorBrush = SolidColor(PrimaryDark)
-                        )
-                    }
+                    BasicTextField(
+                        value = textFieldValueState,
+                        onValueChange = { newTfv ->
+                            textFieldValueState = newTfv
+                            if (newTfv.text != percentValue) {
+                                onPercentChange(newTfv.text)
+                            }
+                        },
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 2.dp),
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        textStyle = TextStyle(
+                            fontFamily = VazirmatnFontFamily,
+                            color = TextDark,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Start,
+                            textDirection = TextDirection.Rtl
+                        ),
+                        cursorBrush = SolidColor(PrimaryDark)
+                    )
                     Text(
                         text = "٪",
                         color = TextMuted,
                         fontSize = 11.sp,
+                        fontFamily = VazirmatnFontFamily,
                         fontWeight = FontWeight.Medium
                     )
                 }
@@ -154,33 +169,34 @@ fun SplitCalculationRow(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-                        BasicTextField(
-                            value = amountValue,
-                            onValueChange = {},
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(horizontal = 2.dp),
-                            enabled = false,
-                            singleLine = true,
-                            textStyle = TextStyle(
-                                color = MaterialTheme.colorScheme.primary,
-                                fontSize = 13.5.sp,
-                                fontWeight = FontWeight.Bold,
-                                textAlign = TextAlign.Start
-                            )
+                    BasicTextField(
+                        value = amountValue,
+                        onValueChange = {},
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 2.dp),
+                        enabled = false,
+                        singleLine = true,
+                        textStyle = TextStyle(
+                            fontFamily = VazirmatnFontFamily,
+                            color = MaterialTheme.colorScheme.primary,
+                            fontSize = 13.5.sp,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Start,
+                            textDirection = TextDirection.Rtl
                         )
-                    }
+                    )
                     Text(
                         text = "تومان",
                         color = TextMuted,
                         fontSize = 10.sp,
+                        fontFamily = VazirmatnFontFamily,
                         fontWeight = FontWeight.Medium
                     )
                 }
             }
 
-            // Lock Icon
+            // Lock icon
             Box(
                 modifier = Modifier
                     .size(32.dp)
@@ -190,8 +206,8 @@ fun SplitCalculationRow(
                 Icon(
                     imageVector = if (isLocked) Icons.Filled.Lock else Icons.Filled.LockOpen,
                     contentDescription = "Lock",
-                    modifier = Modifier.size(17.dp),
-                    tint = if (isLocked) MaterialTheme.colorScheme.primary else Color(0xFFBCC9DF)
+                    modifier = Modifier.size(16.dp),
+                    tint = if (isLocked) PrimaryDark else TextMuted
                 )
             }
         }

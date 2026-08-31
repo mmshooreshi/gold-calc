@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -22,6 +23,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FileDownload
@@ -31,6 +33,7 @@ import androidx.compose.material.icons.filled.FormatSize
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Nightlight
 import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.Sparkles
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -57,6 +60,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mahvagallery.app.ui.components.DebugLogViewer
@@ -65,6 +69,7 @@ import com.mahvagallery.app.ui.theme.DisabledBg
 import com.mahvagallery.app.ui.theme.PrimaryDark
 import com.mahvagallery.app.ui.theme.TextDark
 import com.mahvagallery.app.ui.theme.TextMuted
+import com.mahvagallery.app.ui.theme.VazirmatnFontFamily
 import com.mahvagallery.app.ui.theme.White
 import com.mahvagallery.app.utils.NumberFormatters
 import com.mahvagallery.app.viewmodel.MainViewModel
@@ -90,20 +95,99 @@ fun SettingsScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
+            .imePadding()
             .verticalScroll(scrollState)
             .padding(horizontal = 16.dp, vertical = 10.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(
-            text = "تنظیمات",
+            text = "تنظیمات و ظاهر",
             fontSize = 17.sp,
+            fontFamily = VazirmatnFontFamily,
             fontWeight = FontWeight.Bold,
             color = PrimaryDark,
             modifier = Modifier.padding(bottom = 2.dp)
         )
 
+        // Live Real-Time Interactive Preview Card
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            color = if (isDark) Color(0xFF1E293B) else Color(0xFFF1F5F9),
+            border = androidx.compose.foundation.BorderStroke(1.5.dp, PrimaryDark.copy(alpha = 0.35f))
+        ) {
+            Column(modifier = Modifier.padding(14.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Filled.Sparkles, contentDescription = null, tint = Color(0xFFF59E0B), modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "پیش‌نمایش زنده قلم و اندازه",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = PrimaryDark
+                        )
+                    }
+                    Text(
+                        text = "اندازه: ${NumberFormatters.toPersianDigits((14 + fontScaleDelta).toString())}px",
+                        fontSize = 11.5.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF10B981)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "نمونه قیمت طلا:",
+                        fontSize = (13.5 + fontScaleDelta).sp,
+                        fontFamily = VazirmatnFontFamily,
+                        fontWeight = if (isBold) FontWeight.Bold else FontWeight.Medium,
+                        color = TextDark
+                    )
+                    Text(
+                        text = "${NumberFormatters.toPersianDigits("14,850,000")} تومان",
+                        fontSize = (14.5 + fontScaleDelta).sp,
+                        fontFamily = VazirmatnFontFamily,
+                        fontWeight = FontWeight.Black,
+                        color = PrimaryDark
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "وزن کل (گرم):",
+                        fontSize = (12.5 + fontScaleDelta).sp,
+                        fontFamily = VazirmatnFontFamily,
+                        fontWeight = if (isBold) FontWeight.Bold else FontWeight.Normal,
+                        color = TextMuted
+                    )
+                    Text(
+                        text = "${NumberFormatters.toPersianDigits("3.420")} گرم",
+                        fontSize = (13 + fontScaleDelta).sp,
+                        fontFamily = VazirmatnFontFamily,
+                        fontWeight = FontWeight.Bold,
+                        color = TextDark
+                    )
+                }
+            }
+        }
+
         // Group 1: Appearance & Typography
-        SettingsGroup(title = "ظاهر و فونت") {
+        SettingsGroup(title = "ظاهر و قلم برنامه") {
             // Dark Mode Toggle
             Row(
                 modifier = Modifier
@@ -116,7 +200,7 @@ fun SettingsScreen(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Filled.Nightlight, contentDescription = null, tint = TextMuted, modifier = Modifier.size(20.dp))
                     Spacer(modifier = Modifier.width(10.dp))
-                    Text(text = "حالت تاریک", fontSize = 13.5.sp, fontWeight = FontWeight.SemiBold, color = TextDark)
+                    Text(text = "حالت تاریک (Dark Mode)", fontSize = 13.5.sp, fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.SemiBold, color = TextDark)
                 }
                 Switch(
                     checked = isDark,
@@ -139,7 +223,7 @@ fun SettingsScreen(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Filled.FormatBold, contentDescription = null, tint = TextMuted, modifier = Modifier.size(20.dp))
                     Spacer(modifier = Modifier.width(10.dp))
-                    Text(text = "متن ضخیم (Bold)", fontSize = 13.5.sp, fontWeight = FontWeight.SemiBold, color = TextDark)
+                    Text(text = "متن ضخیم (Bold)", fontSize = 13.5.sp, fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.SemiBold, color = TextDark)
                 }
                 Switch(
                     checked = isBold,
@@ -150,7 +234,7 @@ fun SettingsScreen(
 
             Divider(color = BorderColor)
 
-            // Font Size Controls
+            // Font Size Controls (+ / -)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -161,7 +245,7 @@ fun SettingsScreen(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Filled.FormatSize, contentDescription = null, tint = TextMuted, modifier = Modifier.size(20.dp))
                     Spacer(modifier = Modifier.width(10.dp))
-                    Text(text = "اندازه فونت", fontSize = 13.5.sp, fontWeight = FontWeight.SemiBold, color = TextDark)
+                    Text(text = "اندازه فونت", fontSize = 13.5.sp, fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.SemiBold, color = TextDark)
                 }
 
                 Row(
@@ -170,10 +254,10 @@ fun SettingsScreen(
                 ) {
                     Surface(
                         modifier = Modifier
-                            .size(34.dp)
-                            .clip(RoundedCornerShape(8.dp))
+                            .size(36.dp)
+                            .clip(RoundedCornerShape(10.dp))
                             .clickable { viewModel.changeFontScale(-1) }
-                            .border(1.dp, BorderColor, RoundedCornerShape(8.dp)),
+                            .border(1.dp, BorderColor, RoundedCornerShape(10.dp)),
                         color = DisabledBg
                     ) {
                         Box(contentAlignment = Alignment.Center) {
@@ -183,19 +267,20 @@ fun SettingsScreen(
 
                     Text(
                         text = "${NumberFormatters.toPersianDigits((14 + fontScaleDelta).toString())}px",
-                        fontSize = 13.sp,
+                        fontSize = 13.5.sp,
+                        fontFamily = VazirmatnFontFamily,
                         fontWeight = FontWeight.Bold,
                         color = PrimaryDark,
-                        modifier = Modifier.width(36.dp),
+                        modifier = Modifier.width(42.dp),
                         textAlign = TextAlign.Center
                     )
 
                     Surface(
                         modifier = Modifier
-                            .size(34.dp)
-                            .clip(RoundedCornerShape(8.dp))
+                            .size(36.dp)
+                            .clip(RoundedCornerShape(10.dp))
                             .clickable { viewModel.changeFontScale(1) }
-                            .border(1.dp, BorderColor, RoundedCornerShape(8.dp)),
+                            .border(1.dp, BorderColor, RoundedCornerShape(10.dp)),
                         color = DisabledBg
                     ) {
                         Box(contentAlignment = Alignment.Center) {
@@ -207,7 +292,7 @@ fun SettingsScreen(
 
             Divider(color = BorderColor)
 
-            // Dedicated Vazirmatn Typography Badge
+            // Vazirmatn Typography Badge
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -218,7 +303,7 @@ fun SettingsScreen(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Filled.TextFields, contentDescription = null, tint = TextMuted, modifier = Modifier.size(20.dp))
                     Spacer(modifier = Modifier.width(10.dp))
-                    Text(text = "قلم استاندارد", fontSize = 13.5.sp, fontWeight = FontWeight.SemiBold, color = TextDark)
+                    Text(text = "قلم اصلی فارسی", fontSize = 13.5.sp, fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.SemiBold, color = TextDark)
                 }
                 Box(
                     modifier = Modifier
@@ -226,107 +311,95 @@ fun SettingsScreen(
                         .background(PrimaryDark.copy(alpha = 0.1f))
                         .padding(horizontal = 10.dp, vertical = 4.dp)
                 ) {
-                    Text(text = "وزیرمتن (Vazirmatn)", fontSize = 11.5.sp, fontWeight = FontWeight.Bold, color = PrimaryDark)
+                    Text(text = "وزیرمتن (Vazirmatn)", fontSize = 11.5.sp, fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, color = PrimaryDark)
                 }
             }
         }
 
-        // Group 2: Default Values
-        SettingsGroup(title = "مقادیر پیش‌فرض") {
+        // Group 2: Default Percentages
+        SettingsGroup(title = "مقادیر پیش‌فرض درصدها") {
             Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 DefaultPercentInputRow(label = "اجرت پیش‌فرض ٪", value = defD, onValueChange = { defD = it }, placeholder = "مثلاً ۷")
-                DefaultPercentInputRow(label = "سود پیش‌فرض ٪", value = defF, onValueChange = { defF = it }, placeholder = "مثلاً ۱۲")
+                DefaultPercentInputRow(label = "سود پیش‌فرض ٪", value = defF, onValueChange = { defF = it }, placeholder = "مثلاً ۷")
                 DefaultPercentInputRow(label = "مالیات پیش‌فرض ٪", value = defH, onValueChange = { defH = it }, placeholder = "مثلاً ۹")
 
                 Button(
                     onClick = { viewModel.saveDefaultPercentages(defD, defF, defH) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 4.dp)
-                        .height(42.dp),
-                    shape = RoundedCornerShape(10.dp),
+                        .padding(top = 6.dp)
+                        .height(44.dp),
+                    shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = PrimaryDark, contentColor = White)
                 ) {
                     Icon(Icons.Filled.Save, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text(text = "ذخیره پیش‌فرض‌ها", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                    Text(text = "ذخیره و اعمال مقادیر پیش‌فرض", fontSize = 13.sp, fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold)
                 }
             }
         }
 
-        // Group 3: Data Management & Backup
-        SettingsGroup(title = "مدیریت داده‌ها") {
-            // Export Backup
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        val json = viewModel.repository.exportBackupJson()
-                        val intent = Intent().apply {
-                            action = Intent.ACTION_SEND
-                            putExtra(Intent.EXTRA_TEXT, json)
-                            type = "application/json"
-                        }
-                        context.startActivity(Intent.createChooser(intent, "پشتیبان‌گیری JSON"))
+        // Group 3: Data Management
+        SettingsGroup(title = "مدیریت داده‌ها و پشتیبان‌گیری") {
+            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    OutlinedButton(
+                        onClick = { viewModel.exportBackupJson(context) },
+                        modifier = Modifier.weight(1f).height(42.dp),
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        Icon(Icons.Filled.FileDownload, contentDescription = null, modifier = Modifier.size(16.dp), tint = PrimaryDark)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(text = "دانلود JSON", fontSize = 12.sp, fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, color = PrimaryDark)
                     }
-                    .padding(horizontal = 14.dp, vertical = 12.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Filled.FileDownload, contentDescription = null, tint = TextMuted, modifier = Modifier.size(20.dp))
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Text(text = "خروجی فایل پشتیبان (JSON)", fontSize = 13.5.sp, fontWeight = FontWeight.SemiBold, color = TextDark)
-                }
-                Icon(Icons.Filled.ChevronLeft, contentDescription = null, tint = TextMuted, modifier = Modifier.size(20.dp))
-            }
 
-            Divider(color = BorderColor)
-
-            // Clear All Data
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { viewModel.requestClearAllData() }
-                    .padding(horizontal = 14.dp, vertical = 12.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Filled.Delete, contentDescription = null, tint = Color(0xFFEF4444), modifier = Modifier.size(20.dp))
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Text(text = "پاک‌سازی کامل تمام داده‌ها", fontSize = 13.5.sp, fontWeight = FontWeight.Bold, color = Color(0xFFEF4444))
+                    OutlinedButton(
+                        onClick = { viewModel.importBackupJson(context) },
+                        modifier = Modifier.weight(1f).height(42.dp),
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        Icon(Icons.Filled.FileUpload, contentDescription = null, modifier = Modifier.size(16.dp), tint = PrimaryDark)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(text = "وارد کردن", fontSize = 12.sp, fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, color = PrimaryDark)
+                    }
                 }
-                Icon(Icons.Filled.ChevronLeft, contentDescription = null, tint = Color(0xFFEF4444), modifier = Modifier.size(20.dp))
+
+                Button(
+                    onClick = viewModel::showClearAllDataConfirmation,
+                    modifier = Modifier.fillMaxWidth().height(42.dp),
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444).copy(alpha = 0.1f), contentColor = Color(0xFFEF4444))
+                ) {
+                    Icon(Icons.Filled.Delete, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(text = "پاک‌سازی تمام داده‌ها", fontSize = 12.5.sp, fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold)
+                }
             }
         }
 
-        // Group 4: Live Debug Logs Viewer
-        DebugLogViewer(
-            logs = logs,
-            onCopyLogs = { viewModel.copyLogsToClipboard(context) },
-            onClearLogs = viewModel::clearDebugLogs
-        )
-
-        // Group 5: About App & Version
-        SettingsGroup(title = "درباره") {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 14.dp, vertical = 12.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Filled.Info, contentDescription = null, tint = TextMuted, modifier = Modifier.size(20.dp))
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Text(text = "نسخه برنامه", fontSize = 13.5.sp, fontWeight = FontWeight.SemiBold, color = TextDark)
-                }
-                Text(text = "6.0.0 (Native Release)", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = TextMuted)
-            }
+        // Group 4: Live Debug Console
+        SettingsGroup(title = "کنسول دیباگ زنده (Debug Logs)") {
+            DebugLogViewer(
+                logs = logs,
+                onClearLogs = viewModel::clearDebugLogs
+            )
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        // App Version
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 12.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "نسخه ۲.۰.۰ — گالری مهوا",
+                fontSize = 11.sp,
+                fontFamily = VazirmatnFontFamily,
+                color = TextMuted,
+                fontWeight = FontWeight.Medium
+            )
+        }
     }
 }
 
@@ -335,23 +408,26 @@ private fun SettingsGroup(
     title: String,
     content: @Composable () -> Unit
 ) {
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
         Text(
             text = title,
-            fontSize = 11.sp,
+            fontSize = 12.5.sp,
+            fontFamily = VazirmatnFontFamily,
             fontWeight = FontWeight.Bold,
             color = TextMuted,
-            modifier = Modifier.padding(start = 6.dp, bottom = 4.dp)
+            modifier = Modifier.padding(horizontal = 4.dp)
         )
         Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(14.dp))
-                .border(1.dp, BorderColor, RoundedCornerShape(14.dp)),
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(14.dp),
             color = White,
-            shadowElevation = 2.dp
+            border = androidx.compose.foundation.BorderStroke(1.dp, BorderColor),
+            shadowElevation = 1.dp
         ) {
-            Column(modifier = Modifier.fillMaxWidth()) {
+            Column {
                 content()
             }
         }
@@ -370,11 +446,11 @@ private fun DefaultPercentInputRow(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = label, fontSize = 12.5.sp, fontWeight = FontWeight.SemiBold, color = TextDark, modifier = Modifier.width(110.dp))
+        Text(text = label, fontSize = 13.sp, fontFamily = VazirmatnFontFamily, color = TextDark, fontWeight = FontWeight.Medium)
 
         Box(
             modifier = Modifier
-                .weight(1f)
+                .width(100.dp)
                 .height(38.dp)
                 .clip(RoundedCornerShape(8.dp))
                 .background(DisabledBg)
@@ -382,26 +458,34 @@ private fun DefaultPercentInputRow(
                 .padding(horizontal = 8.dp),
             contentAlignment = Alignment.Center
         ) {
-            BasicTextField(
-                value = value,
-                onValueChange = onValueChange,
+            Row(
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                textStyle = TextStyle(
-                    color = TextDark,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Start
-                ),
-                cursorBrush = SolidColor(PrimaryDark),
-                decorationBox = { innerTextField ->
-                    if (value.isEmpty()) {
-                        Text(text = placeholder, color = Color(0xFFC4CFDE), fontSize = 12.sp)
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                BasicTextField(
+                    value = value,
+                    onValueChange = onValueChange,
+                    modifier = Modifier.weight(1f),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    textStyle = TextStyle(
+                        fontFamily = VazirmatnFontFamily,
+                        color = TextDark,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Start,
+                        textDirection = TextDirection.Rtl
+                    ),
+                    cursorBrush = SolidColor(PrimaryDark),
+                    decorationBox = { innerTextField ->
+                        if (value.isEmpty() && placeholder.isNotEmpty()) {
+                            Text(text = placeholder, color = Color(0xFFBAC5D6), fontSize = 12.sp, fontFamily = VazirmatnFontFamily)
+                        }
+                        innerTextField()
                     }
-                    innerTextField()
-                }
-            )
+                )
+                Text(text = "٪", color = TextMuted, fontSize = 10.5.sp, fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Medium)
+            }
         }
     }
 }

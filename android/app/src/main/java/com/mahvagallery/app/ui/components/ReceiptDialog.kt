@@ -1,8 +1,10 @@
 package com.mahvagallery.app.ui.components
 
-import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Canvas as AndroidCanvas
+import android.graphics.Picture
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,7 +19,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
@@ -28,10 +33,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -42,6 +47,7 @@ import com.mahvagallery.app.ui.theme.PrimaryDark
 import com.mahvagallery.app.ui.theme.TextDark
 import com.mahvagallery.app.ui.theme.White
 import com.mahvagallery.app.utils.NumberFormatters
+import com.mahvagallery.app.utils.ReceiptExporter
 
 @Composable
 fun ReceiptDialog(
@@ -65,7 +71,7 @@ fun ReceiptDialog(
     val receiptText = """
         گالری طلا مهوا
         $title
-        تاریخ: $date  |  زمان: $time
+        تاریخ: ${NumberFormatters.toPersianDigits(date)}  |  زمان: ${NumberFormatters.toPersianDigits(time)}
         --------------------------------
         وزن طلا: $formattedWeight گرم
         فی طلا: $formattedRaw تومان
@@ -77,18 +83,19 @@ fun ReceiptDialog(
         مبلغ کل: $formattedTotal تومان
         --------------------------------
         از حسن انتخاب شما سپاسگزاریم
+        SYS. MAHVA / ${NumberFormatters.toPersianDigits("83921")}
     """.trimIndent()
 
     Dialog(onDismissRequest = onDismiss) {
         Surface(
-            shape = RoundedCornerShape(20.dp),
+            shape = RoundedCornerShape(22.dp),
             color = Color(0xFFFFFDF8),
             shadowElevation = 24.dp,
             modifier = Modifier.fillMaxWidth()
         ) {
             Column(
                 modifier = Modifier
-                    .padding(20.dp)
+                    .padding(18.dp)
                     .verticalScroll(scrollState),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -98,14 +105,14 @@ fun ReceiptDialog(
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Black,
                     color = Color(0xFF111111),
-                    letterSpacing = (-0.5).sp
+                    textAlign = TextAlign.Center
                 )
                 Text(
                     text = title,
-                    fontSize = 13.sp,
+                    fontSize = 12.5.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF555555),
-                    modifier = Modifier.padding(top = 2.dp, bottom = 12.dp)
+                    modifier = Modifier.padding(top = 2.dp, bottom = 10.dp)
                 )
 
                 // Date & Time
@@ -115,26 +122,26 @@ fun ReceiptDialog(
                         .padding(vertical = 4.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(text = "تاریخ: $date", fontSize = 12.sp, color = Color(0xFF555555))
-                    Text(text = "زمان: $time", fontSize = 12.sp, color = Color(0xFF555555))
+                    Text(text = "تاریخ: ${NumberFormatters.toPersianDigits(date)}", fontSize = 11.5.sp, color = Color(0xFF555555))
+                    Text(text = "زمان: ${NumberFormatters.toPersianDigits(time)}", fontSize = 11.5.sp, color = Color(0xFF555555))
                 }
 
-                Divider(color = Color(0xFFAAAAAA), thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp))
+                Divider(color = Color(0xFFAAAAAA), thickness = 1.dp, modifier = Modifier.padding(vertical = 6.dp))
 
                 // Line Items
                 ReceiptRow("وزن طلا:", "$formattedWeight گـرم", isBold = true)
                 ReceiptRow("فی طلا (خام):", "$formattedRaw ت")
 
-                Divider(color = Color(0xFFAAAAAA), thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp))
+                Divider(color = Color(0xFFAAAAAA), thickness = 1.dp, modifier = Modifier.padding(vertical = 6.dp))
 
-                ReceiptRow("اجرت (${NumberFormatters.toPersianDigits(calcData.d.toString())}٪):", "$formattedOjrat ت")
-                ReceiptRow("سود (${NumberFormatters.toPersianDigits(calcData.f.toString())}٪):", "$formattedProfit ت")
-                ReceiptRow("مالیات (${NumberFormatters.toPersianDigits(calcData.h.toString())}٪):", "$formattedTax ت")
+                ReceiptRow("اجرت (${NumberFormatters.formatPercentage(calcData.d)}٪):", "$formattedOjrat ت")
+                ReceiptRow("سود (${NumberFormatters.formatPercentage(calcData.f)}٪):", "$formattedProfit ت")
+                ReceiptRow("مالیات (${NumberFormatters.formatPercentage(calcData.h)}٪):", "$formattedTax ت")
 
                 Spacer(modifier = Modifier.height(4.dp))
                 ReceiptRow("مجموع هزینه‌ها:", "$formattedCosts ت", isMuted = true)
 
-                Divider(color = Color(0xFF222222), thickness = 1.5.dp, modifier = Modifier.padding(vertical = 10.dp))
+                Divider(color = Color(0xFF222222), thickness = 1.5.dp, modifier = Modifier.padding(vertical = 8.dp))
 
                 // Total Price
                 Row(
@@ -144,68 +151,206 @@ fun ReceiptDialog(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = "مبلغ کل:", fontSize = 16.sp, fontWeight = FontWeight.Black, color = Color(0xFF111111))
-                    Text(text = "$formattedTotal تومان", fontSize = 17.sp, fontWeight = FontWeight.Black, color = PrimaryDark)
+                    Text(text = "مبلغ کل:", fontSize = 15.sp, fontWeight = FontWeight.Black, color = Color(0xFF111111))
+                    Text(text = "$formattedTotal تومان", fontSize = 16.5.sp, fontWeight = FontWeight.Black, color = PrimaryDark)
                 }
 
-                Spacer(modifier = Modifier.height(14.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
                 // Thank you note
                 Text(
                     text = "از حسـن انتخـاب شمـا سپـاسگزاريـم",
-                    fontSize = 12.sp,
+                    fontSize = 11.5.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF555555),
                     textAlign = TextAlign.Center
                 )
 
-                // Simulated Barcode
-                Box(
+                // Realistic Striped Barcode
+                Canvas(
                     modifier = Modifier
-                        .padding(top = 12.dp)
-                        .fillMaxWidth(0.85f)
+                        .padding(top = 10.dp)
+                        .fillMaxWidth(0.9f)
                         .height(28.dp)
-                        .background(Color(0xFF111111).copy(alpha = 0.85f))
-                )
+                ) {
+                    val barWidths = listOf(
+                        3f, 1.5f, 4f, 2f, 1f, 3f, 5f, 1.5f, 2f, 4f, 1f, 3.5f,
+                        2f, 4f, 1f, 3f, 5f, 2f, 1.5f, 4f, 2f, 3f, 1.5f, 2f, 4f, 3f, 1.5f, 2f, 5f, 1f, 3f, 2f, 4f
+                    )
+                    val totalSum = barWidths.sum() + (barWidths.size * 2f)
+                    val scaleFactor = size.width / totalSum
+                    var currentX = 0f
+
+                    for ((idx, w) in barWidths.withIndex()) {
+                        val barW = w * scaleFactor
+                        val gapW = 2f * scaleFactor
+                        if (idx % 2 == 0) {
+                            drawRect(
+                                color = Color(0xFF1A1A1A),
+                                topLeft = Offset(currentX, 0f),
+                                size = Size(barW, size.height)
+                            )
+                        }
+                        currentX += barW + gapW
+                    }
+                }
 
                 Text(
-                    text = "SYS. MAHVA / ${NumberFormatters.toPersianDigits((10000..99999).random().toString())}",
-                    fontSize = 10.sp,
+                    text = "SYS. MAHVA / ${NumberFormatters.toPersianDigits("83921")}",
+                    fontSize = 9.5.sp,
                     color = Color(0xFF888888),
-                    modifier = Modifier.padding(top = 6.dp, bottom = 18.dp)
+                    modifier = Modifier.padding(top = 4.dp, bottom = 14.dp)
                 )
 
-                // Buttons
+                // Primary Default Action: Share High-Res Image
+                Button(
+                    onClick = {
+                        // Generate receipt bitmap
+                        val width = 600
+                        val height = 900
+                        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+                        val canvas = AndroidCanvas(bitmap)
+                        canvas.drawColor(android.graphics.Color.parseColor("#FFFDF8"))
+
+                        val pTitle = android.graphics.Paint().apply {
+                            color = android.graphics.Color.parseColor("#172051")
+                            textSize = 36f
+                            isFakeBoldText = true
+                            textAlign = android.graphics.Paint.Align.CENTER
+                        }
+                        val pSub = android.graphics.Paint().apply {
+                            color = android.graphics.Color.parseColor("#555555")
+                            textSize = 22f
+                            textAlign = android.graphics.Paint.Align.CENTER
+                        }
+                        val pTextRight = android.graphics.Paint().apply {
+                            color = android.graphics.Color.parseColor("#333333")
+                            textSize = 24f
+                            textAlign = android.graphics.Paint.Align.RIGHT
+                        }
+                        val pTextLeft = android.graphics.Paint().apply {
+                            color = android.graphics.Color.parseColor("#172051")
+                            textSize = 25f
+                            isFakeBoldText = true
+                            textAlign = android.graphics.Paint.Align.LEFT
+                        }
+                        val pLine = android.graphics.Paint().apply {
+                            color = android.graphics.Color.parseColor("#CCCCCC")
+                            strokeWidth = 2f
+                        }
+
+                        var y = 65f
+                        canvas.drawText("گالری طلا مهوا", width / 2f, y, pTitle)
+                        y += 38f
+                        canvas.drawText(title, width / 2f, y, pSub)
+                        y += 35f
+                        canvas.drawLine(30f, y, width - 30f, y, pLine)
+                        y += 38f
+
+                        canvas.drawText("تاریخ: ${NumberFormatters.toPersianDigits(date)}", width - 30f, y, pTextRight)
+                        canvas.drawText("زمان: ${NumberFormatters.toPersianDigits(time)}", 30f, y, pTextLeft)
+                        y += 35f
+                        canvas.drawLine(30f, y, width - 30f, y, pLine)
+                        y += 40f
+
+                        canvas.drawText("وزن طلا:", width - 30f, y, pTextRight)
+                        canvas.drawText("$formattedWeight گرم", 30f, y, pTextLeft)
+                        y += 40f
+                        canvas.drawText("فی طلا (خام):", width - 30f, y, pTextRight)
+                        canvas.drawText("$formattedRaw ت", 30f, y, pTextLeft)
+                        y += 35f
+                        canvas.drawLine(30f, y, width - 30f, y, pLine)
+                        y += 40f
+
+                        canvas.drawText("اجرت (${NumberFormatters.formatPercentage(calcData.d)}٪):", width - 30f, y, pTextRight)
+                        canvas.drawText("$formattedOjrat ت", 30f, y, pTextLeft)
+                        y += 40f
+                        canvas.drawText("سود (${NumberFormatters.formatPercentage(calcData.f)}٪):", width - 30f, y, pTextRight)
+                        canvas.drawText("$formattedProfit ت", 30f, y, pTextLeft)
+                        y += 40f
+                        canvas.drawText("مالیات (${NumberFormatters.formatPercentage(calcData.h)}٪):", width - 30f, y, pTextRight)
+                        canvas.drawText("$formattedTax ت", 30f, y, pTextLeft)
+                        y += 40f
+
+                        canvas.drawText("مجموع هزینه‌ها:", width - 30f, y, pTextRight)
+                        canvas.drawText("$formattedCosts ت", 30f, y, pTextLeft)
+                        y += 35f
+                        canvas.drawLine(30f, y, width - 30f, y, pLine)
+                        y += 50f
+
+                        pTextRight.textSize = 28f
+                        pTextRight.isFakeBoldText = true
+                        pTextLeft.textSize = 32f
+                        pTextLeft.color = android.graphics.Color.parseColor("#172051")
+                        canvas.drawText("مبلغ کل:", width - 30f, y, pTextRight)
+                        canvas.drawText("$formattedTotal تومان", 30f, y, pTextLeft)
+                        y += 55f
+
+                        val pBarcode = android.graphics.Paint().apply { color = android.graphics.Color.parseColor("#222222") }
+                        val bWidths = floatArrayOf(4f, 8f, 2f, 6f, 4f, 10f, 2f, 4f, 8f, 2f, 6f, 4f, 8f, 2f, 6f, 10f, 4f, 2f, 8f, 4f, 6f, 2f, 4f, 8f)
+                        var bX = 70f
+                        for (w in bWidths) {
+                            canvas.drawRect(bX, y, bX + w, y + 40f, pBarcode)
+                            bX += w + 6f
+                        }
+                        y += 65f
+
+                        pSub.textSize = 18f
+                        canvas.drawText("از حسن انتخاب شما سپاسگزاریم", width / 2f, y, pSub)
+
+                        ReceiptExporter.shareReceiptAsImage(context, bitmap)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(44.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryDark, contentColor = White)
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(imageVector = Icons.Filled.Image, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(text = "اشتراک تصویر فاکتور (تلگرام و...)", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Secondary Action Row: Share PDF, Share Text, Close
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     OutlinedButton(
                         onClick = onDismiss,
-                        modifier = Modifier.weight(1f).height(44.dp),
-                        shape = RoundedCornerShape(12.dp)
+                        modifier = Modifier.weight(0.8f).height(40.dp),
+                        shape = RoundedCornerShape(10.dp)
                     ) {
-                        Text(text = "بستن", color = TextDark, fontWeight = FontWeight.SemiBold)
+                        Text(text = "بستن", color = TextDark, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                    }
+
+                    OutlinedButton(
+                        onClick = {
+                            ReceiptExporter.shareReceiptAsText(context, receiptText)
+                        },
+                        modifier = Modifier.weight(0.9f).height(40.dp),
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        Icon(imageVector = Icons.Filled.ContentCopy, contentDescription = null, modifier = Modifier.size(15.dp), tint = TextDark)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(text = "متن", color = TextDark, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
                     }
 
                     Button(
                         onClick = {
-                            val sendIntent = Intent().apply {
-                                action = Intent.ACTION_SEND
-                                putExtra(Intent.EXTRA_TEXT, receiptText)
-                                type = "text/plain"
-                            }
-                            context.startActivity(Intent.createChooser(sendIntent, "اشتراک‌گذاری فاکتور"))
+                            ReceiptExporter.shareReceiptAsPdf(context, calcData, date, time, title)
                         },
-                        modifier = Modifier.weight(1.3f).height(44.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = PrimaryDark, contentColor = White)
+                        modifier = Modifier.weight(1.1f).height(40.dp),
+                        shape = RoundedCornerShape(10.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2A3675), contentColor = White)
                     ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(imageVector = Icons.Filled.Share, contentDescription = null, modifier = Modifier.size(16.dp))
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text(text = "اشتراک فاکتور", fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                        }
+                        Icon(imageVector = Icons.Filled.PictureAsPdf, contentDescription = null, modifier = Modifier.size(15.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(text = "فایل PDF", fontSize = 12.sp, fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -228,13 +373,13 @@ private fun ReceiptRow(
     ) {
         Text(
             text = label,
-            fontSize = 12.5.sp,
+            fontSize = 12.sp,
             color = if (isMuted) Color(0xFF666666) else Color(0xFF222222),
             fontWeight = if (isBold) FontWeight.Bold else FontWeight.Normal
         )
         Text(
             text = value,
-            fontSize = 13.sp,
+            fontSize = 12.5.sp,
             color = if (isMuted) Color(0xFF666666) else Color(0xFF111111),
             fontWeight = if (isBold) FontWeight.Black else FontWeight.Bold
         )

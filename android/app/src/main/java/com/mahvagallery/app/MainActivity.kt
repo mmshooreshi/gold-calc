@@ -45,6 +45,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val isDark by viewModel.isDarkMode.collectAsState()
+            val isBold by viewModel.isBoldText.collectAsState()
+            val fontScaleDelta by viewModel.fontScaleDelta.collectAsState()
             val toastMsg by viewModel.toastMessage.collectAsState()
             val context = LocalContext.current
 
@@ -55,7 +57,11 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            MahvaGalleryTheme(darkTheme = isDark) {
+            MahvaGalleryTheme(
+                darkTheme = isDark,
+                fontScaleDelta = fontScaleDelta,
+                isBoldText = isBold
+            ) {
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                     MainAppScaffold(viewModel = viewModel)
                 }

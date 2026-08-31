@@ -22,18 +22,22 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mahvagallery.app.ui.theme.BorderColor
@@ -41,6 +45,7 @@ import com.mahvagallery.app.ui.theme.DisabledBg
 import com.mahvagallery.app.ui.theme.PrimaryDark
 import com.mahvagallery.app.ui.theme.TextDark
 import com.mahvagallery.app.ui.theme.TextMuted
+import com.mahvagallery.app.ui.theme.VazirmatnFontFamily
 import com.mahvagallery.app.ui.theme.White
 
 @Composable
@@ -48,16 +53,20 @@ fun CalculatorInputRow(
     label: String,
     value: String,
     onValueChange: (String) -> Unit,
-    unitText: String,
-    modifier: Modifier = Modifier,
+    placeholder: String = "",
+    unitText: String = "",
     isReadOnly: Boolean = false,
-    keyboardType: KeyboardType = KeyboardType.Number,
+    isHighlighted: Boolean = false,
     isLocked: Boolean? = null,
     onToggleLock: (() -> Unit)? = null,
     onInfoClick: (() -> Unit)? = null,
-    isHighlighted: Boolean = false,
-    placeholder: String = ""
+    keyboardType: KeyboardType = KeyboardType.Number,
+    modifier: Modifier = Modifier
 ) {
+    var textFieldValueState by remember(value) {
+        mutableStateOf(TextFieldValue(text = value, selection = TextRange(value.length)))
+    }
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -73,6 +82,7 @@ fun CalculatorInputRow(
                 text = label,
                 color = if (isHighlighted) MaterialTheme.colorScheme.primary else TextDark,
                 fontSize = 13.5.sp,
+                fontFamily = VazirmatnFontFamily,
                 fontWeight = if (isHighlighted) FontWeight.Bold else FontWeight.SemiBold
             )
             if (onInfoClick != null) {
@@ -111,41 +121,48 @@ fun CalculatorInputRow(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-                        BasicTextField(
-                            value = value,
-                            onValueChange = onValueChange,
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(horizontal = 4.dp),
-                            enabled = !isReadOnly,
-                            singleLine = true,
-                            keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-                            textStyle = TextStyle(
-                                color = if (isReadOnly) MaterialTheme.colorScheme.primary else TextDark,
-                                fontSize = if (isHighlighted) 16.sp else 14.5.sp,
-                                fontWeight = FontWeight.Bold,
-                                textAlign = TextAlign.Start
-                            ),
-                            cursorBrush = SolidColor(PrimaryDark),
-                            decorationBox = { innerTextField ->
-                                if (value.isEmpty() && placeholder.isNotEmpty()) {
-                                    Text(
-                                        text = placeholder,
-                                        color = Color(0xFFC4CFDE),
-                                        fontSize = 14.sp
-                                    )
-                                }
-                                innerTextField()
+                    BasicTextField(
+                        value = if (isReadOnly) TextFieldValue(value) else textFieldValueState,
+                        onValueChange = { newTfv ->
+                            textFieldValueState = newTfv
+                            if (newTfv.text != value) {
+                                onValueChange(newTfv.text)
                             }
-                        )
-                    }
+                        },
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 4.dp),
+                        enabled = !isReadOnly,
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+                        textStyle = TextStyle(
+                            fontFamily = VazirmatnFontFamily,
+                            color = if (isReadOnly) MaterialTheme.colorScheme.primary else TextDark,
+                            fontSize = if (isHighlighted) 16.sp else 14.5.sp,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Start,
+                            textDirection = TextDirection.Rtl
+                        ),
+                        cursorBrush = SolidColor(PrimaryDark),
+                        decorationBox = { innerTextField ->
+                            if (value.isEmpty() && placeholder.isNotEmpty()) {
+                                Text(
+                                    text = placeholder,
+                                    color = Color(0xFFC4CFDE),
+                                    fontSize = 14.sp,
+                                    fontFamily = VazirmatnFontFamily
+                                )
+                            }
+                            innerTextField()
+                        }
+                    )
 
                     if (unitText.isNotEmpty()) {
                         Text(
                             text = unitText,
                             color = if (isHighlighted) MaterialTheme.colorScheme.primary else TextMuted,
                             fontSize = 11.sp,
+                            fontFamily = VazirmatnFontFamily,
                             fontWeight = FontWeight.Medium
                         )
                     }
@@ -163,8 +180,8 @@ fun CalculatorInputRow(
                     Icon(
                         imageVector = if (isLocked) Icons.Filled.Lock else Icons.Filled.LockOpen,
                         contentDescription = "Lock",
-                        modifier = Modifier.size(17.dp),
-                        tint = if (isLocked) MaterialTheme.colorScheme.primary else Color(0xFFBCC9DF)
+                        modifier = Modifier.size(16.dp),
+                        tint = if (isLocked) PrimaryDark else TextMuted
                     )
                 }
             } else {
