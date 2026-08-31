@@ -26,6 +26,12 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<!-- ADD THIS LINE after line 28 -->
+<script src="https://cdn.jsdelivr.net/npm/eruda@3/dist/eruda.min.js"></script>
+
+
+
+
 
 <style>
 /* ============================
@@ -2296,6 +2302,16 @@ function openModal(id){document.getElementById(id).classList.add('on');}
 function closeModal(id){document.getElementById(id).classList.remove('on');}
 function showInfo(t,d){document.getElementById('info-t').textContent=t;document.getElementById('info-d').textContent=d;openModal('m-info');}
 
+eruda.init();
+const hInput=(e,mx)=>{
+  let eng=p2e(e.target.value.replace(/,/g,'')).replace(/[٫،,]/g,'.').replace(/[^0-9.]/g,'');
+  let pts=eng.split('.');
+  if(pts.length>2)pts=[pts[0],pts.slice(1).join('')];
+  let dec=pts.length>1?'.'+pts[1].substring(0,mx+1):'';
+  let int=pts[0]!==''?Number(pts[0]).toLocaleString('en-US'):'';
+  e.target.value=e2p(int+dec);
+  calc();
+};
 /* ============================================================
    STATE
    ============================================================ */
