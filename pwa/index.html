@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>مهوا گالری</title>
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <style>
+        :root {
+            --primary-dark: #172051;
+            --bg-light: #f4f6f8;
+            --white: #ffffff;
+            --border-color: #e2e8f0;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Vazirmatn', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            display: flex;
+            justify-content: center;
+            min-height: 100dvh;
+        }
+
+        /* Mobile First Container */
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            background-color: var(--white);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            min-height: 100dvh;
+            position: relative;
+        }
+
+        /* Header */
+        header {
+            background-color: var(--primary-dark);
+            color: var(--white);
+            text-align: center;
+            padding: 20px 0;
+            font-size: 1.4rem;
+            font-weight: 700;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        /* Form Layout */
+        .form-content {
+            padding: 0 20px 80px 20px; /* 80px bottom padding for sticky button */
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .row-label {
+            font-weight: 600;
+            font-size: 0.95rem;
+            width: 30%;
+        }
+
+        .input-group {
+            position: relative;
+            width: 68%;
+            display: flex;
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        .input-group:focus-within {
+            border-color: var(--text-muted);
+            box-shadow: 0 0 0 2px rgba(10, 19, 36, 0.1);
+        }
+
+        .input-group.disabled-group {
+            background-color: var(--bg-light);
+        }
+
+        /* Split inputs (Percentage + Value) */
+        .split-container {
+            width: 68%;
+            display: flex;
+            gap: 8px;
+        }
+
+        .split-container .input-group {
+            width: 50%;
+        }
+
+        input {
+            width: 100%;
+            border: none;
+            outline: none;
+            padding: 14px 12px;
+            font-size: 1rem;
+            text-align: left; /* Numbers usually look better LTR inside RTL */
+            direction: ltr;
+            background: transparent;
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        input:disabled {
+            color: var(--primary-dark);
+        }
+
+        .unit {
+
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            pointer-events: none;
+        }
+
+        /* Bottom Sticky Button */
+        .footer-action {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 480px;
+            background-color: var(--white);
+            padding: 16px 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn-reset {
+            background-color: var(--primary-dark);
+            color: var(--white);
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: opacity 0.2s;
+        }
+
+        .btn-reset:active {
+            opacity: 0.8;
+        }
+
+        .btn-reset svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <header>مهوا گالری</header>
+
+    <div class="form-content">
+        <!-- ردیف ۱: قیمت طلای خام -->
+        <div class="row">
+            <div class="row-label">قیمت طلای خام:</div>
+            <div class="input-group">
+                <span class="unit">تومان</span>
+                <input type="text" id="val-A" inputmode="numeric" placeholder="">
+            </div>
+        </div>
+
+        <!-- ردیف ۲: وزن -->
+        <div class="row">
+            <div class="row-label">وزن:</div>
+            <div class="input-group">
+                <span class="unit" style="left: auto; right: 12px;">گرم</span>
+                <input type="text" id="val-B" inputmode="decimal" placeholder="" style="padding-left: 80px; text-align: left;">
+            </div>
+        </div>
+
+        <!-- ردیف ۳: قیمت خام (محاسباتی) -->
+        <div class="row">
+            <div class="row-label">قیمت خام:</div>
+            <div class="input-group disabled-group">
+                <span class="unit">تومان</span>
+                <input type="text" id="val-C" disabled>
+            </div>
+        </div>
+
+        <!-- ردیف ۴: اجرت -->
+        <div class="row">
+            <div class="row-label">اجرت:</div>
+            <div class="split-container">
+                <div class="input-group">
+                    <span class="unit">درصد</span>
+                    <input type="text" id="val-D" inputmode="decimal">
+                </div>
+                <div class="input-group disabled-group">
+                    <span class="unit">تومان</span>
+                    <input type="text" id="val-E" disabled>
+                </div>
+            </div>
+        </div>
+
+        <!-- ردیف ۵: سود -->
+        <div class="row">
+            <div class="row-label">سود:</div>
+            <div class="split-container">
+                <div class="input-group">
+                    <span class="unit">درصد</span>
+                    <input type="text" id="val-F" inputmode="decimal">
+                </div>
+                <div class="input-group disabled-group">
+                    <span class="unit">تومان</span>
+                    <input type="text" id="val-G" disabled>
+                </div>
+            </div>
+        </div>
+
+        <!-- ردیف ۶: مالیات -->
+        <div class="row">
+            <div class="row-label">مالیات:</div>
+            <div class="split-container">
+                <div class="input-group">
+                    <span class="unit">درصد</span>
+                    <input type="text" id="val-H" inputmode="decimal">
+                </div>
+                <div class="input-group disabled-group">
+                    <span class="unit">تومان</span>
+                    <input type="text" id="val-I" disabled>
+                </div>
+            </div>
+        </div>
+
+        <!-- ردیف ۷: قیمت کل (محاسباتی) -->
+        <div class="row" style="margin-top: 10px;">
+            <div class="row-label">قیمت کل:</div>
+            <div class="input-group disabled-group">
+                <span class="unit">تومان</span>
+                <input type="text" id="val-K" disabled>
+            </div>
+        </div>
+
+        <!-- ردیف ۸: درصد نهایی (محاسباتی) -->
+        <div class="row">
+            <div class="row-label">درصد نهایی:</div>
+            <div class="input-group disabled-group">
+                <span class="unit">%</span>
+                <input type="text" id="val-J" disabled>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Action -->
+    <div class="footer-action">
+        <button class="btn-reset" id="reset-btn">
+            <svg viewBox="0 0 24 24">
+                <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+            </svg>
+            محاسبه مجدد
+        </button>
+    </div>
+</div>
+
+<script>
+    // Utility functions for formatting numbers
+    const formatNumber = (num) => {
+        if (!num || isNaN(num)) return "";
+        return Number(num).toLocaleString('en-US');
+    };
+
+    const unformatNumber = (str) => {
+        if (!str) return 0;
+        return parseFloat(str.replace(/,/g, ''));
+    };
+
+    // DOM Elements
+    const inputA = document.getElementById('val-A'); // طلای خام
+    const inputB = document.getElementById('val-B'); // وزن
+    const outputC = document.getElementById('val-C'); // قیمت خام
+    const inputD = document.getElementById('val-D'); // درصد اجرت
+    const outputE = document.getElementById('val-E'); // مبلغ اجرت
+    const inputF = document.getElementById('val-F'); // درصد سود
+    const outputG = document.getElementById('val-G'); // مبلغ سود
+    const inputH = document.getElementById('val-H'); // درصد مالیات
+    const outputI = document.getElementById('val-I'); // مبلغ مالیات
+    const outputK = document.getElementById('val-K'); // قیمت کل
+    const outputJ = document.getElementById('val-J'); // درصد نهایی
+    const resetBtn = document.getElementById('reset-btn');
+
+    // Load saved percentages from LocalStorage (Smart Defaults)
+    window.addEventListener('DOMContentLoaded', () => {
+        if(localStorage.getItem('mahva_D')) inputD.value = localStorage.getItem('mahva_D');
+        if(localStorage.getItem('mahva_F')) inputF.value = localStorage.getItem('mahva_F');
+        if(localStorage.getItem('mahva_H')) inputH.value = localStorage.getItem('mahva_H');
+    });
+
+    // Core Calculation Logic (Based exactly on your requested formulas)
+    const calculate = () => {
+        const A = unformatNumber(inputA.value);
+        const B = unformatNumber(inputB.value);
+        const D = unformatNumber(inputD.value);
+        const F = unformatNumber(inputF.value);
+        const H = unformatNumber(inputH.value);
+
+        // Save percentages to LocalStorage for future sessions
+        if(inputD.value) localStorage.setItem('mahva_D', inputD.value);
+        if(inputF.value) localStorage.setItem('mahva_F', inputF.value);
+        if(inputH.value) localStorage.setItem('mahva_H', inputH.value);
+
+        // C = A × B
+        const C = A * B;
+        outputC.value = formatNumber(Math.round(C));
+
+        // E = D × C ÷ 100
+        const E = (D * C) / 100;
+        outputE.value = formatNumber(Math.round(E));
+
+        // G = F × E ÷ 100
+        const G = (F * E) / 100;
+        outputG.value = formatNumber(Math.round(G));
+
+        // I = (E + G) × H ÷ 100
+        const I = ((E + G) * H) / 100;
+        outputI.value = formatNumber(Math.round(I));
+
+        // K = C + E + G + I
+        const K = C + E + G + I;
+        outputK.value = formatNumber(Math.round(K));
+
+        // J = ((K ÷ C) - 1) × 100 (2 decimal places)
+        if (C > 0) {
+            const J = (((K / C) - 1) * 100).toFixed(2);
+            outputJ.value = J;
+        } else {
+            outputJ.value = "";
+        }
+    };
+
+    // Input Formatting logic (adds commas while typing for currency)
+    const handleInput = (e) => {
+        // Only allow numbers and decimal point
+        let val = e.target.value.replace(/[^0-9.]/g, '');
+
+        // Formatting for specific fields
+        if (e.target.id === 'val-A') {
+            e.target.value = formatNumber(unformatNumber(val));
+        } else if (e.target.id === 'val-B') {
+            // Keep up to 3 decimal places for weight
+            if(val.includes('.')) {
+                const parts = val.split('.');
+                e.target.value = parts[0] + '.' + parts[1].substring(0, 3);
+            } else {
+                e.target.value = val;
+            }
+        } else {
+             // For percentages, just raw numbers/decimals
+             e.target.value = val;
+        }
+
+        calculate();
+    };
+
+    // Attach listeners
+    [inputA, inputB, inputD, inputF, inputH].forEach(input => {
+        input.addEventListener('input', handleInput);
+    });
+
+    // Reset functionality
+    resetBtn.addEventListener('click', () => {
+        inputA.value = '';
+        inputB.value = '';
+        // We do NOT clear D, F, H because they are defaults, but we trigger calc to clear outputs
+        calculate();
+    });
+
+</script>
+</body>
+</html>

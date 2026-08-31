@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">مهوا گالری</string>
+    <string name="raw_gold_price_label">قیمت طلای خام:</string>
+    <string name="weight_label">وزن:</string>
+    <string name="raw_price_label">قیمت خام:</string>
+    <string name="ojrat_label">اجرت:</string>
+    <string name="profit_label">سود:</string>
+    <string name="tax_label">مالیات:</string>
+    <string name="total_price_label">قیمت کل:</string>
+    <string name="final_percentage_label">درصد نهایی:</string>
+    <string name="unit_toman">تومان</string>
+    <string name="unit_gram">گرم</string>
+    <string name="unit_percent">درصد</string>
+    <string name="unit_percent_sym">%</string>
+    <string name="btn_recalculate">محاسبه مجدد</string>
+</resources>
