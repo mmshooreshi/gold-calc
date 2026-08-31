@@ -1,6 +1,9 @@
 package com.mahvagallery.app.ui.screens
 
 import android.content.Intent
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -16,18 +19,23 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.FileUpload
 import androidx.compose.material.icons.filled.FormatBold
 import androidx.compose.material.icons.filled.FormatSize
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Nightlight
+import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material3.Button
@@ -77,6 +85,7 @@ fun SettingsScreen(
     val isBold by viewModel.isBoldText.collectAsState()
     val fontScaleDelta by viewModel.fontScaleDelta.collectAsState()
     val defaults by viewModel.defaults.collectAsState()
+    val snapshots by viewModel.snapshots.collectAsState()
     val logs by viewModel.logs.collectAsState()
     val colors = AppTheme.colors
 
@@ -88,6 +97,13 @@ fun SettingsScreen(
     var defH by remember(defaults) { mutableStateOf(defaults.defaultH) }
 
     var sliderValue by remember(fontScaleDelta) { mutableFloatStateOf(fontScaleDelta.toFloat()) }
+
+    // Real JSON File Picker
+    val jsonFilePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let { viewModel.importBackupFromUri(context, it) }
+    }
 
     Column(
         modifier = modifier
@@ -377,16 +393,17 @@ fun SettingsScreen(
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = colors.primary, contentColor = Color.White)
                 ) {
-                    Icon(Icons.Filled.Save, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Icon(Icons.Filled.Save, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color.White)
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text(text = "ذخیره و اعمال مقادیر پیش‌فرض", fontSize = scaledSp(13f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold)
+                    Text(text = "ذخیره و اعمال مقادیر پیش‌فرض", fontSize = scaledSp(13f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, color = Color.White)
                 }
             }
         }
 
-        // Group 3: Data Management
-        SettingsGroup(title = "مدیریت داده‌ها و پشتیبان‌گیری") {
-            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        // Group 3: Snapshot Version History & Backup
+        SettingsGroup(title = "نسخه‌های ذخیره‌شده و پشتیبان‌گیری") {
+            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                // Actions row: Export JSON & Import JSON (Real file picker!)
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     OutlinedButton(
                         onClick = { viewModel.exportBackupJson(context) },
@@ -399,21 +416,126 @@ fun SettingsScreen(
                         Text(text = "دانلود JSON", fontSize = scaledSp(12f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, color = colors.primary)
                     }
 
-                    OutlinedButton(
-                        onClick = { viewModel.importBackupJson(context) },
+                    Button(
+                        onClick = { jsonFilePickerLauncher.launch("application/json") },
                         modifier = Modifier.weight(1f).height(42.dp),
                         shape = RoundedCornerShape(10.dp),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, colors.border)
+                        colors = ButtonDefaults.buttonColors(containerColor = colors.primary, contentColor = Color.White)
                     ) {
-                        Icon(Icons.Filled.FileUpload, contentDescription = null, modifier = Modifier.size(16.dp), tint = colors.primary)
+                        Icon(Icons.Filled.FileUpload, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color.White)
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text(text = "وارد کردن", fontSize = scaledSp(12f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, color = colors.primary)
+                        Text(text = "انتخاب و وارد کردن", fontSize = scaledSp(11.5f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, color = Color.White)
                     }
                 }
 
+                // Snapshots list header + Create snapshot button
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "تاریخچه نسخه‌های پشتیبان:",
+                        fontSize = scaledSp(12f),
+                        fontFamily = VazirmatnFontFamily,
+                        fontWeight = FontWeight.Bold,
+                        color = colors.textMuted
+                    )
+
+                    Surface(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable { viewModel.repository.createSnapshot() }
+                            .border(1.dp, colors.primary.copy(alpha = 0.4f), RoundedCornerShape(8.dp)),
+                        color = colors.primary.copy(alpha = 0.1f)
+                    ) {
+                        Row(modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Filled.Add, contentDescription = null, modifier = Modifier.size(13.dp), tint = colors.primary)
+                            Spacer(modifier = Modifier.width(2.dp))
+                            Text(text = "ثبت نسخه فعلی", fontSize = scaledSp(11f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, color = colors.primary)
+                        }
+                    }
+                }
+
+                // Snapshot compact rows
+                if (snapshots.isEmpty()) {
+                    Text(text = "نسخه‌ای ثبت نشده است", fontSize = scaledSp(11.5f), color = colors.textMuted)
+                } else {
+                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        snapshots.forEach { snap ->
+                            Surface(
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(10.dp),
+                                color = if (snap.isCurrent) colors.primary.copy(alpha = 0.08f) else colors.inputBgDisabled,
+                                border = androidx.compose.foundation.BorderStroke(1.dp, if (snap.isCurrent) colors.primary else colors.border)
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 10.dp, vertical = 8.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                        if (snap.isCurrent) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .size(7.dp)
+                                                    .clip(CircleShape)
+                                                    .background(colors.success)
+                                            )
+                                        }
+                                        Column {
+                                            Text(
+                                                text = "${snap.date}  |  ${NumberFormatters.toPersianDigits(snap.time)}",
+                                                fontSize = scaledSp(11.5f),
+                                                fontFamily = VazirmatnFontFamily,
+                                                fontWeight = FontWeight.Bold,
+                                                color = colors.textPrimary
+                                            )
+                                            Text(
+                                                text = "${NumberFormatters.toPersianDigits(snap.itemCount.toString())} تراکنش",
+                                                fontSize = scaledSp(10.5f),
+                                                fontFamily = VazirmatnFontFamily,
+                                                color = colors.textMuted
+                                            )
+                                        }
+                                    }
+
+                                    if (snap.isCurrent) {
+                                        Box(
+                                            modifier = Modifier
+                                                .clip(RoundedCornerShape(6.dp))
+                                                .background(colors.success.copy(alpha = 0.15f))
+                                                .padding(horizontal = 6.dp, vertical = 2.dp)
+                                        ) {
+                                            Text(text = "نسخه فعلی ✓", fontSize = scaledSp(10.5f), fontFamily = VazirmatnFontFamily, color = colors.success, fontWeight = FontWeight.Bold)
+                                        }
+                                    } else {
+                                        Surface(
+                                            modifier = Modifier
+                                                .clip(RoundedCornerShape(8.dp))
+                                                .clickable { viewModel.restoreSnapshot(snap.id) }
+                                                .border(1.dp, colors.border, RoundedCornerShape(8.dp)),
+                                            color = colors.surface
+                                        ) {
+                                            Row(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                                                Icon(Icons.Filled.Restore, contentDescription = null, modifier = Modifier.size(13.dp), tint = colors.primary)
+                                                Spacer(modifier = Modifier.width(3.dp))
+                                                Text(text = "بازیابی", fontSize = scaledSp(11f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, color = colors.primary)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Clear All Data
                 Button(
                     onClick = viewModel::showClearAllDataConfirmation,
-                    modifier = Modifier.fillMaxWidth().height(42.dp),
+                    modifier = Modifier.fillMaxWidth().padding(top = 4.dp).height(42.dp),
                     shape = RoundedCornerShape(10.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = colors.danger.copy(alpha = 0.12f), contentColor = colors.danger)
                 ) {
@@ -524,7 +646,7 @@ private fun DefaultPercentInputRow(
                         fontSize = scaledSp(13f),
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Start,
-                        textDirection = TextDirection.Rtl
+                        textDirection = TextDirection.Ltr
                     ),
                     cursorBrush = SolidColor(colors.primary),
                     decorationBox = { innerTextField ->

@@ -1,6 +1,11 @@
 package com.mahvagallery.app.ui.screens
 
 import android.content.Intent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -17,10 +22,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.FileDownload
+import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -31,14 +39,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
 import com.mahvagallery.app.ui.components.SimpleBarChart
 import com.mahvagallery.app.ui.components.SimpleLineChart
@@ -46,6 +60,8 @@ import com.mahvagallery.app.ui.theme.AppTheme
 import com.mahvagallery.app.ui.theme.VazirmatnFontFamily
 import com.mahvagallery.app.ui.theme.scaledSp
 import com.mahvagallery.app.utils.NumberFormatters
+import com.mahvagallery.app.utils.PersianCalendarHelper
+import com.mahvagallery.app.utils.ReceiptExporter
 import com.mahvagallery.app.viewmodel.ChartType
 import com.mahvagallery.app.viewmodel.MainViewModel
 import com.mahvagallery.app.viewmodel.StatsDatePreset
@@ -60,38 +76,50 @@ fun StatsScreen(
 ) {
     val history by viewModel.repository.history.collectAsState()
     val activePreset by viewModel.statsDatePreset.collectAsState()
-    val chartType by viewModel.chartType.collectAsState()
     val colors = AppTheme.colors
     val context = LocalContext.current
     val scrollState = rememberScrollState()
 
-    // Filter sales by preset
-    val sales = remember(history, activePreset) {
+    var isCustomRangeActive by remember { mutableStateOf(false) }
+    var customStartDate by remember { mutableStateOf("") }
+    var customEndDate by remember { mutableStateOf("") }
+
+    // Filter sales by preset or custom date range
+    val sales = remember(history, activePreset, isCustomRangeActive, customStartDate, customEndDate) {
         val allSales = history.filter { it.type == "sale" }
-        when (activePreset) {
-            StatsDatePreset.ALL -> allSales
-            StatsDatePreset.TODAY -> {
-                val cal = Calendar.getInstance()
-                val todayIso = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(cal.time)
-                allSales.filter { it.iso == todayIso }
+        if (isCustomRangeActive && (customStartDate.isNotEmpty() || customEndDate.isNotEmpty())) {
+            allSales.filter { item ->
+                val date = item.date
+                val afterStart = if (customStartDate.isNotEmpty()) date >= customStartDate else true
+                val beforeEnd = if (customEndDate.isNotEmpty()) date <= customEndDate else true
+                afterStart && beforeEnd
             }
-            StatsDatePreset.WEEK -> {
-                val cal = Calendar.getInstance()
-                cal.add(Calendar.DAY_OF_YEAR, -7)
-                val cutoff = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(cal.time)
-                allSales.filter { it.iso >= cutoff }
-            }
-            StatsDatePreset.MONTH -> {
-                val cal = Calendar.getInstance()
-                cal.add(Calendar.MONTH, -1)
-                val cutoff = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(cal.time)
-                allSales.filter { it.iso >= cutoff }
-            }
-            StatsDatePreset.THREE_MONTHS -> {
-                val cal = Calendar.getInstance()
-                cal.add(Calendar.MONTH, -3)
-                val cutoff = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(cal.time)
-                allSales.filter { it.iso >= cutoff }
+        } else {
+            when (activePreset) {
+                StatsDatePreset.ALL -> allSales
+                StatsDatePreset.TODAY -> {
+                    val cal = Calendar.getInstance()
+                    val todayIso = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(cal.time)
+                    allSales.filter { it.iso == todayIso }
+                }
+                StatsDatePreset.WEEK -> {
+                    val cal = Calendar.getInstance()
+                    cal.add(Calendar.DAY_OF_YEAR, -7)
+                    val cutoff = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(cal.time)
+                    allSales.filter { it.iso >= cutoff }
+                }
+                StatsDatePreset.MONTH -> {
+                    val cal = Calendar.getInstance()
+                    cal.add(Calendar.MONTH, -1)
+                    val cutoff = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(cal.time)
+                    allSales.filter { it.iso >= cutoff }
+                }
+                StatsDatePreset.THREE_MONTHS -> {
+                    val cal = Calendar.getInstance()
+                    cal.add(Calendar.MONTH, -3)
+                    val cutoff = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(cal.time)
+                    allSales.filter { it.iso >= cutoff }
+                }
             }
         }
     }
@@ -188,32 +216,91 @@ fun StatsScreen(
                 fontWeight = FontWeight.Bold,
                 color = colors.primary
             )
+
+            // Custom Range Toggle Button
+            Surface(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .clickable { isCustomRangeActive = !isCustomRangeActive }
+                    .border(1.dp, if (isCustomRangeActive) colors.primary else colors.border, RoundedCornerShape(8.dp)),
+                color = if (isCustomRangeActive) colors.primary.copy(alpha = 0.12f) else colors.surface
+            ) {
+                Row(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Filled.DateRange, contentDescription = null, modifier = Modifier.size(14.dp), tint = colors.primary)
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "بازه دلخواه",
+                        fontSize = scaledSp(11.5f),
+                        fontFamily = VazirmatnFontFamily,
+                        fontWeight = FontWeight.Bold,
+                        color = colors.primary
+                    )
+                }
+            }
         }
 
-        // Date Presets Row
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        // Custom Date Range Inputs
+        AnimatedVisibility(
+            visible = isCustomRangeActive,
+            enter = fadeIn() + expandVertically(),
+            exit = fadeOut() + shrinkVertically()
         ) {
-            StatsDatePreset.values().forEach { preset ->
-                val isSelected = preset == activePreset
-                Surface(
-                    modifier = Modifier
-                        .weight(1f)
-                        .clip(RoundedCornerShape(12.dp))
-                        .clickable { viewModel.setStatsDatePreset(preset) }
-                        .border(1.dp, if (isSelected) colors.primary else colors.border, RoundedCornerShape(12.dp)),
-                    color = if (isSelected) colors.primary else colors.surface
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                color = colors.surface,
+                border = androidx.compose.foundation.BorderStroke(1.dp, colors.border)
+            ) {
+                Row(
+                    modifier = Modifier.padding(10.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = preset.title,
-                        modifier = Modifier.padding(vertical = 8.dp),
-                        fontSize = scaledSp(11f),
-                        fontFamily = VazirmatnFontFamily,
-                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                        color = if (isSelected) Color.White else colors.textPrimary,
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                    CustomDateInput(
+                        modifier = Modifier.weight(1f),
+                        label = "از تاریخ",
+                        value = customStartDate,
+                        onValueChange = { customStartDate = it },
+                        placeholder = "۱۴۰۳/۰۱/۰۱"
                     )
+
+                    CustomDateInput(
+                        modifier = Modifier.weight(1f),
+                        label = "تا تاریخ",
+                        value = customEndDate,
+                        onValueChange = { customEndDate = it },
+                        placeholder = PersianCalendarHelper.getTodayShamsi().formatPersian()
+                    )
+                }
+            }
+        }
+
+        // Standard Date Presets Row
+        if (!isCustomRangeActive) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                StatsDatePreset.values().forEach { preset ->
+                    val isSelected = preset == activePreset
+                    Surface(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(12.dp))
+                            .clickable { viewModel.setStatsDatePreset(preset) }
+                            .border(1.dp, if (isSelected) colors.primary else colors.border, RoundedCornerShape(12.dp)),
+                        color = if (isSelected) colors.primary else colors.surface
+                    ) {
+                        Text(
+                            text = preset.title,
+                            modifier = Modifier.padding(vertical = 8.dp),
+                            fontSize = scaledSp(11f),
+                            fontFamily = VazirmatnFontFamily,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                            color = if (isSelected) Color.White else colors.textPrimary,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        )
+                    }
                 }
             }
         }
@@ -272,13 +359,14 @@ fun StatsScreen(
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     OutlinedButton(
                         onClick = {
+                            val presetName = if (isCustomRangeActive) "$customStartDate تا $customEndDate" else activePreset.title
                             val report = """
                                 گزارش فروش مهوا گالری
-                                بازه: ${activePreset.title}
+                                بازه: $presetName
                                 ----------------------------
                                 مجموع فروش: ${NumberFormatters.formatCurrency(totalAmount, toPersian = true)} تومان
                                 تعداد تراکنش: ${NumberFormatters.toPersianDigits(count.toString())}
@@ -290,15 +378,37 @@ fun StatsScreen(
                                 putExtra(Intent.EXTRA_TEXT, report)
                                 type = "text/plain"
                             }
-                            context.startActivity(Intent.createChooser(sendIntent, "اشتراک گزارش"))
+                            context.startActivity(Intent.createChooser(sendIntent, "اشتراک متن گزارش"))
                         },
                         modifier = Modifier.weight(1f).height(42.dp),
                         shape = RoundedCornerShape(10.dp),
                         border = androidx.compose.foundation.BorderStroke(1.dp, colors.border)
                     ) {
-                        Icon(Icons.Filled.Share, contentDescription = null, modifier = Modifier.size(16.dp), tint = colors.primary)
+                        Icon(Icons.Filled.Share, contentDescription = null, modifier = Modifier.size(15.dp), tint = colors.primary)
+                        Spacer(modifier = Modifier.width(3.dp))
+                        Text(text = "متن", fontSize = scaledSp(11.5f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, color = colors.primary)
+                    }
+
+                    Button(
+                        onClick = {
+                            val presetName = if (isCustomRangeActive) "$customStartDate تا $customEndDate" else activePreset.title
+                            ReceiptExporter.exportStatsPdf(
+                                context = context,
+                                sales = sales,
+                                totalAmount = totalAmount,
+                                count = count,
+                                avgAmount = avgAmount,
+                                maxAmount = maxAmount,
+                                presetTitle = presetName
+                            )
+                        },
+                        modifier = Modifier.weight(1.1f).height(42.dp),
+                        shape = RoundedCornerShape(10.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2A3675), contentColor = Color.White)
+                    ) {
+                        Icon(Icons.Filled.PictureAsPdf, contentDescription = null, modifier = Modifier.size(15.dp), tint = Color.White)
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text(text = "اشتراک متن", fontSize = scaledSp(12f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, color = colors.primary)
+                        Text(text = "خروجی PDF", fontSize = scaledSp(12f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, color = Color.White)
                     }
 
                     Button(
@@ -307,15 +417,61 @@ fun StatsScreen(
                         shape = RoundedCornerShape(10.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = colors.primary, contentColor = Color.White)
                     ) {
-                        Icon(Icons.Filled.FileDownload, contentDescription = null, modifier = Modifier.size(16.dp))
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(text = "دانلود داده‌ها", fontSize = scaledSp(12f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold)
+                        Icon(Icons.Filled.FileDownload, contentDescription = null, modifier = Modifier.size(15.dp), tint = Color.White)
+                        Spacer(modifier = Modifier.width(3.dp))
+                        Text(text = "داده‌ها", fontSize = scaledSp(11.5f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, color = Color.White)
                     }
                 }
             }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
+    }
+}
+
+@Composable
+private fun CustomDateInput(
+    label: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    placeholder: String,
+    modifier: Modifier = Modifier
+) {
+    val colors = AppTheme.colors
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Text(text = label, fontSize = scaledSp(11f), fontFamily = VazirmatnFontFamily, color = colors.textMuted)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(36.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(colors.inputBg)
+                .border(1.dp, colors.inputBorder, RoundedCornerShape(8.dp))
+                .padding(horizontal = 8.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            BasicTextField(
+                value = value,
+                onValueChange = onValueChange,
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                textStyle = TextStyle(
+                    fontFamily = VazirmatnFontFamily,
+                    color = colors.textPrimary,
+                    fontSize = scaledSp(12f),
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Start,
+                    textDirection = TextDirection.Ltr
+                ),
+                cursorBrush = SolidColor(colors.primary),
+                decorationBox = { innerTextField ->
+                    if (value.isEmpty()) {
+                        Text(text = placeholder, color = colors.textMuted.copy(alpha = 0.4f), fontSize = scaledSp(11f), fontFamily = VazirmatnFontFamily)
+                    }
+                    innerTextField()
+                }
+            )
+        }
     }
 }
 

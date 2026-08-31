@@ -1,9 +1,11 @@
 package com.mahvagallery.app.data
 
 import android.content.Context
+import android.content.SharedPreferences
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.mahvagallery.app.model.CalcData
+import com.mahvagallery.app.model.CustomerInfo
 import com.mahvagallery.app.model.DefaultValues
 import com.mahvagallery.app.model.EditTrace
 import com.mahvagallery.app.model.HistoryItem
@@ -14,9 +16,18 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
+data class BackupSnapshot(
+    val id: String = System.currentTimeMillis().toString(),
+    val date: String = "",
+    val time: String = "",
+    val itemCount: Int = 0,
+    val isCurrent: Boolean = false,
+    val jsonPayload: String = ""
+)
+
 class AppRepository(context: Context) {
 
-    private val prefs = context.getSharedPreferences("mahva_app_prefs_v6", Context.MODE_PRIVATE)
+    private val prefs: SharedPreferences = context.getSharedPreferences("mahva_gold_calc_prefs", Context.MODE_PRIVATE)
     private val gson = Gson()
 
     private val _history = MutableStateFlow<List<HistoryItem>>(emptyList())
@@ -25,11 +36,11 @@ class AppRepository(context: Context) {
     private val _locks = MutableStateFlow(LockSettings())
     val locks: StateFlow<LockSettings> = _locks.asStateFlow()
 
+    private val _lockedValues = MutableStateFlow<Map<String, String>>(emptyMap())
+    val lockedValues: StateFlow<Map<String, String>> = _lockedValues.asStateFlow()
+
     private val _defaults = MutableStateFlow(DefaultValues())
     val defaults: StateFlow<DefaultValues> = _defaults.asStateFlow()
-
-    private val _lockedValues = MutableStateFlow(mapOf<String, String>())
-    val lockedValues: StateFlow<Map<String, String>> = _lockedValues.asStateFlow()
 
     private val _isDarkMode = MutableStateFlow(false)
     val isDarkMode: StateFlow<Boolean> = _isDarkMode.asStateFlow()
@@ -40,18 +51,21 @@ class AppRepository(context: Context) {
     private val _fontScaleDelta = MutableStateFlow(0)
     val fontScaleDelta: StateFlow<Int> = _fontScaleDelta.asStateFlow()
 
+    private val _snapshots = MutableStateFlow<List<BackupSnapshot>>(emptyList())
+    val snapshots: StateFlow<List<BackupSnapshot>> = _snapshots.asStateFlow()
+
     init {
-        loadPersistedData()
+        loadDataFromStorage()
     }
 
-    private fun loadPersistedData() {
+    private fun loadDataFromStorage() {
         try {
             // Load history
             val historyJson = prefs.getString("history_v6", null)
-            if (historyJson != null) {
-                val type = object : TypeToken<List<HistoryItem>>() {}.type
-                val items: List<HistoryItem> = gson.fromJson(historyJson, type) ?: emptyList()
-                _history.value = items
+            if (!historyJson.isNullOrEmpty()) {
+                val listType = object : TypeToken<List<HistoryItem>>() {}.type
+                val loadedList: List<HistoryItem> = gson.fromJson(historyJson, listType) ?: emptyList()
+                _history.value = loadedList
             }
 
             // Load locks
@@ -79,6 +93,16 @@ class AppRepository(context: Context) {
             _isBoldText.value = prefs.getBoolean("bold_text", false)
             _fontScaleDelta.value = prefs.getInt("font_scale_delta", 0)
 
+            // Load snapshots
+            val snapJson = prefs.getString("snapshots_v1", null)
+            if (!snapJson.isNullOrEmpty()) {
+                val snapType = object : TypeToken<List<BackupSnapshot>>() {}.type
+                val loadedSnapshots: List<BackupSnapshot> = gson.fromJson(snapJson, snapType) ?: emptyList()
+                _snapshots.value = loadedSnapshots
+            } else {
+                createInitialSnapshot()
+            }
+
             AppLogger.info("REPO", "Loaded ${_history.value.size} transactions and user settings from storage")
         } catch (e: Exception) {
             AppLogger.error("REPO", "Error loading storage: ${e.message}")
@@ -94,19 +118,75 @@ class AppRepository(context: Context) {
         }
     }
 
-    fun saveSale(calcData: CalcData, editingId: Long? = null): HistoryItem {
+    private fun persistSnapshots() {
+        try {
+            val json = gson.toJson(_snapshots.value)
+            prefs.edit().putString("snapshots_v1", json).apply()
+        } catch (e: Exception) {
+            AppLogger.error("REPO", "Failed to persist snapshots: ${e.message}")
+        }
+    }
+
+    fun createInitialSnapshot() {
+        val payload = exportBackupJson()
+        val snap = BackupSnapshot(
+            id = "init",
+            date = PersianCalendarHelper.getTodayShamsi().formatPersian(),
+            time = PersianCalendarHelper.getCurrentTimeString(),
+            itemCount = _history.value.size,
+            isCurrent = true,
+            jsonPayload = payload
+        )
+        _snapshots.value = listOf(snap)
+        persistSnapshots()
+    }
+
+    fun createSnapshot(): BackupSnapshot {
+        val payload = exportBackupJson()
+        val snap = BackupSnapshot(
+            id = System.currentTimeMillis().toString(),
+            date = PersianCalendarHelper.getTodayShamsi().formatPersian(),
+            time = PersianCalendarHelper.getCurrentTimeString(),
+            itemCount = _history.value.size,
+            isCurrent = true,
+            jsonPayload = payload
+        )
+        val updated = listOf(snap) + _snapshots.value.map { it.copy(isCurrent = false) }
+        _snapshots.value = if (updated.size > 8) updated.take(8) else updated
+        persistSnapshots()
+        AppLogger.info("REPO", "Created backup snapshot #${snap.id}")
+        return snap
+    }
+
+    fun restoreSnapshot(snapshotId: String): Boolean {
+        val snap = _snapshots.value.find { it.id == snapshotId } ?: return false
+        val success = importBackupJson(snap.jsonPayload)
+        if (success) {
+            _snapshots.update { list ->
+                list.map { it.copy(isCurrent = it.id == snapshotId) }
+            }
+            persistSnapshots()
+        }
+        return success
+    }
+
+    fun saveSale(calcData: CalcData, customer: CustomerInfo = CustomerInfo(), editingId: Long? = null): HistoryItem {
         val today = PersianCalendarHelper.getTodayShamsi().formatPersian()
         val time = PersianCalendarHelper.getCurrentTimeString()
         val iso = PersianCalendarHelper.getCurrentIsoDate()
 
+        // Remove active draft if any
+        val withoutDrafts = _history.value.filter { it.type != "draft" || it.id == editingId }
+
         if (editingId != null) {
             val existing = _history.value.find { it.id == editingId }
             if (existing != null) {
-                val newTrace = EditTrace(existing.time, existing.date, existing.calc)
-                val updatedList = _history.value.map { item ->
+                val newTrace = EditTrace(existing.time, existing.date, existing.calc, existing.customer)
+                val updatedList = withoutDrafts.map { item ->
                     if (item.id == editingId) {
                         item.copy(
                             calc = calcData,
+                            customer = customer,
                             time = time,
                             date = today,
                             iso = iso,
@@ -129,10 +209,11 @@ class AppRepository(context: Context) {
             date = today,
             iso = iso,
             calc = calcData,
+            customer = customer,
             edits = emptyList()
         )
         _history.update { current ->
-            val list = listOf(newItem) + current
+            val list = listOf(newItem) + current.filter { it.type != "draft" }
             if (list.size > 200) list.take(200) else list
         }
         persistHistory()
@@ -140,10 +221,47 @@ class AppRepository(context: Context) {
         return newItem
     }
 
-    fun deleteTransaction(id: Long) {
-        _history.update { current -> current.filter { it.id != id } }
+    fun syncDraft(calcData: CalcData, customer: CustomerInfo = CustomerInfo()) {
+        if (calcData.b <= 0.0 && calcData.a <= 0.0) return
+
+        val today = PersianCalendarHelper.getTodayShamsi().formatPersian()
+        val time = PersianCalendarHelper.getCurrentTimeString()
+        val iso = PersianCalendarHelper.getCurrentIsoDate()
+
+        val currentList = _history.value
+        val existingDraft = currentList.firstOrNull { it.type == "draft" }
+
+        val draftItem = if (existingDraft != null) {
+            existingDraft.copy(
+                calc = calcData,
+                customer = customer,
+                time = time,
+                date = today,
+                iso = iso
+            )
+        } else {
+            HistoryItem(
+                id = 9999999999L,
+                type = "draft",
+                time = time,
+                date = today,
+                iso = iso,
+                calc = calcData,
+                customer = customer,
+                edits = emptyList()
+            )
+        }
+
+        _history.value = listOf(draftItem) + currentList.filter { it.type != "draft" }
         persistHistory()
-        AppLogger.warn("REPO", "Deleted transaction #$id")
+    }
+
+    fun deleteTransaction(id: Long) {
+        _history.update { current ->
+            current.filter { it.id != id }
+        }
+        persistHistory()
+        AppLogger.info("REPO", "Deleted transaction #$id")
     }
 
     fun toggleLock(field: String, currentValue: String) {
@@ -166,6 +284,15 @@ class AppRepository(context: Context) {
         val lockedMap = _lockedValues.value.toMutableMap()
         lockedMap[field] = if (isLocked) currentValue else ""
         _lockedValues.value = lockedMap
+
+        // Sync with default values so settings defaults and locks are unified
+        if (isLocked) {
+            when (field) {
+                "D" -> saveDefaults(currentValue, _defaults.value.defaultF, _defaults.value.defaultH)
+                "F" -> saveDefaults(_defaults.value.defaultD, currentValue, _defaults.value.defaultH)
+                "H" -> saveDefaults(_defaults.value.defaultD, _defaults.value.defaultF, currentValue)
+            }
+        }
 
         prefs.edit()
             .putBoolean("lock_$field", isLocked)
@@ -205,7 +332,7 @@ class AppRepository(context: Context) {
     }
 
     fun setFontScaleDelta(delta: Int) {
-        val clamped = delta.coerceIn(-3, 5)
+        val clamped = delta.coerceIn(-4, 10)
         _fontScaleDelta.value = clamped
         prefs.edit().putInt("font_scale_delta", clamped).apply()
         AppLogger.debug("SETTINGS", "Font scale delta set to $clamped")
@@ -220,6 +347,7 @@ class AppRepository(context: Context) {
         _isDarkMode.value = false
         _isBoldText.value = false
         _fontScaleDelta.value = 0
+        _snapshots.value = emptyList()
         AppLogger.warn("REPO", "All local application data cleared")
     }
 
@@ -230,7 +358,7 @@ class AppRepository(context: Context) {
             "locks" to _locks.value,
             "isDarkMode" to _isDarkMode.value,
             "isBoldText" to _isBoldText.value,
-            "version" to "6.0.0"
+            "version" to "2.0.0"
         )
         return gson.toJson(backupMap)
     }
@@ -245,6 +373,12 @@ class AppRepository(context: Context) {
                 _history.value = historyList
                 persistHistory()
             }
+            if (map.containsKey("defaults")) {
+                val defType = object : TypeToken<DefaultValues>() {}.type
+                val defs: DefaultValues = gson.fromJson(gson.toJson(map["defaults"]), defType)
+                saveDefaults(defs.defaultD, defs.defaultF, defs.defaultH)
+            }
+            createSnapshot()
             AppLogger.info("REPO", "Successfully imported JSON backup with ${_history.value.size} items")
             true
         } catch (e: Exception) {

@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
@@ -51,12 +52,13 @@ import com.mahvagallery.app.utils.NumberFormatters
 fun HistoryCard(
     item: HistoryItem,
     onEdit: (HistoryItem) -> Unit,
-    onDelete: (Long) -> Unit,
+    onDelete: (HistoryItem) -> Unit,
     onShowReceipt: (HistoryItem) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var isExpanded by remember { mutableStateOf(false) }
     val isEdited = item.edits.isNotEmpty()
+    val isDraft = item.type == "draft"
     val colors = AppTheme.colors
 
     val totalFormatted = NumberFormatters.formatCurrency(item.calc.k, toPersian = true)
@@ -72,7 +74,11 @@ fun HistoryCard(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(14.dp))
-            .border(1.dp, colors.border, RoundedCornerShape(14.dp)),
+            .border(
+                1.dp,
+                if (isDraft) colors.warning.copy(alpha = 0.5f) else colors.border,
+                RoundedCornerShape(14.dp)
+            ),
         color = colors.surface,
         shadowElevation = 2.dp
     ) {
@@ -95,14 +101,14 @@ fun HistoryCard(
                         modifier = Modifier
                             .clip(RoundedCornerShape(18.dp))
                             .background(
-                                if (item.type == "sale") colors.success.copy(alpha = 0.15f)
-                                else colors.textMuted.copy(alpha = 0.12f)
+                                if (isDraft) colors.warning.copy(alpha = 0.18f)
+                                else colors.success.copy(alpha = 0.15f)
                             )
                             .padding(horizontal = 8.dp, vertical = 3.dp)
                     ) {
                         Text(
-                            text = if (item.type == "sale") "فروش" else "محاسبه",
-                            color = if (item.type == "sale") colors.success else colors.textMuted,
+                            text = if (isDraft) "پیش‌نویس" else "فروش",
+                            color = if (isDraft) colors.warning else colors.success,
                             fontSize = scaledSp(11f),
                             fontFamily = VazirmatnFontFamily,
                             fontWeight = FontWeight.Bold
@@ -125,6 +131,23 @@ fun HistoryCard(
                         fontWeight = FontWeight.Black,
                         color = colors.textPrimary
                     )
+
+                    if (item.customer.isNotEmpty && item.customer.name.isNotEmpty()) {
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(colors.primary.copy(alpha = 0.1f))
+                                .padding(horizontal = 6.dp, vertical = 2.dp)
+                        ) {
+                            Text(
+                                text = item.customer.name,
+                                fontSize = scaledSp(10.5f),
+                                fontFamily = VazirmatnFontFamily,
+                                color = colors.primary,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
                 }
 
                 // Time, Receipt and Chevron
@@ -177,6 +200,30 @@ fun HistoryCard(
                         .background(colors.inputBgDisabled)
                         .padding(14.dp)
                 ) {
+                    // Customer Details Card if available
+                    if (item.customer.isNotEmpty) {
+                        Surface(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 8.dp),
+                            shape = RoundedCornerShape(10.dp),
+                            color = colors.surface,
+                            border = androidx.compose.foundation.BorderStroke(1.dp, colors.border)
+                        ) {
+                            Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(Icons.Filled.Person, contentDescription = null, tint = colors.primary, modifier = Modifier.size(15.dp))
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(text = "مشخصات خریدار و پرداخت", fontSize = scaledSp(11.5f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, color = colors.primary)
+                                }
+                                if (item.customer.name.isNotEmpty()) DetailItem("نام مشتری:", item.customer.name)
+                                if (item.customer.phone.isNotEmpty()) DetailItem("شماره تماس:", NumberFormatters.toPersianDigits(item.customer.phone))
+                                if (item.customer.paymentMethod.isNotEmpty()) DetailItem("پرداخت:", "${item.customer.paymentMethod} ${item.customer.bankName}")
+                                if (item.customer.trackingCode.isNotEmpty()) DetailItem("کد رهگیری:", NumberFormatters.toPersianDigits(item.customer.trackingCode))
+                            }
+                        }
+                    }
+
                     // Breakdown Grid
                     Row(modifier = Modifier.fillMaxWidth()) {
                         Column(modifier = Modifier.weight(1f)) {
@@ -256,7 +303,7 @@ fun HistoryCard(
                             ) {
                                 Icon(Icons.Filled.Edit, contentDescription = null, modifier = Modifier.size(15.dp), tint = colors.warning)
                                 Spacer(modifier = Modifier.width(4.dp))
-                                Text(text = "ویرایش", fontSize = scaledSp(12f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, color = colors.warning)
+                                Text(text = if (isDraft) "تکمیل و ثبت" else "ویرایش", fontSize = scaledSp(12f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, color = colors.warning)
                             }
                         }
 
@@ -264,7 +311,7 @@ fun HistoryCard(
                             modifier = Modifier
                                 .weight(1f)
                                 .clip(RoundedCornerShape(8.dp))
-                                .clickable { onDelete(item.id) },
+                                .clickable { onDelete(item) },
                             color = colors.danger.copy(alpha = 0.15f)
                         ) {
                             Row(
@@ -287,8 +334,11 @@ fun HistoryCard(
 @Composable
 private fun DetailItem(label: String, value: String) {
     val colors = AppTheme.colors
-    Column(modifier = Modifier.padding(vertical = 2.dp)) {
-        Text(text = label, fontSize = scaledSp(10.5f), fontFamily = VazirmatnFontFamily, color = colors.textMuted, fontWeight = FontWeight.Medium)
-        Text(text = value, fontSize = scaledSp(12.5f), fontFamily = VazirmatnFontFamily, color = colors.textPrimary, fontWeight = FontWeight.Bold)
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 1.5.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(text = label, fontSize = scaledSp(11f), fontFamily = VazirmatnFontFamily, color = colors.textMuted, fontWeight = FontWeight.Medium)
+        Text(text = value, fontSize = scaledSp(12f), fontFamily = VazirmatnFontFamily, color = colors.textPrimary, fontWeight = FontWeight.Bold)
     }
 }

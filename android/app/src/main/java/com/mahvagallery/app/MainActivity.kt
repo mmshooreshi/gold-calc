@@ -9,10 +9,9 @@ import androidx.activity.viewModels
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -25,6 +24,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import com.mahvagallery.app.ui.components.AppBottomBar
 import com.mahvagallery.app.ui.components.ConfirmationDialog
+import com.mahvagallery.app.ui.components.CustomerDialog
 import com.mahvagallery.app.ui.components.InfoDialog
 import com.mahvagallery.app.ui.components.ReceiptDialog
 import com.mahvagallery.app.ui.components.TopHeaderBar
@@ -32,6 +32,7 @@ import com.mahvagallery.app.ui.screens.CalculatorScreen
 import com.mahvagallery.app.ui.screens.HistoryScreen
 import com.mahvagallery.app.ui.screens.SettingsScreen
 import com.mahvagallery.app.ui.screens.StatsScreen
+import com.mahvagallery.app.ui.theme.AppTheme
 import com.mahvagallery.app.ui.theme.MahvaGalleryTheme
 import com.mahvagallery.app.viewmodel.AppTab
 import com.mahvagallery.app.viewmodel.MainViewModel
@@ -75,8 +76,11 @@ fun MainAppScaffold(viewModel: MainViewModel) {
     val currentTab by viewModel.currentTab.collectAsState()
     val activeInfo by viewModel.activeInfoDialog.collectAsState()
     val activeReceipt by viewModel.activeReceiptDialog.collectAsState()
+    val activeCustomer by viewModel.activeCustomer.collectAsState()
+    val showCustomerDialog by viewModel.showCustomerDialog.collectAsState()
     val itemToDelete by viewModel.itemToDelete.collectAsState()
     val showClearModal by viewModel.showClearDataModal.collectAsState()
+    val colors = AppTheme.colors
 
     Scaffold(
         topBar = { TopHeaderBar() },
@@ -86,13 +90,14 @@ fun MainAppScaffold(viewModel: MainViewModel) {
                 onTabSelected = viewModel::selectTab
             )
         },
-        containerColor = MaterialTheme.colorScheme.background
+        containerColor = colors.background,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { innerPadding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .background(MaterialTheme.colorScheme.background)
+                .background(colors.background)
         ) {
             Crossfade(targetState = currentTab, label = "tabTransition") { tab ->
                 when (tab) {
@@ -106,6 +111,14 @@ fun MainAppScaffold(viewModel: MainViewModel) {
     }
 
     // Modal Dialogs
+    if (showCustomerDialog) {
+        CustomerDialog(
+            initialInfo = activeCustomer,
+            onSave = viewModel::saveCustomerInfo,
+            onDismiss = viewModel::closeCustomerDialog
+        )
+    }
+
     activeInfo?.let { info ->
         InfoDialog(
             title = info.title,
@@ -117,6 +130,7 @@ fun MainAppScaffold(viewModel: MainViewModel) {
     activeReceipt?.let { receipt ->
         ReceiptDialog(
             calcData = receipt.calcData,
+            customer = receipt.customer,
             date = receipt.date,
             time = receipt.time,
             title = receipt.title,

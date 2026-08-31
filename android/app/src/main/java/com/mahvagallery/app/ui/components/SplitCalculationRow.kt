@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.LockOpen
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -37,6 +39,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.mahvagallery.app.ui.theme.AppTheme
 import com.mahvagallery.app.ui.theme.VazirmatnFontFamily
@@ -95,7 +98,7 @@ fun SplitCalculationRow(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
-            // Box 1: Percentage input
+            // Box 1: Percentage input (LTR)
             val percentBg = if (isLocked) colors.lockedBg else colors.inputBg
             val percentBorder = if (isLocked) colors.lockedBorder else colors.inputBorder
             val percentTextColor = if (isLocked) colors.lockedText else colors.textPrimary
@@ -107,36 +110,38 @@ fun SplitCalculationRow(
                     .clip(RoundedCornerShape(10.dp))
                     .background(percentBg)
                     .border(if (isLocked) 1.8.dp else 1.dp, percentBorder, RoundedCornerShape(10.dp))
-                    .padding(horizontal = 8.dp),
+                    .padding(horizontal = 6.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    BasicTextField(
-                        value = tfvState,
-                        onValueChange = { newTfv ->
-                            tfvState = newTfv
-                            if (newTfv.text != percentValue) {
-                                onPercentChange(newTfv.text)
-                            }
-                        },
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(horizontal = 2.dp),
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                        textStyle = TextStyle(
-                            fontFamily = VazirmatnFontFamily,
-                            color = percentTextColor,
-                            fontSize = scaledSp(14f),
-                            fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Start,
-                            textDirection = TextDirection.Rtl
-                        ),
-                        cursorBrush = SolidColor(if (isLocked) colors.lockedBorder else colors.primary)
-                    )
+                    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                        BasicTextField(
+                            value = tfvState,
+                            onValueChange = { newTfv ->
+                                tfvState = newTfv
+                                if (newTfv.text != percentValue) {
+                                    onPercentChange(newTfv.text)
+                                }
+                            },
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(horizontal = 2.dp),
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                            textStyle = TextStyle(
+                                fontFamily = VazirmatnFontFamily,
+                                color = percentTextColor,
+                                fontSize = scaledSp(14f),
+                                fontWeight = FontWeight.Bold,
+                                textAlign = TextAlign.Start,
+                                textDirection = TextDirection.Ltr
+                            ),
+                            cursorBrush = SolidColor(if (isLocked) colors.lockedBorder else colors.primary)
+                        )
+                    }
                     Text(
                         text = "٪",
                         color = if (isLocked) colors.lockedText else colors.textMuted,
@@ -147,7 +152,7 @@ fun SplitCalculationRow(
                 }
             }
 
-            // Box 2: Calculated Amount
+            // Box 2: Calculated Amount (LTR)
             Box(
                 modifier = Modifier
                     .weight(0.58f)
@@ -155,30 +160,32 @@ fun SplitCalculationRow(
                     .clip(RoundedCornerShape(10.dp))
                     .background(colors.inputBgDisabled)
                     .border(1.dp, colors.inputBorder, RoundedCornerShape(10.dp))
-                    .padding(horizontal = 8.dp),
+                    .padding(horizontal = 6.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    BasicTextField(
-                        value = amountValue,
-                        onValueChange = {},
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(horizontal = 2.dp),
-                        enabled = false,
-                        singleLine = true,
-                        textStyle = TextStyle(
-                            fontFamily = VazirmatnFontFamily,
-                            color = colors.primary,
-                            fontSize = scaledSp(13.5f),
-                            fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Start,
-                            textDirection = TextDirection.Rtl
+                    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                        BasicTextField(
+                            value = amountValue,
+                            onValueChange = {},
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(horizontal = 2.dp),
+                            enabled = false,
+                            singleLine = true,
+                            textStyle = TextStyle(
+                                fontFamily = VazirmatnFontFamily,
+                                color = colors.primary,
+                                fontSize = scaledSp(13.5f),
+                                fontWeight = FontWeight.Bold,
+                                textAlign = TextAlign.Start,
+                                textDirection = TextDirection.Ltr
+                            )
                         )
-                    )
+                    }
                     Text(
                         text = "تومان",
                         color = colors.textMuted,

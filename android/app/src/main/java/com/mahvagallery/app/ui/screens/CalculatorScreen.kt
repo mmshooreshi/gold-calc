@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -27,6 +28,8 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.CleaningServices
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -45,7 +48,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.mahvagallery.app.ui.components.CalculatorInputRow
 import com.mahvagallery.app.ui.components.SplitCalculationRow
 import com.mahvagallery.app.ui.theme.AppTheme
@@ -60,6 +62,7 @@ fun CalculatorScreen(
 ) {
     val state by viewModel.calcState.collectAsState()
     val locks by viewModel.locks.collectAsState()
+    val activeCustomer by viewModel.activeCustomer.collectAsState()
     val colors = AppTheme.colors
     val scrollState = rememberScrollState()
 
@@ -67,6 +70,7 @@ fun CalculatorScreen(
         modifier = modifier
             .fillMaxSize()
             .background(colors.background)
+            .imePadding()
             .verticalScroll(scrollState)
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -120,6 +124,58 @@ fun CalculatorScreen(
                             Spacer(modifier = Modifier.width(3.dp))
                             Text(text = "لغو", color = Color.White, fontSize = scaledSp(12f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold)
                         }
+                    }
+                }
+            }
+        }
+
+        // Customer Quick Attachment Bar
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .clickable(onClick = viewModel::openCustomerDialog)
+                .border(1.dp, if (activeCustomer.isNotEmpty) colors.primary else colors.border, RoundedCornerShape(12.dp)),
+            color = if (activeCustomer.isNotEmpty) colors.primary.copy(alpha = 0.08f) else colors.surface
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = if (activeCustomer.isNotEmpty) Icons.Filled.Person else Icons.Filled.PersonAdd,
+                        contentDescription = "Customer",
+                        modifier = Modifier.size(18.dp),
+                        tint = if (activeCustomer.isNotEmpty) colors.primary else colors.textMuted
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = if (activeCustomer.name.isNotEmpty()) "مشتری: ${activeCustomer.name}" else "ثبت اطلاعات مشتری و پرداخت",
+                        fontSize = scaledSp(12.5f),
+                        fontFamily = VazirmatnFontFamily,
+                        fontWeight = if (activeCustomer.isNotEmpty) FontWeight.Bold else FontWeight.Medium,
+                        color = if (activeCustomer.isNotEmpty) colors.primary else colors.textMuted
+                    )
+                }
+
+                if (activeCustomer.paymentMethod.isNotEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(colors.primary.copy(alpha = 0.15f))
+                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                    ) {
+                        Text(
+                            text = activeCustomer.paymentMethod,
+                            fontSize = scaledSp(10.5f),
+                            fontFamily = VazirmatnFontFamily,
+                            color = colors.primary,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
             }
@@ -238,7 +294,7 @@ fun CalculatorScreen(
                 .padding(bottom = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // Receipt Button (Big, clear, distinct icon)
+            // Receipt Button (Crisp icon, White surface)
             Surface(
                 modifier = Modifier
                     .size(width = 54.dp, height = 48.dp)
@@ -276,7 +332,7 @@ fun CalculatorScreen(
                 Text(text = "پاک کردن", color = colors.danger, fontSize = scaledSp(13f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold)
             }
 
-            // Save Sale Button
+            // Save Sale Button (Always Crisp White Text on Dark Navy / Gold background!)
             Button(
                 onClick = viewModel::onSaveSale,
                 modifier = Modifier
@@ -291,14 +347,16 @@ fun CalculatorScreen(
                 Icon(
                     imageVector = Icons.Filled.CheckCircle,
                     contentDescription = null,
-                    modifier = Modifier.size(18.dp)
+                    modifier = Modifier.size(18.dp),
+                    tint = Color.White
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
                     text = if (state.editingId != null) "بروزرسانی" else "ثبت فروش",
                     fontSize = scaledSp(14f),
                     fontFamily = VazirmatnFontFamily,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
                 )
             }
         }

@@ -5,11 +5,14 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.mahvagallery.app.data.AppLogger
 import com.mahvagallery.app.data.AppRepository
+import com.mahvagallery.app.data.BackupSnapshot
 import com.mahvagallery.app.model.CalcData
+import com.mahvagallery.app.model.CustomerInfo
 import com.mahvagallery.app.model.DefaultValues
 import com.mahvagallery.app.model.HistoryItem
 import com.mahvagallery.app.model.LockSettings
@@ -23,6 +26,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import java.io.BufferedReader
+import java.io.InputStreamReader
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -37,9 +42,9 @@ enum class AppTab(val title: String) {
 
 enum class HistoryFilter(val title: String) {
     ALL("همه"),
-    TODAY("امروز"),
-    WEEK("این هفته"),
-    MONTH("این ماه")
+    SALES("فروش‌ها"),
+    DRAFTS("پیش‌نویس‌ها"),
+    TODAY("امروز")
 }
 
 enum class StatsDatePreset(val title: String) {
@@ -82,6 +87,7 @@ data class InfoDialogData(
 
 data class ReceiptDialogData(
     val calcData: CalcData,
+    val customer: CustomerInfo = CustomerInfo(),
     val date: String,
     val time: String,
     val title: String
@@ -97,11 +103,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _calcState = MutableStateFlow(CalculatorState())
     val calcState: StateFlow<CalculatorState> = _calcState.asStateFlow()
 
+    private val _activeCustomer = MutableStateFlow(CustomerInfo())
+    val activeCustomer: StateFlow<CustomerInfo> = _activeCustomer.asStateFlow()
+
+    private val _showCustomerDialog = MutableStateFlow(false)
+    val showCustomerDialog: StateFlow<Boolean> = _showCustomerDialog.asStateFlow()
+
     val locks: StateFlow<LockSettings> = repository.locks
     val defaults: StateFlow<DefaultValues> = repository.defaults
     val isDarkMode: StateFlow<Boolean> = repository.isDarkMode
     val isBoldText: StateFlow<Boolean> = repository.isBoldText
     val fontScaleDelta: StateFlow<Int> = repository.fontScaleDelta
+    val snapshots: StateFlow<List<BackupSnapshot>> = repository.snapshots
     val logs: StateFlow<List<LogEntry>> = AppLogger.logs
 
     private val _historyFilter = MutableStateFlow(HistoryFilter.ALL)
@@ -136,28 +149,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     ) { history, filter ->
         when (filter) {
             HistoryFilter.ALL -> history
+            HistoryFilter.SALES -> history.filter { it.type == "sale" }
+            HistoryFilter.DRAFTS -> history.filter { it.type == "draft" }
             HistoryFilter.TODAY -> {
                 val todayIso = PersianCalendarHelper.getCurrentIsoDate()
                 history.filter { it.iso == todayIso }
-            }
-            HistoryFilter.WEEK -> {
-                val cal = Calendar.getInstance()
-                cal.add(Calendar.DAY_OF_YEAR, -7)
-                val cutoffIso = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(cal.time)
-                history.filter { it.iso >= cutoffIso }
-            }
-            HistoryFilter.MONTH -> {
-                val cal = Calendar.getInstance()
-                cal.add(Calendar.MONTH, -1)
-                val cutoffIso = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(cal.time)
-                history.filter { it.iso >= cutoffIso }
             }
         }
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
     init {
         AppLogger.info("VM", "MainViewModel initialized")
-        // Load initial values from locks or defaults
         val lockedMap = repository.lockedValues.value
         val defaultVals = repository.defaults.value
 
@@ -189,35 +191,51 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _chartType.value = type
     }
 
-    fun onGoldPriceChange(input: String) {
-        val formatted = NumberFormatters.formatCurrencyInput(input)
+    fun openCustomerDialog() {
+        _showCustomerDialog.value = true
+    }
+
+    fun closeCustomerDialog() {
+        _showCustomerDialog.value = false
+    }
+
+    fun saveCustomerInfo(info: CustomerInfo) {
+        _activeCustomer.value = info
+        _showCustomerDialog.value = false
+        if (info.isNotEmpty) {
+            showToast("مشخصات مشتری ثبت شد: ${info.name}")
+        }
+    }
+
+    fun onGoldPriceChange(value: String) {
+        val formatted = NumberFormatters.formatInputWithCommas(value)
         _calcState.update { it.copy(goldPrice = formatted) }
         if (locks.value.lockA) repository.updateLockedValue("A", formatted)
         recalculate()
     }
 
-    fun onWeightChange(input: String) {
-        val formatted = NumberFormatters.formatWeightInput(input)
+    fun onWeightChange(value: String) {
+        val formatted = NumberFormatters.formatDecimalInput(value)
         _calcState.update { it.copy(weight = formatted) }
         recalculate()
     }
 
-    fun onOjratPercentChange(input: String) {
-        val formatted = NumberFormatters.formatPercentageInput(input)
+    fun onOjratPercentChange(value: String) {
+        val formatted = NumberFormatters.formatDecimalInput(value)
         _calcState.update { it.copy(ojratPercent = formatted) }
         if (locks.value.lockD) repository.updateLockedValue("D", formatted)
         recalculate()
     }
 
-    fun onProfitPercentChange(input: String) {
-        val formatted = NumberFormatters.formatPercentageInput(input)
+    fun onProfitPercentChange(value: String) {
+        val formatted = NumberFormatters.formatDecimalInput(value)
         _calcState.update { it.copy(profitPercent = formatted) }
         if (locks.value.lockF) repository.updateLockedValue("F", formatted)
         recalculate()
     }
 
-    fun onTaxPercentChange(input: String) {
-        val formatted = NumberFormatters.formatPercentageInput(input)
+    fun onTaxPercentChange(value: String) {
+        val formatted = NumberFormatters.formatDecimalInput(value)
         _calcState.update { it.copy(taxPercent = formatted) }
         if (locks.value.lockH) repository.updateLockedValue("H", formatted)
         recalculate()
@@ -287,12 +305,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 rawCalcData = calcData
             )
         }
+
+        // Auto sync live draft if not editing existing record
+        if (s.editingId == null) {
+            repository.syncDraft(calcData, _activeCustomer.value)
+        }
     }
 
     fun onClearForm(keepLocks: Boolean = true) {
         val l = locks.value
         val defs = repository.defaults.value
 
+        _activeCustomer.value = CustomerInfo()
         _calcState.update {
             it.copy(
                 goldPrice = if (keepLocks && l.lockA) it.goldPrice else "",
@@ -313,7 +337,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
         val isEdit = _calcState.value.editingId != null
-        repository.saveSale(raw, _calcState.value.editingId)
+        repository.saveSale(raw, _activeCustomer.value, _calcState.value.editingId)
         
         if (isEdit) {
             cancelEdit()
@@ -325,6 +349,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun startEdit(item: HistoryItem) {
+        _activeCustomer.value = item.customer
         _calcState.update {
             it.copy(
                 goldPrice = NumberFormatters.formatCurrency(item.calc.a),
@@ -353,18 +378,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
         _activeReceiptDialog.value = ReceiptDialogData(
             calcData = calc,
+            customer = _activeCustomer.value,
             date = PersianCalendarHelper.getTodayShamsi().formatPersian(),
             time = PersianCalendarHelper.getCurrentTimeString(),
-            title = "پیش‌فاکتور (ثبت نشده)"
+            title = "پیش‌فاکتور طلا"
         )
     }
 
     fun openReceiptForHistory(item: HistoryItem) {
         _activeReceiptDialog.value = ReceiptDialogData(
             calcData = item.calc,
+            customer = item.customer,
             date = item.date,
             time = item.time,
-            title = if (item.type == "sale") "فاکتور فروش" else "پیش‌فاکتور"
+            title = if (item.type == "sale") "فاکتور فروش طلا" else "پیش‌فاکتور طلا"
         )
     }
 
@@ -380,8 +407,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _activeInfoDialog.value = null
     }
 
-    fun requestDelete(id: Long) {
-        _itemToDelete.value = id
+    fun requestDelete(item: HistoryItem) {
+        _itemToDelete.value = item.id
     }
 
     fun confirmDelete() {
@@ -427,6 +454,33 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         showToast("پیش‌فرض‌ها ذخیره شدند ✓")
     }
 
+    fun restoreSnapshot(snapshotId: String) {
+        val success = repository.restoreSnapshot(snapshotId)
+        if (success) {
+            showToast("نسخه پشتیبان با موفقیت بازیابی شد ✓")
+        } else {
+            showToast("خطا در بازیابی نسخه پشتیبان")
+        }
+    }
+
+    fun importBackupFromUri(context: Context, uri: Uri) {
+        try {
+            val inputStream = context.contentResolver.openInputStream(uri)
+            if (inputStream != null) {
+                val reader = BufferedReader(InputStreamReader(inputStream))
+                val json = reader.use { it.readText() }
+                val success = repository.importBackupJson(json)
+                if (success) {
+                    showToast("پشتیبان با موفقیت وارد و بازیابی شد ✓")
+                } else {
+                    showToast("قالب فایل JSON نامعتبر است")
+                }
+            }
+        } catch (e: Exception) {
+            showToast("خطا در باز کردن فایل: ${e.message}")
+        }
+    }
+
     fun copyLogsToClipboard(context: Context) {
         val logsText = AppLogger.getExportableLogText()
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
@@ -452,10 +506,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             putExtra(Intent.EXTRA_TITLE, "mahva-backup.json")
         }
         context.startActivity(Intent.createChooser(intent, "دانلود یا ارسال پشتیبان JSON"))
-    }
-
-    fun importBackupJson(context: Context) {
-        showToast("فایل پشتیبان JSON را انتخاب یا وارد کنید")
     }
 
     fun showToast(msg: String) {

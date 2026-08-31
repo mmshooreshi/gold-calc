@@ -9,6 +9,8 @@ import android.graphics.Paint
 import android.graphics.pdf.PdfDocument
 import androidx.core.content.FileProvider
 import com.mahvagallery.app.model.CalcData
+import com.mahvagallery.app.model.CustomerInfo
+import com.mahvagallery.app.model.HistoryItem
 import java.io.File
 import java.io.FileOutputStream
 
@@ -44,6 +46,7 @@ object ReceiptExporter {
     fun shareReceiptAsPdf(
         context: Context,
         calcData: CalcData,
+        customer: CustomerInfo = CustomerInfo(),
         date: String,
         time: String,
         title: String
@@ -51,7 +54,7 @@ object ReceiptExporter {
         try {
             val pdfDocument = PdfDocument()
             val pageWidth = 280
-            val pageHeight = 480
+            val pageHeight = if (customer.isNotEmpty) 540 else 480
             val pageInfo = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, 1).create()
             val page = pdfDocument.startPage(pageInfo)
             val canvas = page.canvas
@@ -105,6 +108,34 @@ object ReceiptExporter {
             canvas.drawText("تاریخ: ${NumberFormatters.toPersianDigits(date)}", pageWidth - 15f, y, textPaint)
             canvas.drawText("زمان: ${NumberFormatters.toPersianDigits(time)}", 15f, y, leftTextPaint)
             y += 20f
+
+            // Customer details if any
+            if (customer.isNotEmpty) {
+                canvas.drawLine(15f, y, pageWidth - 15f, y, linePaint)
+                y += 18f
+
+                if (customer.name.isNotEmpty()) {
+                    canvas.drawText("خریدار:", pageWidth - 15f, y, textPaint)
+                    canvas.drawText(customer.name, 15f, y, leftTextPaint)
+                    y += 18f
+                }
+                if (customer.phone.isNotEmpty()) {
+                    canvas.drawText("شماره تماس:", pageWidth - 15f, y, textPaint)
+                    canvas.drawText(NumberFormatters.toPersianDigits(customer.phone), 15f, y, leftTextPaint)
+                    y += 18f
+                }
+                if (customer.paymentMethod.isNotEmpty()) {
+                    val payText = if (customer.bankName.isNotEmpty()) "${customer.paymentMethod} (${customer.bankName})" else customer.paymentMethod
+                    canvas.drawText("روش پرداخت:", pageWidth - 15f, y, textPaint)
+                    canvas.drawText(payText, 15f, y, leftTextPaint)
+                    y += 18f
+                }
+                if (customer.trackingCode.isNotEmpty()) {
+                    canvas.drawText("کد پیگیری:", pageWidth - 15f, y, textPaint)
+                    canvas.drawText(NumberFormatters.toPersianDigits(customer.trackingCode), 15f, y, leftTextPaint)
+                    y += 18f
+                }
+            }
 
             canvas.drawLine(15f, y, pageWidth - 15f, y, linePaint)
             y += 20f
@@ -203,6 +234,92 @@ object ReceiptExporter {
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
             context.startActivity(Intent.createChooser(shareIntent, "ارسال PDF فاکتور (تلگرام، واتساپ و...)"))
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    fun exportStatsPdf(
+        context: Context,
+        sales: List<HistoryItem>,
+        totalAmount: Double,
+        count: Int,
+        avgAmount: Double,
+        maxAmount: Double,
+        presetTitle: String
+    ) {
+        try {
+            val pdfDocument = PdfDocument()
+            val pageWidth = 400
+            val pageHeight = (280 + sales.size * 28).coerceAtLeast(400)
+            val pageInfo = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, 1).create()
+            val page = pdfDocument.startPage(pageInfo)
+            val canvas = page.canvas
+
+            val bgPaint = Paint().apply { color = Color.parseColor("#F8FAFC"); style = Paint.Style.FILL }
+            canvas.drawRect(0f, 0f, pageWidth.toFloat(), pageHeight.toFloat(), bgPaint)
+
+            val headerPaint = Paint().apply {
+                color = Color.parseColor("#172051")
+                textSize = 18f
+                isFakeBoldText = true
+                textAlign = Paint.Align.CENTER
+            }
+            var y = 35f
+            canvas.drawText("گزارش فروش و عملکرد مهوا گالری", pageWidth / 2f, y, headerPaint)
+            y += 22f
+
+            headerPaint.textSize = 12f
+            headerPaint.color = Color.parseColor("#64748B")
+            canvas.drawText("بازه زمانی: $presetTitle", pageWidth / 2f, y, headerPaint)
+            y += 25f
+
+            val cardPaint = Paint().apply { color = Color.WHITE; style = Paint.Style.FILL }
+            canvas.drawRoundRect(20f, y, pageWidth - 20f, y + 65f, 12f, 12f, cardPaint)
+
+            val textPaint = Paint().apply { color = Color.parseColor("#1E293B"); textSize = 11.5f; textAlign = Paint.Align.RIGHT }
+            val boldPaint = Paint().apply { color = Color.parseColor("#172051"); textSize = 12.5f; isFakeBoldText = true; textAlign = Paint.Align.LEFT }
+
+            canvas.drawText("مجموع فروش:", pageWidth - 35f, y + 25f, textPaint)
+            canvas.drawText("${NumberFormatters.formatCurrency(totalAmount, toPersian = true)} تومان", 35f, y + 25f, boldPaint)
+
+            canvas.drawText("تعداد تراکنش‌ها:", pageWidth - 35f, y + 48f, textPaint)
+            canvas.drawText("${NumberFormatters.toPersianDigits(count.toString())} عدد", 35f, y + 48f, boldPaint)
+            y += 85f
+
+            val rowPaint = Paint().apply { color = Color.parseColor("#334155"); textSize = 11f; textAlign = Paint.Align.RIGHT }
+            val linePaint = Paint().apply { color = Color.parseColor("#CBD5E1"); strokeWidth = 1f }
+
+            canvas.drawText("ریز تراکنش‌های فروش:", pageWidth - 20f, y, textPaint)
+            y += 18f
+
+            sales.take(50).forEachIndexed { idx, item ->
+                val line = "${idx + 1}. تاریخ: ${NumberFormatters.toPersianDigits(item.date)} | وزن: ${NumberFormatters.formatWeight(item.calc.b, toPersian = true)} گرم"
+                canvas.drawText(line, pageWidth - 25f, y, rowPaint)
+                canvas.drawText("${NumberFormatters.formatCurrency(item.calc.k, toPersian = true)} ت", 25f, y, boldPaint)
+                y += 14f
+                canvas.drawLine(25f, y, pageWidth - 25f, y, linePaint)
+                y += 14f
+            }
+
+            pdfDocument.finishPage(page)
+
+            val docsFolder = File(context.cacheDir, "docs").apply { mkdirs() }
+            val file = File(docsFolder, "Mahva_SalesReport_${System.currentTimeMillis()}.pdf")
+            val stream = FileOutputStream(file)
+            pdfDocument.writeTo(stream)
+            pdfDocument.close()
+            stream.flush()
+            stream.close()
+
+            val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+            val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                type = "application/pdf"
+                putExtra(Intent.EXTRA_STREAM, uri)
+                putExtra(Intent.EXTRA_SUBJECT, "گزارش فروش مهوا گالری")
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+            context.startActivity(Intent.createChooser(shareIntent, "ارسال PDF گزارش فروش"))
         } catch (e: Exception) {
             e.printStackTrace()
         }

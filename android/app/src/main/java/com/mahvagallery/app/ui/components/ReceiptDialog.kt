@@ -49,6 +49,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.mahvagallery.app.model.CalcData
+import com.mahvagallery.app.model.CustomerInfo
 import com.mahvagallery.app.ui.theme.AppTheme
 import com.mahvagallery.app.ui.theme.PrimaryDark
 import com.mahvagallery.app.ui.theme.TextDark
@@ -61,13 +62,13 @@ import kotlinx.coroutines.delay
 @Composable
 fun ReceiptDialog(
     calcData: CalcData,
+    customer: CustomerInfo = CustomerInfo(),
     date: String,
     time: String,
     title: String,
     onDismiss: () -> Unit
 ) {
     val context = LocalContext.current
-    val colors = AppTheme.colors
     val scrollState = rememberScrollState()
 
     var rollProgress by remember { mutableIntStateOf(0) }
@@ -87,23 +88,29 @@ fun ReceiptDialog(
     val formattedTax = NumberFormatters.formatCurrency(calcData.i, toPersian = true)
     val formattedCosts = NumberFormatters.formatCurrency(calcData.totalCosts, toPersian = true)
 
-    val receiptText = """
-        گالری طلا مهوا
-        $title
-        تاریخ: ${NumberFormatters.toPersianDigits(date)}  |  زمان: ${NumberFormatters.toPersianDigits(time)}
-        --------------------------------
-        وزن طلا: $formattedWeight گرم
-        فی طلا: $formattedRaw تومان
-        اجرت (${NumberFormatters.toPersianDigits(calcData.d.toString())}٪): $formattedOjrat تومان
-        سود (${NumberFormatters.toPersianDigits(calcData.f.toString())}٪): $formattedProfit تومان
-        مالیات (${NumberFormatters.toPersianDigits(calcData.h.toString())}٪): $formattedTax تومان
-        --------------------------------
-        مجموع هزینه‌ها: $formattedCosts تومان
-        مبلغ کل: $formattedTotal تومان
-        --------------------------------
-        از حسن انتخاب شما سپاسگزاریم
-        SYS. MAHVA / ${NumberFormatters.toPersianDigits("83921")}
-    """.trimIndent()
+    val receiptText = buildString {
+        appendLine("گالری طلا مهوا")
+        appendLine(title)
+        appendLine("تاریخ: ${NumberFormatters.toPersianDigits(date)}  |  زمان: ${NumberFormatters.toPersianDigits(time)}")
+        if (customer.isNotEmpty) {
+            appendLine("--------------------------------")
+            if (customer.name.isNotEmpty()) appendLine("خریدار: ${customer.name}")
+            if (customer.phone.isNotEmpty()) appendLine("شماره تماس: ${customer.phone}")
+            if (customer.paymentMethod.isNotEmpty()) appendLine("روش پرداخت: ${customer.paymentMethod} ${customer.bankName}")
+        }
+        appendLine("--------------------------------")
+        appendLine("وزن طلا: $formattedWeight گرم")
+        appendLine("فی طلا: $formattedRaw تومان")
+        appendLine("اجرت (${NumberFormatters.toPersianDigits(calcData.d.toString())}٪): $formattedOjrat تومان")
+        appendLine("سود (${NumberFormatters.toPersianDigits(calcData.f.toString())}٪): $formattedProfit تومان")
+        appendLine("مالیات (${NumberFormatters.toPersianDigits(calcData.h.toString())}٪): $formattedTax تومان")
+        appendLine("--------------------------------")
+        appendLine("مجموع هزینه‌ها: $formattedCosts تومان")
+        appendLine("مبلغ کل: $formattedTotal تومان")
+        appendLine("--------------------------------")
+        appendLine("از حسن انتخاب شما سپاسگزاریم")
+        appendLine("SYS. MAHVA / ${NumberFormatters.toPersianDigits("83921")}")
+    }
 
     Dialog(onDismissRequest = onDismiss) {
         Surface(
@@ -150,6 +157,18 @@ fun ReceiptDialog(
                         ) {
                             Text(text = "تاریخ: ${NumberFormatters.toPersianDigits(date)}", fontSize = scaledSp(11.5f), fontFamily = VazirmatnFontFamily, color = Color(0xFF555555))
                             Text(text = "زمان: ${NumberFormatters.toPersianDigits(time)}", fontSize = scaledSp(11.5f), fontFamily = VazirmatnFontFamily, color = Color(0xFF555555))
+                        }
+
+                        // Customer info box
+                        if (customer.isNotEmpty) {
+                            Divider(color = Color(0xFFAAAAAA), thickness = 1.dp, modifier = Modifier.padding(vertical = 6.dp))
+                            if (customer.name.isNotEmpty()) ReceiptRow("خریدار:", customer.name, isBold = true)
+                            if (customer.phone.isNotEmpty()) ReceiptRow("شماره تماس:", NumberFormatters.toPersianDigits(customer.phone))
+                            if (customer.paymentMethod.isNotEmpty()) {
+                                val payDesc = if (customer.bankName.isNotEmpty()) "${customer.paymentMethod} (${customer.bankName})" else customer.paymentMethod
+                                ReceiptRow("روش پرداخت:", payDesc)
+                            }
+                            if (customer.trackingCode.isNotEmpty()) ReceiptRow("کد پیگیری:", NumberFormatters.toPersianDigits(customer.trackingCode))
                         }
 
                         Divider(color = Color(0xFFAAAAAA), thickness = 1.dp, modifier = Modifier.padding(vertical = 6.dp))
@@ -263,7 +282,7 @@ fun ReceiptDialog(
                         Button(
                             onClick = {
                                 val width = 600
-                                val height = 900
+                                val height = if (customer.isNotEmpty) 1000 else 900
                                 val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
                                 val canvas = AndroidCanvas(bitmap)
                                 canvas.drawColor(android.graphics.Color.parseColor("#FFFDF8"))
@@ -306,6 +325,22 @@ fun ReceiptDialog(
                                 canvas.drawText("تاریخ: ${NumberFormatters.toPersianDigits(date)}", width - 30f, y, pTextRight)
                                 canvas.drawText("زمان: ${NumberFormatters.toPersianDigits(time)}", 30f, y, pTextLeft)
                                 y += 35f
+
+                                if (customer.isNotEmpty) {
+                                    canvas.drawLine(30f, y, width - 30f, y, pLine)
+                                    y += 38f
+                                    if (customer.name.isNotEmpty()) {
+                                        canvas.drawText("خریدار:", width - 30f, y, pTextRight)
+                                        canvas.drawText(customer.name, 30f, y, pTextLeft)
+                                        y += 38f
+                                    }
+                                    if (customer.phone.isNotEmpty()) {
+                                        canvas.drawText("شماره تماس:", width - 30f, y, pTextRight)
+                                        canvas.drawText(customer.phone, 30f, y, pTextLeft)
+                                        y += 38f
+                                    }
+                                }
+
                                 canvas.drawLine(30f, y, width - 30f, y, pLine)
                                 y += 40f
 
@@ -368,7 +403,7 @@ fun ReceiptDialog(
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(imageVector = Icons.Filled.Image, contentDescription = null, modifier = Modifier.size(18.dp))
                                 Spacer(modifier = Modifier.width(6.dp))
-                                Text(text = "اشتراک تصویر فاکتور (تلگرام و...)", fontSize = scaledSp(13f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold)
+                                Text(text = "اشتراک تصویر فاکتور (تلگرام و...)", fontSize = scaledSp(13f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, color = Color.White)
                             }
                         }
 
@@ -401,15 +436,15 @@ fun ReceiptDialog(
 
                             Button(
                                 onClick = {
-                                    ReceiptExporter.shareReceiptAsPdf(context, calcData, date, time, title)
+                                    ReceiptExporter.shareReceiptAsPdf(context, calcData, customer, date, time, title)
                                 },
                                 modifier = Modifier.weight(1.1f).height(40.dp),
                                 shape = RoundedCornerShape(10.dp),
                                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2A3675), contentColor = Color.White)
                             ) {
-                                Icon(imageVector = Icons.Filled.PictureAsPdf, contentDescription = null, modifier = Modifier.size(15.dp))
+                                Icon(imageVector = Icons.Filled.PictureAsPdf, contentDescription = null, modifier = Modifier.size(15.dp), tint = Color.White)
                                 Spacer(modifier = Modifier.width(4.dp))
-                                Text(text = "فایل PDF", fontSize = scaledSp(12f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold)
+                                Text(text = "فایل PDF", fontSize = scaledSp(12f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, color = Color.White)
                             }
                         }
                     }
