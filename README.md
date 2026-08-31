@@ -1,35 +1,44 @@
 <div align="center">
 
+<img src="pwa/logo.png" alt="Mahva Gallery Emblem" width="110" />
+
 # MAHVA GALLERY
-### Gold Valuation & Atelier Pricing Engine
+### 𓋞 Gold Valuation & Atelier Pricing Engine 𓋞
 
 <p align="center">
-  <i>A bespoke precision calculation suite designed for fine jewelry ateliers and gold galleries.</i>
+  <i>Bespoke precision calculation suite designed for fine jewelry ateliers and bullion trade.</i>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Android-Jetpack%20Compose-172051?style=for-the-badge&logo=android&logoColor=white" alt="Android" />
+  <img src="https://img.shields.io/badge/Web-Progressive%20App-64748B?style=for-the-badge&logo=pwa&logoColor=white" alt="PWA" />
+  <img src="https://img.shields.io/badge/CI%2FCD-Cloud%20Forge-172051?style=for-the-badge&logo=githubactions&logoColor=white" alt="GitHub Actions" />
+  <img src="https://img.shields.io/badge/Kotlin-2.0-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white" alt="Kotlin" />
 </p>
 
 ---
 
 </div>
 
-## Overview
+## ⟡ Overview
 
 **Mahva Gallery Gold Calc** is a dual-platform valuation suite crafted to compute real-time gold pricing, artisanal labor fees (*Ojrat*), profit margins, and statutory taxation with instant mathematical precision.
 
-Available both as a native Android experience and an offline-first Progressive Web Application.
+Built with a native 120Hz Android Jetpack Compose engine alongside an offline-first Progressive Web Application.
 
 ---
 
-## Platforms & Architecture
+## ⟡ Platform Architecture
 
-| Platform | Technology | Design Characteristics |
+| Platform | Technology Stack | Core Capabilities |
 | :--- | :--- | :--- |
-| **Android** | Kotlin · Jetpack Compose | Native 120Hz rendering, RTL layout, Persian digit normalization, SharedPreferences persistence |
-| **PWA** | Vanilla HTML5 / ES6 / CSS3 | Zero-dependency standalone web app, embedded Vazirmatn typography, LocalStorage state |
-| **CI / CD** | GitHub Actions | Automated headless APK compilation without requiring local Android Studio installations |
+| **Android** | Kotlin · Jetpack Compose · Material 3 | 120Hz native rendering · Persian digit normalization (`۰-۹` ⇄ `0-9`) · Live currency comma grouping · SharedPreferences persistence |
+| **PWA** | HTML5 · Modern ES6 · Vanilla CSS | Zero external runtime dependencies · Embedded Vazirmatn typography · LocalStorage defaults |
+| **CI / CD** | GitHub Actions Workflow | Automated cloud APK compilation — generates ready-to-install `.apk` binaries without local Android Studio |
 
 ---
 
-## Directory Structure
+## ⟡ Directory Layout
 
 ```
 mahva-gallery/
@@ -43,38 +52,43 @@ mahva-gallery/
 
 ---
 
-## Valuation Mathematics
+## ⟡ Valuation Mathematics
 
-All transactions follow standardized Iranian gold trade pricing standards:
+Standardized pricing formulas conforming to Persian bullion and jewelry trade regulations:
 
-$$\begin{aligned}
-\text{Raw Gold Value } (C) &= \text{Price per Gram } (A) \times \text{Weight in Grams } (B) \\[6pt]
-\text{Artisanal Labor / Ojrat } (E) &= \frac{\text{Labor \% } (D) \times C}{100} \\[6pt]
-\text{Trade Profit } (G) &= \frac{\text{Profit \% } (F) \times E}{100} \\[6pt]
-\text{Statutory Tax } (I) &= \frac{(E + G) \times \text{Tax \% } (H)}{100} \\[6pt]
-\text{Final Price } (K) &= C + E + G + I \\[6pt]
-\text{Effective Markup } (J) &= \left(\frac{K}{C} - 1\right) \times 100 \quad [\%]
-\end{aligned}$$
+| Symbol | Parameter | Persian Term | Formula | Unit |
+| :---: | :--- | :--- | :--- | :---: |
+| **$A$** | Raw Gold Price | قیمت طلای خام | *User Input* | تومان |
+| **$B$** | Gold Weight | وزن | *User Input* | گرم |
+| **$C$** | Raw Price | قیمت خام | $$C = A \times B$$ | تومان |
+| **$D$** | Artisanal Labor Fee | درصد اجرت | *User Input* | $\%$ |
+| **$E$** | Labor Amount | مبلغ اجرت | $$E = \frac{D \times C}{100}$$ | تومان |
+| **$F$** | Trade Profit Rate | درصد سود | *User Input* | $\%$ |
+| **$G$** | Profit Amount | مبلغ سود | $$G = \frac{F \times E}{100}$$ | تومان |
+| **$H$** | Statutory Tax Rate | درصد مالیات | *User Input* | $\%$ |
+| **$I$** | Tax Amount | مبلغ مالیات | $$I = \frac{(E + G) \times H}{100}$$ | تومان |
+| **$K$** | Total Acquisition Price | قیمت کل | $$K = C + E + G + I$$ | تومان |
+| **$J$** | Effective Markup Rate | درصد نهایی | $$J = \left(\frac{K}{C} - 1\right) \times 100$$ | $\%$ |
 
 ---
 
-## Getting Started
+## ⟡ Getting Started
 
-### Cloud Build (Recommended)
+### 1. Cloud Build (Zero Local Setup)
 This repository compiles `.apk` binaries automatically via GitHub Actions:
 1. Push any commit to the `main` branch.
-2. Navigate to **Actions** $\rightarrow$ **Build Android APK**.
-3. Download the signed artifact `mahva-gallery-debug-apk`.
+2. Navigate to the repository's **Actions** tab $\rightarrow$ select **Build Android APK**.
+3. Download the signed artifact **`mahva-gallery-debug-apk`**.
 
-### Local Compilation
-To compile the Android package locally using the Gradle wrapper:
+### 2. Local Compilation
+To compile the Android package locally via the Gradle wrapper:
 
 ```bash
 cd android
 ./gradlew assembleDebug
 ```
 
-The output binary will be generated at:
+The compiled binary will be located at:
 ```
 android/app/build/outputs/apk/debug/app-debug.apk
 ```
@@ -82,5 +96,5 @@ android/app/build/outputs/apk/debug/app-debug.apk
 ---
 
 <div align="center">
-  <sub>Mahva Gallery · Atelier Precision & Craftsmanship</sub>
+  <sub>𓋞 &nbsp; Mahva Gallery · Precision Gold Valuation & Atelier Engineering &nbsp; 𓋞</sub>
 </div>
