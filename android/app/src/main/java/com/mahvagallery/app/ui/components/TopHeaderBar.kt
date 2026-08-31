@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -19,22 +18,28 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.mahvagallery.app.ui.theme.PrimaryDark
-import com.mahvagallery.app.ui.theme.White
+import com.mahvagallery.app.ui.theme.AppTheme
+import com.mahvagallery.app.ui.theme.VazirmatnFontFamily
+import com.mahvagallery.app.ui.theme.scaledSp
 
 @Composable
 fun TopHeaderBar(
     modifier: Modifier = Modifier
 ) {
+    val colors = AppTheme.colors
+
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .shadow(elevation = 8.dp, shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
+            .shadow(elevation = 6.dp, shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
             .clip(RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
             .background(
                 Brush.linearGradient(
-                    colors = listOf(PrimaryDark, Color(0xFF2A3675))
+                    colors = if (colors.isDark) {
+                        listOf(Color(0xFF0F172A), Color(0xFF1E293B))
+                    } else {
+                        listOf(Color(0xFF172051), Color(0xFF2A3675))
+                    }
                 )
             )
             .statusBarsPadding()
@@ -46,11 +51,11 @@ fun TopHeaderBar(
             horizontalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "مهوا گالری",
-                color = White,
-                fontSize = 19.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = (-0.5).sp
+                text = "گالری طلا مهوا",
+                color = Color.White,
+                fontSize = scaledSp(18.5f),
+                fontFamily = VazirmatnFontFamily,
+                fontWeight = FontWeight.Bold
             )
         }
     }

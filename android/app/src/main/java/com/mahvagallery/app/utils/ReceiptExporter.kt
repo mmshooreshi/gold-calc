@@ -6,7 +6,6 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
 import androidx.core.content.FileProvider
 import com.mahvagallery.app.model.CalcData
@@ -51,32 +50,35 @@ object ReceiptExporter {
     ) {
         try {
             val pdfDocument = PdfDocument()
-            val pageWidth = 250 // ~88mm
-            val pageHeight = 420
+            val pageWidth = 280
+            val pageHeight = 480
             val pageInfo = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, 1).create()
             val page = pdfDocument.startPage(pageInfo)
             val canvas = page.canvas
 
             // Background
-            val bgPaint = Paint().apply { color = Color.parseColor("#FFFDF8") }
+            val bgPaint = Paint().apply {
+                color = Color.parseColor("#FFFDF8")
+                style = Paint.Style.FILL
+            }
             canvas.drawRect(0f, 0f, pageWidth.toFloat(), pageHeight.toFloat(), bgPaint)
 
             val titlePaint = Paint().apply {
                 color = Color.parseColor("#172051")
-                textSize = 16f
+                textSize = 18f
                 isFakeBoldText = true
                 textAlign = Paint.Align.CENTER
             }
 
             val textPaint = Paint().apply {
                 color = Color.parseColor("#333333")
-                textSize = 10f
+                textSize = 11f
                 textAlign = Paint.Align.RIGHT
             }
 
             val leftTextPaint = Paint().apply {
                 color = Color.parseColor("#172051")
-                textSize = 10.5f
+                textSize = 11.5f
                 isFakeBoldText = true
                 textAlign = Paint.Align.LEFT
             }
@@ -84,91 +86,99 @@ object ReceiptExporter {
             val linePaint = Paint().apply {
                 color = Color.parseColor("#CCCCCC")
                 strokeWidth = 1f
+                style = Paint.Style.STROKE
             }
 
-            var y = 28f
+            var y = 32f
             canvas.drawText("گالری طلا مهوا", pageWidth / 2f, y, titlePaint)
-            y += 16f
+            y += 20f
 
-            titlePaint.textSize = 10f
+            titlePaint.textSize = 11f
             titlePaint.color = Color.parseColor("#555555")
             canvas.drawText(title, pageWidth / 2f, y, titlePaint)
-            y += 18f
+            y += 20f
 
             canvas.drawLine(15f, y, pageWidth - 15f, y, linePaint)
-            y += 16f
+            y += 18f
 
             // Date & Time
             canvas.drawText("تاریخ: ${NumberFormatters.toPersianDigits(date)}", pageWidth - 15f, y, textPaint)
             canvas.drawText("زمان: ${NumberFormatters.toPersianDigits(time)}", 15f, y, leftTextPaint)
-            y += 18f
+            y += 20f
 
             canvas.drawLine(15f, y, pageWidth - 15f, y, linePaint)
-            y += 18f
+            y += 20f
 
             // Weight & Gold Price
             canvas.drawText("وزن طلا:", pageWidth - 15f, y, textPaint)
-            canvas.drawText("${NumberFormatters.formatWeight(calcData.b)} گرم", 15f, y, leftTextPaint)
-            y += 16f
+            canvas.drawText("${NumberFormatters.formatWeight(calcData.b, toPersian = true)} گرم", 15f, y, leftTextPaint)
+            y += 18f
 
             canvas.drawText("فی طلا (خام):", pageWidth - 15f, y, textPaint)
-            canvas.drawText("${NumberFormatters.formatCurrency(calcData.a)} ت", 15f, y, leftTextPaint)
-            y += 16f
+            canvas.drawText("${NumberFormatters.formatCurrency(calcData.a, toPersian = true)} ت", 15f, y, leftTextPaint)
+            y += 18f
 
             canvas.drawLine(15f, y, pageWidth - 15f, y, linePaint)
-            y += 16f
+            y += 18f
 
             // Ojrat, Profit, Tax
             canvas.drawText("اجرت (${NumberFormatters.formatPercentage(calcData.d)}٪):", pageWidth - 15f, y, textPaint)
-            canvas.drawText("${NumberFormatters.formatCurrency(calcData.e)} ت", 15f, y, leftTextPaint)
-            y += 16f
+            canvas.drawText("${NumberFormatters.formatCurrency(calcData.e, toPersian = true)} ت", 15f, y, leftTextPaint)
+            y += 18f
 
             canvas.drawText("سود (${NumberFormatters.formatPercentage(calcData.f)}٪):", pageWidth - 15f, y, textPaint)
-            canvas.drawText("${NumberFormatters.formatCurrency(calcData.g)} ت", 15f, y, leftTextPaint)
-            y += 16f
+            canvas.drawText("${NumberFormatters.formatCurrency(calcData.g, toPersian = true)} ت", 15f, y, leftTextPaint)
+            y += 18f
 
             canvas.drawText("مالیات (${NumberFormatters.formatPercentage(calcData.h)}٪):", pageWidth - 15f, y, textPaint)
-            canvas.drawText("${NumberFormatters.formatCurrency(calcData.i)} ت", 15f, y, leftTextPaint)
-            y += 18f
+            canvas.drawText("${NumberFormatters.formatCurrency(calcData.i, toPersian = true)} ت", 15f, y, leftTextPaint)
+            y += 20f
 
             val totalCosts = calcData.e + calcData.g + calcData.i
             canvas.drawText("مجموع هزینه‌ها:", pageWidth - 15f, y, textPaint)
-            canvas.drawText("${NumberFormatters.formatCurrency(totalCosts)} ت", 15f, y, leftTextPaint)
-            y += 18f
+            canvas.drawText("${NumberFormatters.formatCurrency(totalCosts, toPersian = true)} ت", 15f, y, leftTextPaint)
+            y += 20f
 
             canvas.drawLine(15f, y, pageWidth - 15f, y, linePaint)
-            y += 22f
+            y += 24f
 
             // Total
             val totalLabelPaint = Paint().apply {
                 color = Color.parseColor("#111111")
-                textSize = 13f
+                textSize = 14f
                 isFakeBoldText = true
                 textAlign = Paint.Align.RIGHT
             }
             val totalValPaint = Paint().apply {
                 color = Color.parseColor("#172051")
-                textSize = 14f
+                textSize = 15f
                 isFakeBoldText = true
                 textAlign = Paint.Align.LEFT
             }
             canvas.drawText("مبلغ کل:", pageWidth - 15f, y, totalLabelPaint)
-            canvas.drawText("${NumberFormatters.formatCurrency(calcData.k)} تومان", 15f, y, totalValPaint)
-            y += 24f
+            canvas.drawText("${NumberFormatters.formatCurrency(calcData.k, toPersian = true)} تومان", 15f, y, totalValPaint)
+            y += 28f
 
-            // Barcode pattern
-            val barPaint = Paint().apply { color = Color.parseColor("#222222") }
-            val barWidths = floatArrayOf(2f, 4f, 1f, 3f, 2f, 5f, 1f, 2f, 4f, 1f, 3f, 2f, 4f, 1f, 3f, 5f, 2f, 1f, 4f, 2f, 3f, 1f, 2f, 4f)
-            var curX = 30f
-            for (w in barWidths) {
-                canvas.drawRect(curX, y, curX + w, y + 20f, barPaint)
-                curX += w + 3f
+            // Barcode pattern with explicit Solid Fill
+            val barPaint = Paint().apply {
+                color = Color.BLACK
+                style = Paint.Style.FILL
             }
-            y += 30f
+            val barWidths = floatArrayOf(
+                3f, 1.5f, 4f, 2f, 1f, 3f, 5f, 1.5f, 2f, 4f, 1f, 3.5f,
+                2f, 4f, 1f, 3f, 5f, 2f, 1.5f, 4f, 2f, 3f, 1.5f, 2f, 4f, 3f, 1.5f, 2f, 5f, 1f, 3f, 2f, 4f
+            )
+            var curX = 25f
+            val barHeight = 26f
+            for (w in barWidths) {
+                canvas.drawRect(curX, y, curX + w, y + barHeight, barPaint)
+                curX += w + 2.5f
+            }
+            y += barHeight + 14f
 
-            titlePaint.textSize = 8.5f
+            titlePaint.textSize = 9.5f
             titlePaint.color = Color.parseColor("#777777")
-            canvas.drawText("SYS. MAHVA / ${NumberFormatters.toPersianDigits((10000..99999).random().toString())}", pageWidth / 2f, y, titlePaint)
+            canvas.drawText("SYS. MAHVA / ${NumberFormatters.toPersianDigits("83921")}", pageWidth / 2f, y, titlePaint)
 
             pdfDocument.finishPage(page)
 

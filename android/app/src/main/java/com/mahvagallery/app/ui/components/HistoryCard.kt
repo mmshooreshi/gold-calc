@@ -28,8 +28,6 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -43,14 +41,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.mahvagallery.app.model.HistoryItem
-import com.mahvagallery.app.ui.theme.BorderColor
-import com.mahvagallery.app.ui.theme.DisabledBg
-import com.mahvagallery.app.ui.theme.PrimaryDark
-import com.mahvagallery.app.ui.theme.TextDark
-import com.mahvagallery.app.ui.theme.TextMuted
-import com.mahvagallery.app.ui.theme.White
+import com.mahvagallery.app.ui.theme.AppTheme
+import com.mahvagallery.app.ui.theme.VazirmatnFontFamily
+import com.mahvagallery.app.ui.theme.scaledSp
 import com.mahvagallery.app.utils.NumberFormatters
 
 @Composable
@@ -63,6 +57,7 @@ fun HistoryCard(
 ) {
     var isExpanded by remember { mutableStateOf(false) }
     val isEdited = item.edits.isNotEmpty()
+    val colors = AppTheme.colors
 
     val totalFormatted = NumberFormatters.formatCurrency(item.calc.k, toPersian = true)
     val weightFormatted = NumberFormatters.formatWeight(item.calc.b, toPersian = true)
@@ -77,8 +72,8 @@ fun HistoryCard(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(14.dp))
-            .border(1.dp, BorderColor, RoundedCornerShape(14.dp)),
-        color = White,
+            .border(1.dp, colors.border, RoundedCornerShape(14.dp)),
+        color = colors.surface,
         shadowElevation = 2.dp
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
@@ -100,15 +95,16 @@ fun HistoryCard(
                         modifier = Modifier
                             .clip(RoundedCornerShape(18.dp))
                             .background(
-                                if (item.type == "sale") Color(0xFF10B981).copy(alpha = 0.15f)
-                                else Color(0xFF64748B).copy(alpha = 0.12f)
+                                if (item.type == "sale") colors.success.copy(alpha = 0.15f)
+                                else colors.textMuted.copy(alpha = 0.12f)
                             )
                             .padding(horizontal = 8.dp, vertical = 3.dp)
                     ) {
                         Text(
                             text = if (item.type == "sale") "فروش" else "محاسبه",
-                            color = if (item.type == "sale") Color(0xFF10B981) else TextMuted,
-                            fontSize = 11.sp,
+                            color = if (item.type == "sale") colors.success else colors.textMuted,
+                            fontSize = scaledSp(11f),
+                            fontFamily = VazirmatnFontFamily,
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -118,15 +114,16 @@ fun HistoryCard(
                             modifier = Modifier
                                 .size(7.dp)
                                 .clip(CircleShape)
-                                .background(Color(0xFFF59E0B))
+                                .background(colors.warning)
                         )
                     }
 
                     Text(
                         text = "$totalFormatted ت",
-                        fontSize = 15.sp,
+                        fontSize = scaledSp(14.5f),
+                        fontFamily = VazirmatnFontFamily,
                         fontWeight = FontWeight.Black,
-                        color = TextDark
+                        color = colors.textPrimary
                     )
                 }
 
@@ -137,31 +134,32 @@ fun HistoryCard(
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(28.dp)
+                            .size(30.dp)
                             .clip(RoundedCornerShape(8.dp))
-                            .background(Color(0xFF172051).copy(alpha = 0.08f))
+                            .background(colors.primary.copy(alpha = 0.12f))
                             .clickable { onShowReceipt(item) },
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Receipt,
                             contentDescription = "Receipt",
-                            modifier = Modifier.size(16.dp),
-                            tint = PrimaryDark
+                            modifier = Modifier.size(17.dp),
+                            tint = colors.primary
                         )
                     }
 
                     Text(
                         text = NumberFormatters.toPersianDigits(item.time),
-                        fontSize = 12.sp,
-                        color = TextMuted,
+                        fontSize = scaledSp(12f),
+                        fontFamily = VazirmatnFontFamily,
+                        color = colors.textMuted,
                         fontWeight = FontWeight.Medium
                     )
 
                     Icon(
                         imageVector = if (isExpanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
                         contentDescription = null,
-                        tint = TextMuted,
+                        tint = colors.textMuted,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -176,7 +174,7 @@ fun HistoryCard(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(DisabledBg)
+                        .background(colors.inputBgDisabled)
                         .padding(14.dp)
                 ) {
                     // Breakdown Grid
@@ -199,18 +197,19 @@ fun HistoryCard(
                             .padding(top = 6.dp),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(text = "درصد نهایی:", fontSize = 12.sp, color = TextMuted, fontWeight = FontWeight.Bold)
-                        Text(text = "$finalPercentFormatted٪", fontSize = 13.sp, color = PrimaryDark, fontWeight = FontWeight.Black)
+                        Text(text = "درصد نهایی:", fontSize = scaledSp(12f), fontFamily = VazirmatnFontFamily, color = colors.textMuted, fontWeight = FontWeight.Bold)
+                        Text(text = "$finalPercentFormatted٪", fontSize = scaledSp(13f), fontFamily = VazirmatnFontFamily, color = colors.primary, fontWeight = FontWeight.Black)
                     }
 
                     // Edit trace history
                     if (isEdited) {
-                        Divider(modifier = Modifier.padding(vertical = 8.dp), color = BorderColor)
+                        Divider(modifier = Modifier.padding(vertical = 8.dp), color = colors.divider)
                         Text(
                             text = "ویرایش‌های قبلی:",
-                            fontSize = 11.sp,
+                            fontSize = scaledSp(11f),
+                            fontFamily = VazirmatnFontFamily,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFFF59E0B),
+                            color = colors.warning,
                             modifier = Modifier.padding(bottom = 4.dp)
                         )
                         item.edits.forEach { trace ->
@@ -222,13 +221,15 @@ fun HistoryCard(
                             ) {
                                 Text(
                                     text = "${trace.date} ${NumberFormatters.toPersianDigits(trace.time)}",
-                                    fontSize = 10.5.sp,
-                                    color = TextMuted
+                                    fontSize = scaledSp(10.5f),
+                                    fontFamily = VazirmatnFontFamily,
+                                    color = colors.textMuted
                                 )
                                 Text(
                                     text = "${NumberFormatters.formatCurrency(trace.calc.k, toPersian = true)} ت",
-                                    fontSize = 10.5.sp,
-                                    color = TextDark,
+                                    fontSize = scaledSp(10.5f),
+                                    fontFamily = VazirmatnFontFamily,
+                                    color = colors.textPrimary,
                                     fontWeight = FontWeight.Bold
                                 )
                             }
@@ -236,7 +237,7 @@ fun HistoryCard(
                     }
 
                     // Action buttons (Edit & Delete)
-                    Divider(modifier = Modifier.padding(vertical = 8.dp), color = BorderColor)
+                    Divider(modifier = Modifier.padding(vertical = 8.dp), color = colors.divider)
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -246,16 +247,16 @@ fun HistoryCard(
                                 .weight(1f)
                                 .clip(RoundedCornerShape(8.dp))
                                 .clickable { onEdit(item) },
-                            color = Color(0xFFF59E0B).copy(alpha = 0.12f)
+                            color = colors.warning.copy(alpha = 0.15f)
                         ) {
                             Row(
                                 modifier = Modifier.padding(vertical = 8.dp),
                                 horizontalArrangement = Arrangement.Center,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Icon(Icons.Filled.Edit, contentDescription = null, modifier = Modifier.size(15.dp), tint = Color(0xFFD97706))
+                                Icon(Icons.Filled.Edit, contentDescription = null, modifier = Modifier.size(15.dp), tint = colors.warning)
                                 Spacer(modifier = Modifier.width(4.dp))
-                                Text(text = "ویرایش", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color(0xFFD97706))
+                                Text(text = "ویرایش", fontSize = scaledSp(12f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, color = colors.warning)
                             }
                         }
 
@@ -264,16 +265,16 @@ fun HistoryCard(
                                 .weight(1f)
                                 .clip(RoundedCornerShape(8.dp))
                                 .clickable { onDelete(item.id) },
-                            color = Color(0xFFEF4444).copy(alpha = 0.12f)
+                            color = colors.danger.copy(alpha = 0.15f)
                         ) {
                             Row(
                                 modifier = Modifier.padding(vertical = 8.dp),
                                 horizontalArrangement = Arrangement.Center,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Icon(Icons.Filled.Delete, contentDescription = null, modifier = Modifier.size(15.dp), tint = Color(0xFFDC2626))
+                                Icon(Icons.Filled.Delete, contentDescription = null, modifier = Modifier.size(15.dp), tint = colors.danger)
                                 Spacer(modifier = Modifier.width(4.dp))
-                                Text(text = "حذف", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color(0xFFDC2626))
+                                Text(text = "حذف", fontSize = scaledSp(12f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, color = colors.danger)
                             }
                         }
                     }
@@ -285,8 +286,9 @@ fun HistoryCard(
 
 @Composable
 private fun DetailItem(label: String, value: String) {
+    val colors = AppTheme.colors
     Column(modifier = Modifier.padding(vertical = 2.dp)) {
-        Text(text = label, fontSize = 10.5.sp, color = TextMuted, fontWeight = FontWeight.Medium)
-        Text(text = value, fontSize = 12.5.sp, color = TextDark, fontWeight = FontWeight.Bold)
+        Text(text = label, fontSize = scaledSp(10.5f), fontFamily = VazirmatnFontFamily, color = colors.textMuted, fontWeight = FontWeight.Medium)
+        Text(text = value, fontSize = scaledSp(12.5f), fontFamily = VazirmatnFontFamily, color = colors.textPrimary, fontWeight = FontWeight.Bold)
     }
 }

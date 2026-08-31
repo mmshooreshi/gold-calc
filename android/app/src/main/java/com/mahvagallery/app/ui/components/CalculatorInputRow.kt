@@ -19,7 +19,6 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.LockOpen
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -29,7 +28,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
@@ -39,14 +37,9 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.mahvagallery.app.ui.theme.BorderColor
-import com.mahvagallery.app.ui.theme.DisabledBg
-import com.mahvagallery.app.ui.theme.PrimaryDark
-import com.mahvagallery.app.ui.theme.TextDark
-import com.mahvagallery.app.ui.theme.TextMuted
+import com.mahvagallery.app.ui.theme.AppTheme
 import com.mahvagallery.app.ui.theme.VazirmatnFontFamily
-import com.mahvagallery.app.ui.theme.White
+import com.mahvagallery.app.ui.theme.scaledSp
 
 @Composable
 fun CalculatorInputRow(
@@ -63,27 +56,35 @@ fun CalculatorInputRow(
     keyboardType: KeyboardType = KeyboardType.Number,
     modifier: Modifier = Modifier
 ) {
-    var textFieldValueState by remember(value) {
-        mutableStateOf(TextFieldValue(text = value, selection = TextRange(value.length)))
+    val colors = AppTheme.colors
+    val isItemLocked = isLocked == true
+
+    var tfvState by remember(value) {
+        val cursor = if (value.isNotEmpty()) value.length else 0
+        mutableStateOf(TextFieldValue(text = value, selection = TextRange(cursor)))
     }
 
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 3.dp),
+            .padding(vertical = 3.5.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Label with optional info icon
+        // Label with optional info
         Row(
             modifier = Modifier.weight(0.32f),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = label,
-                color = if (isHighlighted) MaterialTheme.colorScheme.primary else TextDark,
-                fontSize = 13.5.sp,
+                color = when {
+                    isHighlighted -> colors.primary
+                    isItemLocked -> colors.lockedText
+                    else -> colors.textPrimary
+                },
+                fontSize = scaledSp(13.5f),
                 fontFamily = VazirmatnFontFamily,
-                fontWeight = if (isHighlighted) FontWeight.Bold else FontWeight.SemiBold
+                fontWeight = if (isHighlighted || isItemLocked) FontWeight.Bold else FontWeight.SemiBold
             )
             if (onInfoClick != null) {
                 Spacer(modifier = Modifier.width(3.dp))
@@ -93,7 +94,7 @@ fun CalculatorInputRow(
                     modifier = Modifier
                         .size(14.dp)
                         .clickable { onInfoClick() },
-                    tint = TextMuted
+                    tint = colors.textMuted
                 )
             }
         }
@@ -103,53 +104,72 @@ fun CalculatorInputRow(
             modifier = Modifier.weight(0.68f),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            val bg = when {
+                isItemLocked -> colors.lockedBg
+                isHighlighted -> colors.highlightBg
+                isReadOnly -> colors.inputBgDisabled
+                else -> colors.inputBg
+            }
+            val borderClr = when {
+                isItemLocked -> colors.lockedBorder
+                isHighlighted -> colors.highlightBorder
+                else -> colors.inputBorder
+            }
+            val borderWidth = when {
+                isItemLocked || isHighlighted -> 1.8.dp
+                else -> 1.dp
+            }
+
             Box(
                 modifier = Modifier
                     .weight(1f)
-                    .height(40.dp)
+                    .height(42.dp)
                     .clip(RoundedCornerShape(10.dp))
-                    .background(if (isReadOnly) DisabledBg else White)
-                    .border(
-                        width = if (isHighlighted) 2.dp else 1.2.dp,
-                        color = if (isHighlighted) MaterialTheme.colorScheme.primary else BorderColor,
-                        shape = RoundedCornerShape(10.dp)
-                    )
-                    .padding(horizontal = 8.dp),
+                    .background(bg)
+                    .border(borderWidth, borderClr, RoundedCornerShape(10.dp))
+                    .padding(horizontal = 10.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    val textColor = when {
+                        isItemLocked -> colors.lockedText
+                        isHighlighted -> colors.primary
+                        isReadOnly -> colors.textSecondary
+                        else -> colors.textPrimary
+                    }
+
                     BasicTextField(
-                        value = if (isReadOnly) TextFieldValue(value) else textFieldValueState,
+                        value = if (isReadOnly) TextFieldValue(value) else tfvState,
                         onValueChange = { newTfv ->
-                            textFieldValueState = newTfv
+                            tfvState = newTfv
                             if (newTfv.text != value) {
                                 onValueChange(newTfv.text)
                             }
                         },
                         modifier = Modifier
                             .weight(1f)
-                            .padding(horizontal = 4.dp),
+                            .padding(horizontal = 2.dp),
                         enabled = !isReadOnly,
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
                         textStyle = TextStyle(
                             fontFamily = VazirmatnFontFamily,
-                            color = if (isReadOnly) MaterialTheme.colorScheme.primary else TextDark,
-                            fontSize = if (isHighlighted) 16.sp else 14.5.sp,
+                            color = textColor,
+                            fontSize = if (isHighlighted) scaledSp(16.5f) else scaledSp(14.5f),
                             fontWeight = FontWeight.Bold,
                             textAlign = TextAlign.Start,
                             textDirection = TextDirection.Rtl
                         ),
-                        cursorBrush = SolidColor(PrimaryDark),
+                        cursorBrush = SolidColor(if (isItemLocked) colors.lockedBorder else colors.primary),
                         decorationBox = { innerTextField ->
                             if (value.isEmpty() && placeholder.isNotEmpty()) {
                                 Text(
                                     text = placeholder,
-                                    color = Color(0xFFC4CFDE),
-                                    fontSize = 14.sp,
+                                    color = colors.textMuted.copy(alpha = 0.5f),
+                                    fontSize = scaledSp(14f),
                                     fontFamily = VazirmatnFontFamily
                                 )
                             }
@@ -160,8 +180,8 @@ fun CalculatorInputRow(
                     if (unitText.isNotEmpty()) {
                         Text(
                             text = unitText,
-                            color = if (isHighlighted) MaterialTheme.colorScheme.primary else TextMuted,
-                            fontSize = 11.sp,
+                            color = if (isItemLocked) colors.lockedText else if (isHighlighted) colors.primary else colors.textMuted,
+                            fontSize = scaledSp(11f),
                             fontFamily = VazirmatnFontFamily,
                             fontWeight = FontWeight.Medium
                         )
@@ -169,23 +189,23 @@ fun CalculatorInputRow(
                 }
             }
 
-            // Lock icon or spacing spacer
+            // Lock icon
             if (isLocked != null && onToggleLock != null) {
                 Box(
                     modifier = Modifier
-                        .size(32.dp)
+                        .size(34.dp)
                         .clickable { onToggleLock() },
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        imageVector = if (isLocked) Icons.Filled.Lock else Icons.Filled.LockOpen,
+                        imageVector = if (isItemLocked) Icons.Filled.Lock else Icons.Filled.LockOpen,
                         contentDescription = "Lock",
-                        modifier = Modifier.size(16.dp),
-                        tint = if (isLocked) PrimaryDark else TextMuted
+                        modifier = Modifier.size(18.dp),
+                        tint = if (isItemLocked) colors.lockedBorder else colors.textMuted
                     )
                 }
             } else {
-                Spacer(modifier = Modifier.width(32.dp))
+                Spacer(modifier = Modifier.width(34.dp))
             }
         }
     }

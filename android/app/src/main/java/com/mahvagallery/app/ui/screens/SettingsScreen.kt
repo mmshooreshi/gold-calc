@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -36,6 +35,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -43,6 +44,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -58,17 +60,13 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.mahvagallery.app.ui.components.DebugLogViewer
-import com.mahvagallery.app.ui.theme.BorderColor
-import com.mahvagallery.app.ui.theme.DisabledBg
-import com.mahvagallery.app.ui.theme.PrimaryDark
-import com.mahvagallery.app.ui.theme.TextDark
-import com.mahvagallery.app.ui.theme.TextMuted
+import com.mahvagallery.app.ui.theme.AppTheme
 import com.mahvagallery.app.ui.theme.VazirmatnFontFamily
-import com.mahvagallery.app.ui.theme.White
+import com.mahvagallery.app.ui.theme.scaledSp
 import com.mahvagallery.app.utils.NumberFormatters
 import com.mahvagallery.app.viewmodel.MainViewModel
+import kotlin.math.roundToInt
 
 @Composable
 fun SettingsScreen(
@@ -80,6 +78,7 @@ fun SettingsScreen(
     val fontScaleDelta by viewModel.fontScaleDelta.collectAsState()
     val defaults by viewModel.defaults.collectAsState()
     val logs by viewModel.logs.collectAsState()
+    val colors = AppTheme.colors
 
     val context = LocalContext.current
     val scrollState = rememberScrollState()
@@ -88,20 +87,22 @@ fun SettingsScreen(
     var defF by remember(defaults) { mutableStateOf(defaults.defaultF) }
     var defH by remember(defaults) { mutableStateOf(defaults.defaultH) }
 
+    var sliderValue by remember(fontScaleDelta) { mutableFloatStateOf(fontScaleDelta.toFloat()) }
+
     Column(
         modifier = modifier
             .fillMaxSize()
-            .imePadding()
+            .background(colors.background)
             .verticalScroll(scrollState)
             .padding(horizontal = 16.dp, vertical = 10.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(
-            text = "تنظیمات و ظاهر",
-            fontSize = 17.sp,
+            text = "تنظیمات و ظاهر برنامه",
+            fontSize = scaledSp(17f),
             fontFamily = VazirmatnFontFamily,
             fontWeight = FontWeight.Bold,
-            color = PrimaryDark,
+            color = colors.primary,
             modifier = Modifier.padding(bottom = 2.dp)
         )
 
@@ -109,8 +110,9 @@ fun SettingsScreen(
         Surface(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
-            color = if (isDark) Color(0xFF1E293B) else Color(0xFFF1F5F9),
-            border = androidx.compose.foundation.BorderStroke(1.5.dp, PrimaryDark.copy(alpha = 0.35f))
+            color = colors.surface,
+            border = androidx.compose.foundation.BorderStroke(1.5.dp, colors.primary.copy(alpha = 0.4f)),
+            shadowElevation = 2.dp
         ) {
             Column(modifier = Modifier.padding(14.dp)) {
                 Row(
@@ -119,42 +121,52 @@ fun SettingsScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Filled.AutoAwesome, contentDescription = null, tint = Color(0xFFF59E0B), modifier = Modifier.size(16.dp))
+                        Icon(Icons.Filled.AutoAwesome, contentDescription = null, tint = colors.warning, modifier = Modifier.size(17.dp))
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             text = "پیش‌نمایش زنده قلم و اندازه",
-                            fontSize = 12.sp,
+                            fontSize = scaledSp(13f),
+                            fontFamily = VazirmatnFontFamily,
                             fontWeight = FontWeight.Bold,
-                            color = PrimaryDark
+                            color = colors.primary
                         )
                     }
-                    Text(
-                        text = "اندازه: ${NumberFormatters.toPersianDigits((14 + fontScaleDelta).toString())}px",
-                        fontSize = 11.5.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF10B981)
-                    )
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(colors.success.copy(alpha = 0.15f))
+                            .padding(horizontal = 8.dp, vertical = 3.dp)
+                    ) {
+                        Text(
+                            text = "اندازه: ${NumberFormatters.toPersianDigits((14 + fontScaleDelta).toString())}px",
+                            fontSize = scaledSp(11.5f),
+                            fontFamily = VazirmatnFontFamily,
+                            fontWeight = FontWeight.Bold,
+                            color = colors.success
+                        )
+                    }
                 }
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = "نمونه قیمت طلا:",
-                        fontSize = (13.5 + fontScaleDelta).sp,
+                        fontSize = scaledSp(13.5f),
                         fontFamily = VazirmatnFontFamily,
                         fontWeight = if (isBold) FontWeight.Bold else FontWeight.Medium,
-                        color = TextDark
+                        color = colors.textPrimary
                     )
                     Text(
                         text = "${NumberFormatters.toPersianDigits("14,850,000")} تومان",
-                        fontSize = (14.5 + fontScaleDelta).sp,
+                        fontSize = scaledSp(15f),
                         fontFamily = VazirmatnFontFamily,
                         fontWeight = FontWeight.Black,
-                        color = PrimaryDark
+                        color = colors.primary
                     )
                 }
 
@@ -162,21 +174,22 @@ fun SettingsScreen(
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = "وزن کل (گرم):",
-                        fontSize = (12.5 + fontScaleDelta).sp,
+                        fontSize = scaledSp(12.5f),
                         fontFamily = VazirmatnFontFamily,
                         fontWeight = if (isBold) FontWeight.Bold else FontWeight.Normal,
-                        color = TextMuted
+                        color = colors.textMuted
                     )
                     Text(
                         text = "${NumberFormatters.toPersianDigits("3.420")} گرم",
-                        fontSize = (13 + fontScaleDelta).sp,
+                        fontSize = scaledSp(13f),
                         fontFamily = VazirmatnFontFamily,
                         fontWeight = FontWeight.Bold,
-                        color = TextDark
+                        color = colors.textPrimary
                     )
                 }
             }
@@ -189,125 +202,161 @@ fun SettingsScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { viewModel.toggleDarkMode() }
-                    .padding(horizontal = 14.dp, vertical = 10.dp),
+                    .padding(horizontal = 14.dp, vertical = 12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Filled.Nightlight, contentDescription = null, tint = TextMuted, modifier = Modifier.size(20.dp))
+                    Icon(Icons.Filled.Nightlight, contentDescription = null, tint = colors.textMuted, modifier = Modifier.size(20.dp))
                     Spacer(modifier = Modifier.width(10.dp))
-                    Text(text = "حالت تاریک (Dark Mode)", fontSize = 13.5.sp, fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.SemiBold, color = TextDark)
+                    Text(text = "حالت تاریک (Dark Mode)", fontSize = scaledSp(13.5f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.SemiBold, color = colors.textPrimary)
                 }
                 Switch(
                     checked = isDark,
                     onCheckedChange = { viewModel.toggleDarkMode() },
-                    colors = SwitchDefaults.colors(checkedThumbColor = White, checkedTrackColor = Color(0xFF10B981))
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = Color.White,
+                        checkedTrackColor = colors.success,
+                        uncheckedThumbColor = colors.textMuted,
+                        uncheckedTrackColor = colors.inputBorder
+                    )
                 )
             }
 
-            Divider(color = BorderColor)
+            Divider(color = colors.divider)
 
             // Bold Text Toggle
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { viewModel.toggleBoldText() }
-                    .padding(horizontal = 14.dp, vertical = 10.dp),
+                    .padding(horizontal = 14.dp, vertical = 12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Filled.FormatBold, contentDescription = null, tint = TextMuted, modifier = Modifier.size(20.dp))
+                    Icon(Icons.Filled.FormatBold, contentDescription = null, tint = colors.textMuted, modifier = Modifier.size(20.dp))
                     Spacer(modifier = Modifier.width(10.dp))
-                    Text(text = "متن ضخیم (Bold)", fontSize = 13.5.sp, fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.SemiBold, color = TextDark)
+                    Text(text = "متن ضخیم (Bold)", fontSize = scaledSp(13.5f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.SemiBold, color = colors.textPrimary)
                 }
                 Switch(
                     checked = isBold,
                     onCheckedChange = { viewModel.toggleBoldText() },
-                    colors = SwitchDefaults.colors(checkedThumbColor = White, checkedTrackColor = Color(0xFF10B981))
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = Color.White,
+                        checkedTrackColor = colors.success,
+                        uncheckedThumbColor = colors.textMuted,
+                        uncheckedTrackColor = colors.inputBorder
+                    )
                 )
             }
 
-            Divider(color = BorderColor)
+            Divider(color = colors.divider)
 
-            // Font Size Controls (+ / -)
-            Row(
+            // Dynamic Font Size Slider (Huge range: -4 to +10)
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 14.dp, vertical = 10.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                    .padding(horizontal = 14.dp, vertical = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Filled.FormatSize, contentDescription = null, tint = TextMuted, modifier = Modifier.size(20.dp))
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Text(text = "اندازه فونت", fontSize = 13.5.sp, fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.SemiBold, color = TextDark)
-                }
-
                 Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Surface(
-                        modifier = Modifier
-                            .size(36.dp)
-                            .clip(RoundedCornerShape(10.dp))
-                            .clickable { viewModel.changeFontScale(-1) }
-                            .border(1.dp, BorderColor, RoundedCornerShape(10.dp)),
-                        color = DisabledBg
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Text(text = "−", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TextDark)
-                        }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Filled.FormatSize, contentDescription = null, tint = colors.textMuted, modifier = Modifier.size(20.dp))
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(text = "نوار اندازه قلم برنامه", fontSize = scaledSp(13.5f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.SemiBold, color = colors.textPrimary)
                     }
 
                     Text(
-                        text = "${NumberFormatters.toPersianDigits((14 + fontScaleDelta).toString())}px",
-                        fontSize = 13.5.sp,
+                        text = "${NumberFormatters.toPersianDigits((14 + sliderValue.roundToInt()).toString())}px",
+                        fontSize = scaledSp(13.5f),
                         fontFamily = VazirmatnFontFamily,
                         fontWeight = FontWeight.Bold,
-                        color = PrimaryDark,
-                        modifier = Modifier.width(42.dp),
-                        textAlign = TextAlign.Center
+                        color = colors.primary
                     )
+                }
 
-                    Surface(
-                        modifier = Modifier
-                            .size(36.dp)
-                            .clip(RoundedCornerShape(10.dp))
-                            .clickable { viewModel.changeFontScale(1) }
-                            .border(1.dp, BorderColor, RoundedCornerShape(10.dp)),
-                        color = DisabledBg
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Text(text = "+", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TextDark)
+                // Slider
+                Slider(
+                    value = sliderValue,
+                    onValueChange = { newVal ->
+                        sliderValue = newVal
+                        val intDelta = newVal.roundToInt()
+                        if (intDelta != fontScaleDelta) {
+                            viewModel.changeFontScale(intDelta - fontScaleDelta)
+                        }
+                    },
+                    valueRange = -4f..10f,
+                    steps = 13,
+                    colors = SliderDefaults.colors(
+                        thumbColor = colors.primary,
+                        activeTrackColor = colors.primary,
+                        inactiveTrackColor = colors.inputBorder
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                // Quick preset buttons
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    val presets = listOf(
+                        "بسیار ریز" to -3,
+                        "استاندارد" to 0,
+                        "درشت" to 4,
+                        "خیلی بزرگ" to 8
+                    )
+                    for ((pLabel, pVal) in presets) {
+                        Surface(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .clickable {
+                                    sliderValue = pVal.toFloat()
+                                    viewModel.changeFontScale(pVal - fontScaleDelta)
+                                }
+                                .border(1.dp, if (fontScaleDelta == pVal) colors.primary else colors.border, RoundedCornerShape(8.dp)),
+                            color = if (fontScaleDelta == pVal) colors.primary.copy(alpha = 0.15f) else colors.inputBgDisabled
+                        ) {
+                            Text(
+                                text = pLabel,
+                                fontSize = scaledSp(11f),
+                                fontFamily = VazirmatnFontFamily,
+                                fontWeight = if (fontScaleDelta == pVal) FontWeight.Bold else FontWeight.Normal,
+                                color = if (fontScaleDelta == pVal) colors.primary else colors.textMuted,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            )
                         }
                     }
                 }
             }
 
-            Divider(color = BorderColor)
+            Divider(color = colors.divider)
 
             // Vazirmatn Typography Badge
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 14.dp, vertical = 10.dp),
+                    .padding(horizontal = 14.dp, vertical = 12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Filled.TextFields, contentDescription = null, tint = TextMuted, modifier = Modifier.size(20.dp))
+                    Icon(Icons.Filled.TextFields, contentDescription = null, tint = colors.textMuted, modifier = Modifier.size(20.dp))
                     Spacer(modifier = Modifier.width(10.dp))
-                    Text(text = "قلم اصلی فارسی", fontSize = 13.5.sp, fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.SemiBold, color = TextDark)
+                    Text(text = "قلم اصلی برنامه", fontSize = scaledSp(13.5f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.SemiBold, color = colors.textPrimary)
                 }
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(14.dp))
-                        .background(PrimaryDark.copy(alpha = 0.1f))
+                        .background(colors.primary.copy(alpha = 0.12f))
                         .padding(horizontal = 10.dp, vertical = 4.dp)
                 ) {
-                    Text(text = "وزیرمتن (Vazirmatn)", fontSize = 11.5.sp, fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, color = PrimaryDark)
+                    Text(text = "وزیرمتن (Vazirmatn)", fontSize = scaledSp(11.5f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, color = colors.primary)
                 }
             }
         }
@@ -326,11 +375,11 @@ fun SettingsScreen(
                         .padding(top = 6.dp)
                         .height(44.dp),
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryDark, contentColor = White)
+                    colors = ButtonDefaults.buttonColors(containerColor = colors.primary, contentColor = Color.White)
                 ) {
                     Icon(Icons.Filled.Save, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text(text = "ذخیره و اعمال مقادیر پیش‌فرض", fontSize = 13.sp, fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold)
+                    Text(text = "ذخیره و اعمال مقادیر پیش‌فرض", fontSize = scaledSp(13f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -342,21 +391,23 @@ fun SettingsScreen(
                     OutlinedButton(
                         onClick = { viewModel.exportBackupJson(context) },
                         modifier = Modifier.weight(1f).height(42.dp),
-                        shape = RoundedCornerShape(10.dp)
+                        shape = RoundedCornerShape(10.dp),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, colors.border)
                     ) {
-                        Icon(Icons.Filled.FileDownload, contentDescription = null, modifier = Modifier.size(16.dp), tint = PrimaryDark)
+                        Icon(Icons.Filled.FileDownload, contentDescription = null, modifier = Modifier.size(16.dp), tint = colors.primary)
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text(text = "دانلود JSON", fontSize = 12.sp, fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, color = PrimaryDark)
+                        Text(text = "دانلود JSON", fontSize = scaledSp(12f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, color = colors.primary)
                     }
 
                     OutlinedButton(
                         onClick = { viewModel.importBackupJson(context) },
                         modifier = Modifier.weight(1f).height(42.dp),
-                        shape = RoundedCornerShape(10.dp)
+                        shape = RoundedCornerShape(10.dp),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, colors.border)
                     ) {
-                        Icon(Icons.Filled.FileUpload, contentDescription = null, modifier = Modifier.size(16.dp), tint = PrimaryDark)
+                        Icon(Icons.Filled.FileUpload, contentDescription = null, modifier = Modifier.size(16.dp), tint = colors.primary)
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text(text = "وارد کردن", fontSize = 12.sp, fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, color = PrimaryDark)
+                        Text(text = "وارد کردن", fontSize = scaledSp(12f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, color = colors.primary)
                     }
                 }
 
@@ -364,11 +415,11 @@ fun SettingsScreen(
                     onClick = viewModel::showClearAllDataConfirmation,
                     modifier = Modifier.fillMaxWidth().height(42.dp),
                     shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444).copy(alpha = 0.1f), contentColor = Color(0xFFEF4444))
+                    colors = ButtonDefaults.buttonColors(containerColor = colors.danger.copy(alpha = 0.12f), contentColor = colors.danger)
                 ) {
                     Icon(Icons.Filled.Delete, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text(text = "پاک‌سازی تمام داده‌ها", fontSize = 12.5.sp, fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold)
+                    Text(text = "پاک‌سازی تمام داده‌ها", fontSize = scaledSp(12.5f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -391,9 +442,9 @@ fun SettingsScreen(
         ) {
             Text(
                 text = "نسخه ۲.۰.۰ — گالری مهوا",
-                fontSize = 11.sp,
+                fontSize = scaledSp(11f),
                 fontFamily = VazirmatnFontFamily,
-                color = TextMuted,
+                color = colors.textMuted,
                 fontWeight = FontWeight.Medium
             )
         }
@@ -405,23 +456,24 @@ private fun SettingsGroup(
     title: String,
     content: @Composable () -> Unit
 ) {
+    val colors = AppTheme.colors
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         Text(
             text = title,
-            fontSize = 12.5.sp,
+            fontSize = scaledSp(12.5f),
             fontFamily = VazirmatnFontFamily,
             fontWeight = FontWeight.Bold,
-            color = TextMuted,
+            color = colors.textMuted,
             modifier = Modifier.padding(horizontal = 4.dp)
         )
         Surface(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(14.dp),
-            color = White,
-            border = androidx.compose.foundation.BorderStroke(1.dp, BorderColor),
+            color = colors.surface,
+            border = androidx.compose.foundation.BorderStroke(1.dp, colors.border),
             shadowElevation = 1.dp
         ) {
             Column {
@@ -438,20 +490,21 @@ private fun DefaultPercentInputRow(
     onValueChange: (String) -> Unit,
     placeholder: String
 ) {
+    val colors = AppTheme.colors
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = label, fontSize = 13.sp, fontFamily = VazirmatnFontFamily, color = TextDark, fontWeight = FontWeight.Medium)
+        Text(text = label, fontSize = scaledSp(13f), fontFamily = VazirmatnFontFamily, color = colors.textPrimary, fontWeight = FontWeight.Medium)
 
         Box(
             modifier = Modifier
                 .width(100.dp)
                 .height(38.dp)
                 .clip(RoundedCornerShape(8.dp))
-                .background(DisabledBg)
-                .border(1.dp, BorderColor, RoundedCornerShape(8.dp))
+                .background(colors.inputBgDisabled)
+                .border(1.dp, colors.inputBorder, RoundedCornerShape(8.dp))
                 .padding(horizontal = 8.dp),
             contentAlignment = Alignment.Center
         ) {
@@ -467,21 +520,21 @@ private fun DefaultPercentInputRow(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     textStyle = TextStyle(
                         fontFamily = VazirmatnFontFamily,
-                        color = TextDark,
-                        fontSize = 13.sp,
+                        color = colors.textPrimary,
+                        fontSize = scaledSp(13f),
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Start,
                         textDirection = TextDirection.Rtl
                     ),
-                    cursorBrush = SolidColor(PrimaryDark),
+                    cursorBrush = SolidColor(colors.primary),
                     decorationBox = { innerTextField ->
                         if (value.isEmpty() && placeholder.isNotEmpty()) {
-                            Text(text = placeholder, color = Color(0xFFBAC5D6), fontSize = 12.sp, fontFamily = VazirmatnFontFamily)
+                            Text(text = placeholder, color = colors.textMuted.copy(alpha = 0.5f), fontSize = scaledSp(12f), fontFamily = VazirmatnFontFamily)
                         }
                         innerTextField()
                     }
                 )
-                Text(text = "٪", color = TextMuted, fontSize = 10.5.sp, fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Medium)
+                Text(text = "٪", color = colors.textMuted, fontSize = scaledSp(10.5f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Medium)
             }
         }
     }

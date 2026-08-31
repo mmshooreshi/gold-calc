@@ -20,7 +20,6 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.LockOpen
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -39,14 +38,9 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.mahvagallery.app.ui.theme.BorderColor
-import com.mahvagallery.app.ui.theme.DisabledBg
-import com.mahvagallery.app.ui.theme.PrimaryDark
-import com.mahvagallery.app.ui.theme.TextDark
-import com.mahvagallery.app.ui.theme.TextMuted
+import com.mahvagallery.app.ui.theme.AppTheme
 import com.mahvagallery.app.ui.theme.VazirmatnFontFamily
-import com.mahvagallery.app.ui.theme.White
+import com.mahvagallery.app.ui.theme.scaledSp
 
 @Composable
 fun SplitCalculationRow(
@@ -59,14 +53,17 @@ fun SplitCalculationRow(
     onInfoClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var textFieldValueState by remember(percentValue) {
-        mutableStateOf(TextFieldValue(text = percentValue, selection = TextRange(percentValue.length)))
+    val colors = AppTheme.colors
+
+    var tfvState by remember(percentValue) {
+        val cursor = if (percentValue.isNotEmpty()) percentValue.length else 0
+        mutableStateOf(TextFieldValue(text = percentValue, selection = TextRange(cursor)))
     }
 
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 3.dp),
+            .padding(vertical = 3.5.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Label with info
@@ -76,10 +73,10 @@ fun SplitCalculationRow(
         ) {
             Text(
                 text = label,
-                color = TextDark,
-                fontSize = 13.5.sp,
+                color = if (isLocked) colors.lockedText else colors.textPrimary,
+                fontSize = scaledSp(13.5f),
                 fontFamily = VazirmatnFontFamily,
-                fontWeight = FontWeight.SemiBold
+                fontWeight = if (isLocked) FontWeight.Bold else FontWeight.SemiBold
             )
             Spacer(modifier = Modifier.width(3.dp))
             Icon(
@@ -88,7 +85,7 @@ fun SplitCalculationRow(
                 modifier = Modifier
                     .size(14.dp)
                     .clickable { onInfoClick() },
-                tint = TextMuted
+                tint = colors.textMuted
             )
         }
 
@@ -96,21 +93,21 @@ fun SplitCalculationRow(
         Row(
             modifier = Modifier.weight(0.68f),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             // Box 1: Percentage input
+            val percentBg = if (isLocked) colors.lockedBg else colors.inputBg
+            val percentBorder = if (isLocked) colors.lockedBorder else colors.inputBorder
+            val percentTextColor = if (isLocked) colors.lockedText else colors.textPrimary
+
             Box(
                 modifier = Modifier
                     .weight(0.42f)
-                    .height(40.dp)
+                    .height(42.dp)
                     .clip(RoundedCornerShape(10.dp))
-                    .background(White)
-                    .border(
-                        width = 1.2.dp,
-                        color = BorderColor,
-                        shape = RoundedCornerShape(10.dp)
-                    )
-                    .padding(horizontal = 6.dp),
+                    .background(percentBg)
+                    .border(if (isLocked) 1.8.dp else 1.dp, percentBorder, RoundedCornerShape(10.dp))
+                    .padding(horizontal = 8.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Row(
@@ -118,9 +115,9 @@ fun SplitCalculationRow(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     BasicTextField(
-                        value = textFieldValueState,
+                        value = tfvState,
                         onValueChange = { newTfv ->
-                            textFieldValueState = newTfv
+                            tfvState = newTfv
                             if (newTfv.text != percentValue) {
                                 onPercentChange(newTfv.text)
                             }
@@ -132,18 +129,18 @@ fun SplitCalculationRow(
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                         textStyle = TextStyle(
                             fontFamily = VazirmatnFontFamily,
-                            color = TextDark,
-                            fontSize = 14.sp,
+                            color = percentTextColor,
+                            fontSize = scaledSp(14f),
                             fontWeight = FontWeight.Bold,
                             textAlign = TextAlign.Start,
                             textDirection = TextDirection.Rtl
                         ),
-                        cursorBrush = SolidColor(PrimaryDark)
+                        cursorBrush = SolidColor(if (isLocked) colors.lockedBorder else colors.primary)
                     )
                     Text(
                         text = "٪",
-                        color = TextMuted,
-                        fontSize = 11.sp,
+                        color = if (isLocked) colors.lockedText else colors.textMuted,
+                        fontSize = scaledSp(11f),
                         fontFamily = VazirmatnFontFamily,
                         fontWeight = FontWeight.Medium
                     )
@@ -154,15 +151,11 @@ fun SplitCalculationRow(
             Box(
                 modifier = Modifier
                     .weight(0.58f)
-                    .height(40.dp)
+                    .height(42.dp)
                     .clip(RoundedCornerShape(10.dp))
-                    .background(DisabledBg)
-                    .border(
-                        width = 1.2.dp,
-                        color = BorderColor,
-                        shape = RoundedCornerShape(10.dp)
-                    )
-                    .padding(horizontal = 6.dp),
+                    .background(colors.inputBgDisabled)
+                    .border(1.dp, colors.inputBorder, RoundedCornerShape(10.dp))
+                    .padding(horizontal = 8.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Row(
@@ -179,8 +172,8 @@ fun SplitCalculationRow(
                         singleLine = true,
                         textStyle = TextStyle(
                             fontFamily = VazirmatnFontFamily,
-                            color = MaterialTheme.colorScheme.primary,
-                            fontSize = 13.5.sp,
+                            color = colors.primary,
+                            fontSize = scaledSp(13.5f),
                             fontWeight = FontWeight.Bold,
                             textAlign = TextAlign.Start,
                             textDirection = TextDirection.Rtl
@@ -188,8 +181,8 @@ fun SplitCalculationRow(
                     )
                     Text(
                         text = "تومان",
-                        color = TextMuted,
-                        fontSize = 10.sp,
+                        color = colors.textMuted,
+                        fontSize = scaledSp(10f),
                         fontFamily = VazirmatnFontFamily,
                         fontWeight = FontWeight.Medium
                     )
@@ -199,15 +192,15 @@ fun SplitCalculationRow(
             // Lock icon
             Box(
                 modifier = Modifier
-                    .size(32.dp)
+                    .size(34.dp)
                     .clickable { onToggleLock() },
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = if (isLocked) Icons.Filled.Lock else Icons.Filled.LockOpen,
                     contentDescription = "Lock",
-                    modifier = Modifier.size(16.dp),
-                    tint = if (isLocked) PrimaryDark else TextMuted
+                    modifier = Modifier.size(18.dp),
+                    tint = if (isLocked) colors.lockedBorder else colors.textMuted
                 )
             }
         }

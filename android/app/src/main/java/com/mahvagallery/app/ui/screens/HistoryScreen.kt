@@ -19,7 +19,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,13 +30,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.mahvagallery.app.ui.components.HistoryCard
-import com.mahvagallery.app.ui.theme.BorderColor
-import com.mahvagallery.app.ui.theme.PrimaryDark
-import com.mahvagallery.app.ui.theme.TextDark
-import com.mahvagallery.app.ui.theme.TextMuted
-import com.mahvagallery.app.ui.theme.White
+import com.mahvagallery.app.ui.theme.AppTheme
+import com.mahvagallery.app.ui.theme.VazirmatnFontFamily
+import com.mahvagallery.app.ui.theme.scaledSp
 import com.mahvagallery.app.viewmodel.HistoryFilter
 import com.mahvagallery.app.viewmodel.MainViewModel
 
@@ -48,18 +44,21 @@ fun HistoryScreen(
 ) {
     val historyList by viewModel.filteredHistory.collectAsState()
     val activeFilter by viewModel.historyFilter.collectAsState()
+    val colors = AppTheme.colors
 
     Column(
         modifier = modifier
             .fillMaxSize()
+            .background(colors.background)
             .padding(horizontal = 16.dp, vertical = 10.dp)
     ) {
         // Section Header
         Text(
             text = "تاریخچه تراکنش‌ها",
-            fontSize = 17.sp,
+            fontSize = scaledSp(17f),
+            fontFamily = VazirmatnFontFamily,
             fontWeight = FontWeight.Bold,
-            color = PrimaryDark,
+            color = colors.primary,
             modifier = Modifier.padding(bottom = 10.dp)
         )
 
@@ -78,17 +77,18 @@ fun HistoryScreen(
                         .clickable { viewModel.setHistoryFilter(filter) }
                         .border(
                             width = 1.dp,
-                            color = if (isSelected) PrimaryDark else BorderColor,
+                            color = if (isSelected) colors.primary else colors.border,
                             shape = RoundedCornerShape(20.dp)
                         ),
-                    color = if (isSelected) PrimaryDark else White
+                    color = if (isSelected) colors.primary else colors.surface
                 ) {
                     Text(
                         text = filter.title,
                         modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp),
-                        fontSize = 12.sp,
+                        fontSize = scaledSp(12f),
+                        fontFamily = VazirmatnFontFamily,
                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                        color = if (isSelected) White else TextDark
+                        color = if (isSelected) Color.White else colors.textPrimary
                     )
                 }
             }
@@ -107,13 +107,14 @@ fun HistoryScreen(
                         imageVector = Icons.Filled.History,
                         contentDescription = null,
                         modifier = Modifier.size(54.dp),
-                        tint = TextMuted.copy(alpha = 0.4f)
+                        tint = colors.textMuted.copy(alpha = 0.4f)
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
                         text = "هنوز تراکنشی ثبت نشده است",
-                        fontSize = 13.5.sp,
-                        color = TextMuted
+                        fontSize = scaledSp(13.5f),
+                        fontFamily = VazirmatnFontFamily,
+                        color = colors.textMuted
                     )
                 }
             }

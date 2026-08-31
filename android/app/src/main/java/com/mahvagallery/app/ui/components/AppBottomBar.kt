@@ -20,7 +20,6 @@ import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Insights
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -29,13 +28,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.mahvagallery.app.ui.theme.PrimaryDark
-import com.mahvagallery.app.ui.theme.TextMuted
+import com.mahvagallery.app.ui.theme.AppTheme
+import com.mahvagallery.app.ui.theme.VazirmatnFontFamily
+import com.mahvagallery.app.ui.theme.scaledSp
 import com.mahvagallery.app.viewmodel.AppTab
 
 @Composable
@@ -44,13 +42,15 @@ fun AppBottomBar(
     onTabSelected: (AppTab) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val colors = AppTheme.colors
+
     Box(
         modifier = modifier
             .fillMaxWidth()
             .shadow(elevation = 12.dp)
-            .background(MaterialTheme.colorScheme.surface)
+            .background(colors.surface)
             .navigationBarsPadding()
-            .height(64.dp)
+            .height(60.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -61,7 +61,7 @@ fun AppBottomBar(
                 val isSelected = tab == currentTab
                 val scale by animateFloatAsState(targetValue = if (isSelected) 1.08f else 1f, label = "scale")
                 val iconColor by animateColorAsState(
-                    targetValue = if (isSelected) MaterialTheme.colorScheme.primary else TextMuted,
+                    targetValue = if (isSelected) colors.primary else colors.textMuted,
                     label = "color"
                 )
 
@@ -82,12 +82,11 @@ fun AppBottomBar(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    // Top active line
                     if (isSelected) {
                         Box(
                             modifier = Modifier
                                 .size(width = 24.dp, height = 3.dp)
-                                .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(bottomStart = 3.dp, bottomEnd = 3.dp))
+                                .background(colors.primary, RoundedCornerShape(bottomStart = 3.dp, bottomEnd = 3.dp))
                         )
                     } else {
                         Box(modifier = Modifier.size(width = 24.dp, height = 3.dp))
@@ -103,7 +102,8 @@ fun AppBottomBar(
                     )
                     Text(
                         text = tab.title,
-                        fontSize = 11.sp,
+                        fontSize = scaledSp(11f),
+                        fontFamily = VazirmatnFontFamily,
                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                         color = iconColor
                     )

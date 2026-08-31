@@ -6,6 +6,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -47,14 +48,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mahvagallery.app.ui.components.CalculatorInputRow
 import com.mahvagallery.app.ui.components.SplitCalculationRow
-import com.mahvagallery.app.ui.theme.BorderColor
-import com.mahvagallery.app.ui.theme.PrimaryDark
-import com.mahvagallery.app.ui.theme.TextDark
-import com.mahvagallery.app.ui.theme.White
+import com.mahvagallery.app.ui.theme.AppTheme
+import com.mahvagallery.app.ui.theme.VazirmatnFontFamily
+import com.mahvagallery.app.ui.theme.scaledSp
 import com.mahvagallery.app.viewmodel.MainViewModel
-
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.border
 
 @Composable
 fun CalculatorScreen(
@@ -63,14 +60,15 @@ fun CalculatorScreen(
 ) {
     val state by viewModel.calcState.collectAsState()
     val locks by viewModel.locks.collectAsState()
+    val colors = AppTheme.colors
     val scrollState = rememberScrollState()
 
     Column(
         modifier = modifier
             .fillMaxSize()
-            .imePadding()
+            .background(colors.background)
             .verticalScroll(scrollState)
-            .padding(horizontal = 16.dp, vertical = 10.dp),
+            .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         // Edit Mode Banner
@@ -83,7 +81,7 @@ fun CalculatorScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(12.dp))
-                    .background(Color(0xFFF59E0B))
+                    .background(colors.warning)
                     .padding(horizontal = 14.dp, vertical = 10.dp)
             ) {
                 Row(
@@ -95,14 +93,15 @@ fun CalculatorScreen(
                         Icon(
                             imageVector = Icons.Filled.Edit,
                             contentDescription = null,
-                            tint = White,
+                            tint = Color.White,
                             modifier = Modifier.size(17.dp)
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             text = "در حال ویرایش تراکنش",
-                            color = White,
-                            fontSize = 13.sp,
+                            color = Color.White,
+                            fontSize = scaledSp(13f),
+                            fontFamily = VazirmatnFontFamily,
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -111,15 +110,15 @@ fun CalculatorScreen(
                         modifier = Modifier
                             .clip(RoundedCornerShape(8.dp))
                             .clickable { viewModel.cancelEdit() },
-                        color = White.copy(alpha = 0.25f)
+                        color = Color.White.copy(alpha = 0.25f)
                     ) {
                         Row(
                             modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(Icons.Filled.Close, contentDescription = null, tint = White, modifier = Modifier.size(13.dp))
+                            Icon(Icons.Filled.Close, contentDescription = null, tint = Color.White, modifier = Modifier.size(13.dp))
                             Spacer(modifier = Modifier.width(3.dp))
-                            Text(text = "لغو", color = White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            Text(text = "لغو", color = Color.White, fontSize = scaledSp(12f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -197,9 +196,9 @@ fun CalculatorScreen(
         )
 
         Divider(
-            color = BorderColor,
+            color = colors.divider,
             thickness = 1.dp,
-            modifier = Modifier.padding(vertical = 4.dp)
+            modifier = Modifier.padding(vertical = 3.dp)
         )
 
         // Row 7: Total Price (Highlighted)
@@ -230,7 +229,7 @@ fun CalculatorScreen(
             isReadOnly = true
         )
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         // Action Buttons Row
         Row(
@@ -239,21 +238,21 @@ fun CalculatorScreen(
                 .padding(bottom = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // Receipt Button
+            // Receipt Button (Big, clear, distinct icon)
             Surface(
                 modifier = Modifier
-                    .size(width = 52.dp, height = 48.dp)
+                    .size(width = 54.dp, height = 48.dp)
                     .clip(RoundedCornerShape(12.dp))
                     .clickable(onClick = viewModel::openReceiptForCurrentForm)
-                    .border(1.2.dp, BorderColor, RoundedCornerShape(12.dp)),
-                color = White
+                    .border(1.2.dp, colors.border, RoundedCornerShape(12.dp)),
+                color = colors.surface
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         imageVector = Icons.Filled.Receipt,
                         contentDescription = "Receipt",
                         modifier = Modifier.size(26.dp),
-                        tint = PrimaryDark
+                        tint = colors.primary
                     )
                 }
             }
@@ -264,28 +263,29 @@ fun CalculatorScreen(
                 modifier = Modifier
                     .weight(1f)
                     .height(48.dp),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(12.dp),
+                border = androidx.compose.foundation.BorderStroke(1.2.dp, colors.danger.copy(alpha = 0.5f))
             ) {
                 Icon(
                     imageVector = Icons.Filled.CleaningServices,
                     contentDescription = null,
-                    modifier = Modifier.size(16.dp),
-                    tint = Color(0xFFEF4444)
+                    modifier = Modifier.size(17.dp),
+                    tint = colors.danger
                 )
                 Spacer(modifier = Modifier.width(4.dp))
-                Text(text = "پاک کردن", color = Color(0xFFEF4444), fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                Text(text = "پاک کردن", color = colors.danger, fontSize = scaledSp(13f), fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold)
             }
 
             // Save Sale Button
             Button(
                 onClick = viewModel::onSaveSale,
                 modifier = Modifier
-                    .weight(1.3f)
+                    .weight(1.35f)
                     .height(48.dp),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (state.editingId != null) Color(0xFFF59E0B) else PrimaryDark,
-                    contentColor = White
+                    containerColor = if (state.editingId != null) colors.warning else colors.primary,
+                    contentColor = Color.White
                 )
             ) {
                 Icon(
@@ -296,7 +296,8 @@ fun CalculatorScreen(
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
                     text = if (state.editingId != null) "بروزرسانی" else "ثبت فروش",
-                    fontSize = 14.sp,
+                    fontSize = scaledSp(14f),
+                    fontFamily = VazirmatnFontFamily,
                     fontWeight = FontWeight.Bold
                 )
             }
