@@ -571,7 +571,7 @@ background: var(--bg);}
 .edited-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--warn); display: inline-block; flex-shrink: 0; }
 
 /* ============================
-   BOTTOM NAV
+   BOTTOM NAV — iOS PWA Safe Area Fixed
    ============================ */
 .bnav {
   position: fixed;
@@ -580,16 +580,17 @@ background: var(--bg);}
   transform: translateX(-50%);
   width: 100%;
   max-width: 480px;
-  height: var(--nav-h);
+  height: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px));
   background: rgba(255,255,255,.97);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-top: 1px solid rgba(0,0,0,.06);
   display: flex;
   justify-content: space-around;
-  align-items: center;
+  align-items: flex-start;
   z-index: 30;
-  padding-bottom: env(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  box-sizing: border-box;
 }
 [data-theme="dark"] .bnav {
   background: rgba(13,21,38,.97);
@@ -602,15 +603,162 @@ background: var(--bg);}
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 3px;
   color: var(--tx2);
-  font-size: .62rem;
+  font-size: .65rem;
   font-weight: 700;
-  height: 100%;
+  height: var(--nav-h);
   cursor: pointer;
   transition: color .25s var(--bounce);
   position: relative;
   font-family: inherit;
+}
+.ni i { font-size: 1.35rem; transition: transform .25s var(--bounce); }
+.ni.on { color: var(--primary); }
+[data-theme="dark"] .ni.on { color: #60a5fa; }
+.ni.on i { transform: translateY(-2px) scale(1.08); }
+.ni:active { opacity: .7; transition: opacity .08s; }
+.ni::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%) scaleX(0);
+  width: 22px; height: 3px;
+  background: var(--primary);
+  border-radius: 0 0 4px 4px;
+  transition: transform .3s var(--bounce);
+}
+[data-theme="dark"] .ni::before { background: #60a5fa; }
+
+/* Telegram-Style Passcode Screen */
+.pass-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(160deg, #172051 0%, #23306B 50%, #172051 100%);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(env(safe-area-inset-top) + 20px) 24px calc(env(safe-area-inset-bottom) + 20px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s ease;
+  user-select: none;
+}
+.pass-overlay.on {
+  opacity: 1;
+  pointer-events: auto;
+}
+.pass-box {
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: auto;
+}
+.pass-icon {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.12);
+  border: 1.5px solid rgba(251,191,36,.6);
+  display: flex; align-items: center; justify-content: center;
+  color: #fbbf24;
+  font-size: 1.8rem;
+  margin-bottom: 14px;
+}
+.pass-title { font-size: 1.15rem; font-weight: 800; color: #fff; margin-bottom: 4px; }
+.pass-sub { font-size: .78rem; color: rgba(255,255,255,.7); margin-bottom: 24px; }
+.pass-dots { display: flex; gap: 16px; align-items: center; justify-content: center; margin-bottom: 28px; }
+.pdot {
+  width: 15px; height: 15px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.2);
+  border: 1.5px solid rgba(255,255,255,.5);
+  transition: all .2s var(--bounce);
+}
+.pdot.filled {
+  background: #fbbf24;
+  border-color: #fbbf24;
+  transform: scale(1.15);
+}
+.pass-dots.shake {
+  animation: passShake 0.4s ease;
+}
+@keyframes passShake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-18px); }
+  40%, 80% { transform: translateX(18px); }
+}
+.pass-keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px 20px;
+  width: 100%;
+  max-width: 280px;
+}
+.pkey {
+  width: 68px; height: 68px;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.2);
+  color: #fff;
+  font-size: 1.55rem;
+  font-weight: 700;
+  font-family: var(--font-main);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .15s, transform .1s;
+}
+.pkey:active { background: rgba(255,255,255,.25); transform: scale(0.92); }
+.pkey-txt { font-size: .85rem; font-weight: 600; border: none; background: transparent; }
+
+/* Customer Bar & Chips */
+.cust-bar {
+  background: var(--sf);
+  border: 1px solid var(--bd);
+  border-radius: 10px;
+  padding: 7px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  cursor: pointer;
+  transition: border-color .2s;
+}
+.cust-bar.active {
+  background: rgba(23,32,81,.06);
+  border-color: var(--primary);
+}
+.pay-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.pay-chip {
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: .72rem;
+  font-weight: 700;
+  border: 1px solid var(--bd);
+  background: var(--bg);
+  color: var(--tx2);
+  cursor: pointer;
+  font-family: inherit;
+}
+.pay-chip.on {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+.minp {
+  width: 100%;
+  height: 38px;
+  border: 1px solid var(--bd);
+  border-radius: 8px;
+  padding: 0 10px;
+  font-family: inherit;
+  font-size: .85rem;
+  background: var(--bg);
+  color: var(--tx);
 }
 .ni i { font-size: 1.35rem; transition: transform .25s var(--bounce); }
 .ni.on { color: var(--primary); }
@@ -1458,6 +1606,113 @@ background: var(--bg);}
   </div>
 </div>
 
+<!-- Customer & Payment Modal -->
+<div class="mo" id="m-customer">
+  <div class="mc" style="max-width: 440px; text-align: right;">
+    <div class="mt" style="display:flex;align-items:center;gap:6px;color:var(--primary)">
+      <i class="ph-fill ph-user-circle"></i> اطلاعات خریدار و پرداخت
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin:12px 0 16px;">
+      <div>
+        <label style="font-size:.72rem;color:var(--tx2);display:block;margin-bottom:3px">نام و نام خانوادگی خریدار</label>
+        <input type="text" id="cust-name" class="minp" placeholder="مثلاً: علی رضایی">
+      </div>
+      <div style="display:flex;gap:8px">
+        <div style="flex:1">
+          <label style="font-size:.72rem;color:var(--tx2);display:block;margin-bottom:3px">شماره تماس</label>
+          <input type="tel" id="cust-phone" class="minp" placeholder="۰۹۱۲۳۴۵۶۷۸۹" inputmode="tel">
+        </div>
+        <div style="flex:1">
+          <label style="font-size:.72rem;color:var(--tx2);display:block;margin-bottom:3px">کد ملی</label>
+          <input type="text" id="cust-nid" class="minp" placeholder="اختیاری" inputmode="numeric">
+        </div>
+      </div>
+      <div>
+        <label style="font-size:.72rem;color:var(--tx2);display:block;margin-bottom:5px">روش پرداخت</label>
+        <div class="pay-chips" id="pay-chips">
+          <button type="button" class="pay-chip on" onclick="setPayMethod('کارتخوان', this)">کارتخوان</button>
+          <button type="button" class="pay-chip" onclick="setPayMethod('نقدی', this)">نقدی</button>
+          <button type="button" class="pay-chip" onclick="setPayMethod('حواله پایا/ساتنا', this)">حواله پایا</button>
+          <button type="button" class="pay-chip" onclick="setPayMethod('چک صیادی', this)">چک صیادی</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <div style="flex:1">
+          <label style="font-size:.72rem;color:var(--tx2);display:block;margin-bottom:3px">نام بانک</label>
+          <input type="text" id="cust-bank" class="minp" placeholder="مثلاً: ملی، ملت">
+        </div>
+        <div style="flex:1">
+          <label style="font-size:.72rem;color:var(--tx2);display:block;margin-bottom:3px">شماره پیگیری / ارجاع</label>
+          <input type="text" id="cust-ref" class="minp" placeholder="کد رهگیری">
+        </div>
+      </div>
+      <div>
+        <label style="font-size:.72rem;color:var(--tx2);display:block;margin-bottom:3px">یادداشت</label>
+        <input type="text" id="cust-note" class="minp" placeholder="توضیحات اختیاری">
+      </div>
+    </div>
+    <div class="ma" style="display:flex;gap:8px">
+      <button class="mb mb-c tap" style="flex:1" onclick="closeModal('m-customer')">انصراف</button>
+      <button class="mb mb-p tap" style="flex:1.4" onclick="saveCustModal()"><i class="ph ph-check"></i> ثبت اطلاعات</button>
+    </div>
+  </div>
+</div>
+
+<!-- Passcode Setup Modal -->
+<div class="mo" id="m-passcode-setup">
+  <div class="mc" style="max-width: 320px; text-align: center;">
+    <div class="mt" style="color:var(--primary);"><i class="ph-fill ph-lock-key"></i> <span id="pass-setup-title">تعیین رمز عبور ۴ رقمی</span></div>
+    <div class="md" id="pass-setup-desc" style="margin-bottom:12px;">رمز عبور جدید خود را وارد کنید:</div>
+    <div class="pass-dots" id="pass-setup-dots" style="margin-bottom:12px">
+      <div class="pdot"></div><div class="pdot"></div><div class="pdot"></div><div class="pdot"></div>
+    </div>
+    <div id="pass-setup-err" style="color:var(--err);font-size:.78rem;font-weight:700;min-height:18px;margin-bottom:8px"></div>
+    <div class="pass-keypad" style="gap:10px;margin:0 auto 10px;">
+      <button class="pkey" style="width:58px;height:58px;background:var(--bg);color:var(--tx);border-color:var(--bd);" onclick="pressSetupPin('1')">۱</button>
+      <button class="pkey" style="width:58px;height:58px;background:var(--bg);color:var(--tx);border-color:var(--bd);" onclick="pressSetupPin('2')">۲</button>
+      <button class="pkey" style="width:58px;height:58px;background:var(--bg);color:var(--tx);border-color:var(--bd);" onclick="pressSetupPin('3')">۳</button>
+      <button class="pkey" style="width:58px;height:58px;background:var(--bg);color:var(--tx);border-color:var(--bd);" onclick="pressSetupPin('4')">۴</button>
+      <button class="pkey" style="width:58px;height:58px;background:var(--bg);color:var(--tx);border-color:var(--bd);" onclick="pressSetupPin('5')">۵</button>
+      <button class="pkey" style="width:58px;height:58px;background:var(--bg);color:var(--tx);border-color:var(--bd);" onclick="pressSetupPin('6')">۶</button>
+      <button class="pkey" style="width:58px;height:58px;background:var(--bg);color:var(--tx);border-color:var(--bd);" onclick="pressSetupPin('7')">۷</button>
+      <button class="pkey" style="width:58px;height:58px;background:var(--bg);color:var(--tx);border-color:var(--bd);" onclick="pressSetupPin('8')">۸</button>
+      <button class="pkey" style="width:58px;height:58px;background:var(--bg);color:var(--tx);border-color:var(--bd);" onclick="pressSetupPin('9')">۹</button>
+      <button class="pkey pkey-txt" style="color:var(--tx2);" onclick="closeModal('m-passcode-setup')">انصراف</button>
+      <button class="pkey" style="width:58px;height:58px;background:var(--bg);color:var(--tx);border-color:var(--bd);" onclick="pressSetupPin('0')">۰</button>
+      <button class="pkey" style="width:58px;height:58px;background:var(--bg);color:var(--tx);border-color:var(--bd);" onclick="backspaceSetupPin()"><i class="ph ph-backspace"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- Telegram-Style Passcode Screen Overlay -->
+<div id="passcode-overlay" class="pass-overlay">
+  <div class="pass-box">
+    <div class="pass-icon"><i class="ph-fill ph-lock-key"></i></div>
+    <div class="pass-title" id="pass-title">رمز عبور را وارد کنید</div>
+    <div class="pass-sub" id="pass-sub">گالری طلای مهوا</div>
+    <div class="pass-dots" id="pass-dots">
+      <div class="pdot"></div>
+      <div class="pdot"></div>
+      <div class="pdot"></div>
+      <div class="pdot"></div>
+    </div>
+    <div class="pass-keypad">
+      <button class="pkey" onclick="pressPin('1')">۱</button>
+      <button class="pkey" onclick="pressPin('2')">۲</button>
+      <button class="pkey" onclick="pressPin('3')">۳</button>
+      <button class="pkey" onclick="pressPin('4')">۴</button>
+      <button class="pkey" onclick="pressPin('5')">۵</button>
+      <button class="pkey" onclick="pressPin('6')">۶</button>
+      <button class="pkey" onclick="pressPin('7')">۷</button>
+      <button class="pkey" onclick="pressPin('8')">۸</button>
+      <button class="pkey" onclick="pressPin('9')">۹</button>
+      <div style="width:68px"></div>
+      <button class="pkey" onclick="pressPin('0')">۰</button>
+      <button class="pkey" onclick="backspacePin()"><i class="ph ph-backspace"></i></button>
+    </div>
+  </div>
+</div>
+
 <!-- ========== DATE PICKER ========== -->
 <div class="dpo" id="dp">
   <div class="dps">
@@ -1623,6 +1878,15 @@ background: var(--bg);}
           <div class="pwa-txt"><b>نصب مهوا</b><span id="pwa-guide">برای دسترسی سریع نصب کنید</span></div>
           <button class="pwa-install tap" id="pwa-btn" onclick="installPWA()">نصب</button>
           <button class="pwa-close" onclick="dismissPWA()"><i class="ph ph-x"></i></button>
+        </div>
+
+        <!-- Customer Quick Bar -->
+        <div id="calc-cust-bar" class="cust-bar tap" onclick="openCustModal()">
+          <div style="display:flex;align-items:center;gap:6px">
+            <i class="ph ph-user-circle" id="cust-bar-icon" style="font-size:1.15rem;color:var(--tx2)"></i>
+            <span id="cust-bar-name" style="font-size:.78rem;font-weight:700;color:var(--tx2)">ثبت مشخصات مشتری و پرداخت</span>
+          </div>
+          <span id="cust-bar-badge" class="badge" style="display:none;background:rgba(23,32,81,.1);color:var(--primary)"></span>
         </div>
 
         <!-- Form Rows -->
@@ -1794,41 +2058,69 @@ background: var(--bg);}
 
   <!-- ===== SETTINGS VIEW ===== -->
   <main id="v-settings" class="view">
-    <div class="sec-h"><h3>تنظیمات</h3></div>
+    <div class="sec-h"><h3>تنظیمات و امنیت برنامه</h3></div>
+
+    <!-- Live Real-Time Interactive Preview Card -->
+    <div class="sg" style="border: 1.5px solid rgba(23,32,81,0.25);">
+      <div style="padding:12px 14px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <span style="font-size:0.82rem; font-weight:800; color:var(--primary); display:flex; align-items:center; gap:5px;">
+            <i class="ph-fill ph-sparkle" style="color:var(--warn)"></i> پیش‌نمایش زنده قلم و اندازه
+          </span>
+          <span id="preview-badge" style="background:rgba(16,185,129,0.15); color:var(--ok); padding:2px 8px; border-radius:8px; font-size:0.68rem; font-weight:800;">۱۴px</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:0.82rem; margin-bottom:4px;">
+          <span style="color:var(--tx)">نمونه قیمت طلا:</span>
+          <span style="font-weight:900; color:var(--primary);">۱۴,۸۵۰,۰۰۰ تومان</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:0.75rem;">
+          <span style="color:var(--tx2)">وزن کل:</span>
+          <span style="font-weight:700;">۳.۴۲۰ گرم</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Security & Telegram Passcode -->
+    <div class="sg">
+      <div class="sgt">امنیت و قفل برنامه (مشابه تلگرام)</div>
+      <div class="si" onclick="togglePasscodeSwitch()">
+        <div class="sil"><i class="ph ph-lock-key"></i> رمز عبور ورود به برنامه</div>
+        <div class="tog" id="t-passcode"></div>
+      </div>
+      <div class="si tap" id="row-change-pass" style="display:none;" onclick="openPasscodeSetupModal()">
+        <div class="sil" style="color:var(--warn)"><i class="ph ph-key" style="color:var(--warn)"></i> تغییر رمز عبور ۴ رقمی</div>
+        <div class="siv"><i class="ph ph-caret-left"></i></div>
+      </div>
+    </div>
 
     <!-- Appearance -->
     <div class="sg">
-      <div class="sgt">ظاهر</div>
+      <div class="sgt">ظاهر و قلم برنامه</div>
       <div class="si" onclick="togDark()">
-        <div class="sil"><i class="ph ph-moon"></i> حالت تاریک</div>
+        <div class="sil"><i class="ph ph-moon"></i> حالت تاریک (Dark Mode)</div>
         <div class="tog" id="t-dark"></div>
       </div>
-    </div>
-
-    <!-- Font Size -->
-    <div class="sg">
-      <div class="sgt">اندازه فونت</div>
-      <div class="fs-row">
-        <button class="fs-btn tap" onclick="chFS(-1)">−</button>
-        <div class="fs-val" id="fs-val">۱۴px</div>
-        <button class="fs-btn tap" onclick="chFS(1)">+</button>
-      </div>
-    </div>
-
-    <!-- Font Family -->
-    <div class="sg">
-      <div class="sgt">نوع فونت و تایپوگرافی</div>
-      <div class="font-picker">
-        <div class="font-opt tap on" data-font="Vazirmatn" onclick="setFont(this)" style="font-family:'Vazirmatn'">وزیرمتن (استاندارد)</div>
-      </div>
-    </div>
-
-    <!-- Bold Text -->
-    <div class="sg">
-      <div class="sgt">وزن متن</div>
       <div class="si" onclick="togBold()">
         <div class="sil"><i class="ph ph-text-bolder"></i> متن ضخیم (Bold)</div>
         <div class="tog" id="t-bold"></div>
+      </div>
+    </div>
+
+    <!-- Dynamic Font Size Range Slider -->
+    <div class="sg">
+      <div class="sgt">نوار اندازه قلم برنامه</div>
+      <div style="padding:10px 14px;">
+        <div style="display:flex; justify-content:space-between; font-size:0.78rem; font-weight:700; margin-bottom:6px;">
+          <span>اندازه متن:</span>
+          <span id="fs-val" style="color:var(--primary); font-weight:900;">۱۴px</span>
+        </div>
+        <input type="range" id="fs-slider" min="10" max="24" value="14" step="1" style="width:100%; accent-color:var(--primary); margin-bottom:10px;" oninput="onFontSlider(this.value)">
+        <div style="display:flex; justify-content:space-between; gap:4px;">
+          <button class="pay-chip tap" onclick="onFontSlider(11)">بسیار ریز</button>
+          <button class="pay-chip tap" onclick="onFontSlider(14)">استاندارد</button>
+          <button class="pay-chip tap" onclick="onFontSlider(18)">درشت</button>
+          <button class="pay-chip tap" onclick="onFontSlider(22)">خیلی بزرگ</button>
+        </div>
       </div>
     </div>
 
@@ -1845,12 +2137,19 @@ background: var(--bg);}
       </div>
     </div>
 
-    <!-- Data -->
+    <!-- Snapshots History & Backups -->
     <div class="sg">
-      <div class="sgt">داده‌ها</div>
-      <div class="si tap" onclick="expJSON()"><div class="sil"><i class="ph ph-download-simple"></i> خروجی JSON</div><div class="siv"><i class="ph ph-caret-left"></i></div></div>
-      <div class="si tap" onclick="impJSON()"><div class="sil"><i class="ph ph-upload-simple"></i> ورود داده JSON</div><div class="siv"><i class="ph ph-caret-left"></i></div></div>
-      <div class="si tap" onclick="openModal('m-clear')"><div class="sil" style="color:var(--err)"><i class="ph ph-trash" style="color:var(--err)"></i> پاک‌سازی کامل</div><div class="siv"><i class="ph ph-caret-left"></i></div></div>
+      <div class="sgt" style="display:flex; justify-content:space-between; align-items:center;">
+        <span>نسخه‌های ذخیره‌شده و پشتیبان‌گیری</span>
+        <button class="pay-chip tap" style="color:var(--primary); font-size:0.68rem;" onclick="createPwaSnapshot()"><i class="ph ph-plus"></i> ثبت نسخه جدید</button>
+      </div>
+      <div style="padding:10px 14px;">
+        <div style="display:flex; gap:8px; margin-bottom:10px;">
+          <button class="btn btn-p tap" style="flex:1; height:38px; font-size:0.75rem;" onclick="expJSON()"><i class="ph ph-download-simple"></i> دانلود JSON</button>
+          <button class="btn btn-o tap" style="flex:1.1; height:38px; font-size:0.75rem;" onclick="impJSON()"><i class="ph ph-upload-simple"></i> انتخاب و وارد کردن</button>
+        </div>
+        <div id="pwa-snapshots-list" style="display:flex; flex-direction:column; gap:6px;"></div>
+      </div>
     </div>
 
     <!-- Live Debug Logs -->
@@ -1860,7 +2159,7 @@ background: var(--bg);}
         <span id="pwa-log-count" style="background:rgba(23,32,81,0.08); padding:1px 6px; border-radius:8px; font-size:0.65rem;">۰ رکورد</span>
       </div>
       <div style="padding:10px 14px;">
-        <div id="pwa-log-box" style="background:#0f172a; color:#e2e8f0; font-family:monospace; font-size:0.7rem; height:120px; overflow-y:auto; padding:8px; border-radius:10px; line-height:1.6; direction:ltr; text-align:left;">
+        <div id="pwa-log-box" style="background:#0f172a; color:#e2e8f0; font-family:monospace; font-size:0.7rem; height:110px; overflow-y:auto; padding:8px; border-radius:10px; line-height:1.6; direction:ltr; text-align:left;">
           [INIT] System initialized successfully.
         </div>
         <div style="display:flex; gap:8px; margin-top:8px;">
@@ -1870,10 +2169,15 @@ background: var(--bg);}
       </div>
     </div>
 
+    <!-- Clear All Data -->
+    <div class="sg">
+      <div class="si tap" onclick="openModal('m-clear')"><div class="sil" style="color:var(--err)"><i class="ph ph-trash" style="color:var(--err)"></i> پاک‌سازی کامل تمام داده‌ها</div><div class="siv"><i class="ph ph-caret-left"></i></div></div>
+    </div>
+
     <!-- About -->
     <div class="sg">
       <div class="sgt">درباره</div>
-      <div class="si"><div class="sil"><i class="ph ph-code"></i> نسخه اپلیکیشن</div><div class="siv">6.0.0 (Release)</div></div>
+      <div class="si"><div class="sil"><i class="ph ph-code"></i> نسخه وب‌اپلیکیشن</div><div class="siv">2.0.0 (Gold Release)</div></div>
     </div>
   </main>
 
@@ -2004,154 +2308,310 @@ let S={
   bold:false,
   fontSize:14,
   fontFamily:'Vazirmatn',
+  passcode:{enabled:false, pin:''},
+  snapshots:[],
   pwaDismissed:false
 };
 
 let editId=null,curCalc=null,ch1=null,ch2=null,cType='bar';
 let dRange={from:null,to:null},dpF='from',calY,calM;
+let activeCustomer={name:'',phone:'',nid:'',paymentMethod:'کارتخوان',bankName:'',trackingCode:'',note:''};
+let passPin='', setupPin1='', setupPin2='', setupStep=1;
+let isPassLocked=false;
 
 try{
   const sv=localStorage.getItem('mahva_v6');
   if(sv){const p=JSON.parse(sv);S={...S,...p};}
-  // Migrate from older versions
   if(!S.fontFamily)S.fontFamily='Vazirmatn';
+  if(!S.snapshots)S.snapshots=[];
 }catch(e){}
 
 const save=()=>localStorage.setItem('mahva_v6',JSON.stringify(S));
 
-/* Apply persisted settings immediately */
-(function applySettings(){
-  if(S.dark){
-    document.documentElement.setAttribute('data-theme','dark');
-    document.getElementById('t-dark')?.classList.add('on');
+/* Passcode Lock Engine */
+function checkPasscodeRequired(){
+  if(S.passcode&&S.passcode.enabled&&S.passcode.pin){
+    isPassLocked=true;
+    document.getElementById('passcode-overlay').classList.add('on');
+    resetPinDisplay();
   }
-  if(S.bold){
-    document.documentElement.style.setProperty('--base-weight','900');
-    document.body.style.fontWeight='700';
-    document.getElementById('t-bold')?.classList.add('on');
-  }
-  if(S.fontSize){
-    document.documentElement.style.setProperty('--font-size',S.fontSize+'px');
-    document.getElementById('fs-val').textContent=e2p(S.fontSize)+'px';
-  }
-  if(S.fontFamily){
-    applyFont(S.fontFamily,false);
-  }
-  ['A','D','F','H'].forEach(k=>{
-    if(S.locks[k]&&S.defaults[k]){
-      document.getElementById('v'+k).value=S.defaults[k];
-      updLock(k,true);
+}
+function pressPin(d){
+  if(passPin.length<4){
+    passPin+=d;
+    updatePinDots();
+    if(passPin.length===4){
+      if(passPin===S.passcode.pin){
+        isPassLocked=false;
+        document.getElementById('passcode-overlay').classList.remove('on');
+        passPin='';
+        resetPinDisplay();
+      }else{
+        const dots=document.getElementById('pass-dots');
+        dots.classList.add('shake');
+        if(navigator.vibrate)navigator.vibrate([10,30,10]);
+        setTimeout(()=>{
+          dots.classList.remove('shake');
+          passPin='';
+          resetPinDisplay();
+        },400);
+      }
     }
-  });
-  if(S.savedDefs){
-    ['D','F','H'].forEach(k=>{
-      if(S.savedDefs[k])document.getElementById('df-'+k).value=S.savedDefs[k];
-    });
   }
-})();
-
-/* ============================================================
-   ROUTING
-   ============================================================ */
-function initRoute(){
-  const h=location.hash.replace('#','')||'calc';
-  const tabs=['calc','history','stats','settings'];
-  const t=tabs.includes(h)?h:'calc';
-  const n=document.querySelector(`.ni[data-t="${t}"]`);
-  if(n)go(t,n,false);
+}
+function backspacePin(){
+  if(passPin.length>0){
+    passPin=passPin.slice(0,-1);
+    updatePinDots();
+  }
+}
+function resetPinDisplay(){
+  document.querySelectorAll('#pass-dots .pdot').forEach(d=>d.classList.remove('filled'));
+}
+function updatePinDots(){
+  const dots=document.querySelectorAll('#pass-dots .pdot');
+  dots.forEach((d,i)=>d.classList.toggle('filled', i<passPin.length));
 }
 
-window.addEventListener('hashchange',()=>{
-  const h=location.hash.replace('#','');
-  const n=document.querySelector(`.ni[data-t="${h}"]`);
-  if(n&&!n.classList.contains('on'))go(h,n,false);
-});
-
-window.go=(id,el,upHash=true)=>{
-  const prev=document.querySelector('.view.active');
-  if(prev&&prev.id!=='v-'+id){
-    prev.classList.remove('visible');
-    setTimeout(()=>prev.classList.remove('active'),55);
-  }
-  setTimeout(()=>{
-    const v=document.getElementById('v-'+id);
-    if(v){
-      v.classList.add('active');
-      v.scrollTop=0;
-      requestAnimationFrame(()=>requestAnimationFrame(()=>v.classList.add('visible')));
-    }
-  },prev&&prev.id!=='v-'+id?85:0);
-  document.querySelectorAll('.ni, .desktop-nav-item').forEach(e=>{
-    e.classList.toggle('on', e.dataset.t === id);
-  });
-  if(upHash)history.pushState(null,null,'#'+id);
-  if(id==='history')renderH();
-  if(id==='stats'){renderStats();renderCharts();}
-  if(id==='settings'){
-    document.getElementById('t-dark').classList.toggle('on',S.dark);
-    document.getElementById('t-bold').classList.toggle('on',S.bold);
-    document.querySelectorAll('.font-opt').forEach(o=>{
-      o.classList.toggle('on',o.dataset.font===S.fontFamily);
-    });
-    document.getElementById('fs-val').textContent=e2p(S.fontSize)+'px';
-  }
-};
-
-/* ============================================================
-   CALCULATION ENGINE
-   ============================================================ */
-let _dbT;
-const calc=()=>{
-  const A=gv('vA'),B=gv('vB'),D=gv('vD'),F=gv('vF'),H=gv('vH');
-  const C=A*B;
-  const E=(D*C)/100;
-  const G=(F*(C+E))/100;
-  const I=((E+G)*H)/100;
-  const K=C+E+G+I;
-
-  const setV=(id,v,dec=0)=>{document.getElementById(id).value=v>0?fmt(Math.round(v*Math.pow(10,dec))/Math.pow(10,dec),dec):'';}
-
-  setV('vC',C);
-  setV('vE',E);
-  setV('vG',G);
-  setV('vI',I);
-  setV('vCosts', E + G + I);
-  setV('vK',K);
-  document.getElementById('vJ').value=C>0?fmt(((K/C)-1)*100,2):'';
-
-  // Update Desktop side live preview panel
-  const sideRaw = document.getElementById('side-raw-price');
-  const sideCosts = document.getElementById('side-costs');
-  const sideFinal = document.getElementById('side-final-percent');
-  const sideTotal = document.getElementById('side-total-price');
-  if(sideRaw) sideRaw.textContent = C > 0 ? fmt(C) + ' تومان' : '۰ تومان';
-  if(sideCosts) sideCosts.textContent = (E + G + I) > 0 ? fmt(E + G + I) + ' تومان' : '۰ تومان';
-  if(sideFinal) sideFinal.textContent = C > 0 ? fmt(((K/C)-1)*100, 2) + '٪' : '۰٪';
-  if(sideTotal) sideTotal.textContent = K > 0 ? fmt(K) + ' تومان' : '۰ تومان';
-
-  // Persist locked values
-  ['A','D','F','H'].forEach(k=>{
-    if(S.locks[k]){S.defaults[k]=document.getElementById('v'+k).value;save();}
-  });
-
-  if(K>0){
-    curCalc={A,B,C,D,E,F,G,H,I,K,J:((K/C)-1)*100};
-    if(!editId){
-      clearTimeout(_dbT);
-      _dbT=setTimeout(()=>saveH('draft',curCalc),1500);
+// Passcode Setup Modal Logic
+function openPasscodeSetupModal(){
+  setupStep=1; setupPin1=''; setupPin2='';
+  document.getElementById('pass-setup-title').textContent='تعیین رمز عبور ۴ رقمی';
+  document.getElementById('pass-setup-desc').textContent='رمز عبور جدید خود را وارد کنید:';
+  document.getElementById('pass-setup-err').textContent='';
+  resetSetupDots();
+  openModal('m-passcode-setup');
+}
+function resetSetupDots(){
+  document.querySelectorAll('#pass-setup-dots .pdot').forEach(d=>d.classList.remove('filled'));
+}
+function updateSetupDots(pin){
+  const dots=document.querySelectorAll('#pass-setup-dots .pdot');
+  dots.forEach((d,i)=>d.classList.toggle('filled', i<pin.length));
+}
+function pressSetupPin(d){
+  document.getElementById('pass-setup-err').textContent='';
+  if(setupStep===1){
+    if(setupPin1.length<4){
+      setupPin1+=d;
+      updateSetupDots(setupPin1);
+      if(setupPin1.length===4){
+        setTimeout(()=>{
+          setupStep=2;
+          document.getElementById('pass-setup-title').textContent='تکرار رمز عبور';
+          document.getElementById('pass-setup-desc').textContent='جهت تایید، مجدداً رمز را وارد کنید:';
+          resetSetupDots();
+        },200);
+      }
     }
   }else{
-    curCalc=null;
+    if(setupPin2.length<4){
+      setupPin2+=d;
+      updateSetupDots(setupPin2);
+      if(setupPin2.length===4){
+        if(setupPin1===setupPin2){
+          S.passcode={enabled:true, pin:setupPin1};
+          save();
+          closeModal('m-passcode-setup');
+          document.getElementById('t-passcode').classList.add('on');
+          document.getElementById('row-change-pass').style.display='flex';
+          toast('رمز عبور فعال شد ✓');
+        }else{
+          document.getElementById('pass-setup-err').textContent='رمز عبور با تکرار آن مطابقت ندارد';
+          setupStep=1; setupPin1=''; setupPin2='';
+          setTimeout(()=>{
+            document.getElementById('pass-setup-title').textContent='تعیین رمز عبور ۴ رقمی';
+            document.getElementById('pass-setup-desc').textContent='رمز عبور جدید خود را وارد کنید:';
+            resetSetupDots();
+          },500);
+        }
+      }
+    }
   }
+}
+function backspaceSetupPin(){
+  if(setupStep===1&&setupPin1.length>0){
+    setupPin1=setupPin1.slice(0,-1);
+    updateSetupDots(setupPin1);
+  }else if(setupStep===2&&setupPin2.length>0){
+    setupPin2=setupPin2.slice(0,-1);
+    updateSetupDots(setupPin2);
+  }
+}
+function togglePasscodeSwitch(){
+  if(S.passcode&&S.passcode.enabled){
+    S.passcode={enabled:false, pin:''};
+    save();
+    document.getElementById('t-passcode').classList.remove('on');
+    document.getElementById('row-change-pass').style.display='none';
+    toast('رمز عبور غیرفعال شد');
+  }else{
+    openPasscodeSetupModal();
+  }
+}
+
+/* Customer Modal Logic */
+function openCustModal(){
+  document.getElementById('cust-name').value = activeCustomer.name||'';
+  document.getElementById('cust-phone').value = activeCustomer.phone||'';
+  document.getElementById('cust-nid').value = activeCustomer.nid||'';
+  document.getElementById('cust-bank').value = activeCustomer.bankName||'';
+  document.getElementById('cust-ref').value = activeCustomer.trackingCode||'';
+  document.getElementById('cust-note').value = activeCustomer.note||'';
+  document.querySelectorAll('#pay-chips .pay-chip').forEach(c=>{
+    c.classList.toggle('on', c.dataset.val === (activeCustomer.paymentMethod||'کارتخوان'));
+  });
+  openModal('m-customer');
+}
+function setPayMethod(val, btn){
+  document.querySelectorAll('#pay-chips .pay-chip').forEach(c=>c.classList.remove('on'));
+  btn.classList.add('on');
+  activeCustomer.paymentMethod = val;
+}
+function saveCustModal(){
+  activeCustomer.name = document.getElementById('cust-name').value.trim();
+  activeCustomer.phone = document.getElementById('cust-phone').value.trim();
+  activeCustomer.nid = document.getElementById('cust-nid').value.trim();
+  activeCustomer.bankName = document.getElementById('cust-bank').value.trim();
+  activeCustomer.trackingCode = document.getElementById('cust-ref').value.trim();
+  activeCustomer.note = document.getElementById('cust-note').value.trim();
+  
+  const bar = document.getElementById('calc-cust-bar');
+  const nameEl = document.getElementById('cust-bar-name');
+  const badgeEl = document.getElementById('cust-bar-badge');
+  const iconEl = document.getElementById('cust-bar-icon');
+  
+  if(activeCustomer.name){
+    bar.classList.add('active');
+    nameEl.textContent = 'مشتری: ' + activeCustomer.name;
+    nameEl.style.color = 'var(--primary)';
+    iconEl.style.color = 'var(--primary)';
+    badgeEl.style.display = 'inline-block';
+    badgeEl.textContent = activeCustomer.paymentMethod||'کارتخوان';
+  }else{
+    bar.classList.remove('active');
+    nameEl.textContent = 'ثبت مشخصات مشتری و پرداخت';
+    nameEl.style.color = 'var(--tx2)';
+    iconEl.style.color = 'var(--tx2)';
+    badgeEl.style.display = 'none';
+  }
+  closeModal('m-customer');
+  if(activeCustomer.name) toast('مشخصات خریدار ثبت شد');
+}
+
+/* Snapshots History Logic */
+function autoUpdateSnapshot(){
+  if(!S.snapshots) S.snapshots=[];
+  const payload = JSON.stringify(S);
+  const nowTime = gTime(), nowDate = gDate();
+  const curIdx = S.snapshots.findIndex(s=>s.isCurrent);
+  if(curIdx !== -1){
+    S.snapshots[curIdx] = {
+      id: S.snapshots[curIdx].id,
+      date: nowDate,
+      time: nowTime,
+      count: S.history.length,
+      isCurrent: true,
+      data: payload
+    };
+  }else{
+    S.snapshots.unshift({
+      id: Date.now().toString(),
+      date: nowDate,
+      time: nowTime,
+      count: S.history.length,
+      isCurrent: true,
+      data: payload
+    });
+  }
+  if(S.snapshots.length > 8) S.snapshots = S.snapshots.slice(0, 8);
+  save();
+  renderSnapshots();
+}
+function createPwaSnapshot(){
+  if(!S.snapshots) S.snapshots=[];
+  S.snapshots.forEach(s=>s.isCurrent=false);
+  S.snapshots.unshift({
+    id: Date.now().toString(),
+    date: gDate(),
+    time: gTime(),
+    count: S.history.length,
+    isCurrent: true,
+    data: JSON.stringify(S)
+  });
+  if(S.snapshots.length > 8) S.snapshots = S.snapshots.slice(0, 8);
+  save();
+  renderSnapshots();
+  toast('نسخه پشتیبان جدید ثبت شد ✓');
+}
+function restorePwaSnapshot(id){
+  const snap = S.snapshots.find(s=>s.id===id);
+  if(!snap) return;
+  try{
+    const parsed = JSON.parse(snap.data);
+    S.history = parsed.history || [];
+    S.savedDefs = parsed.savedDefs || S.savedDefs;
+    S.defaults = parsed.defaults || S.defaults;
+    S.locks = parsed.locks || S.locks;
+    S.snapshots.forEach(s=>s.isCurrent = (s.id===id));
+    save();
+    renderH();
+    renderSnapshots();
+    toast('نسخه پشتیبان بازیابی شد ✓');
+  }catch(e){
+    toast('خطا در بازیابی پشتیبان');
+  }
+}
+function renderSnapshots(){
+  const cont = document.getElementById('pwa-snapshots-list');
+  if(!cont) return;
+  cont.innerHTML = '';
+  if(!S.snapshots || !S.snapshots.length){
+    cont.innerHTML = '<div style="font-size:0.75rem;color:var(--tx2)">نسخه‌ای ثبت نشده است</div>';
+    return;
+  }
+  S.snapshots.forEach(snap=>{
+    const el = document.createElement('div');
+    el.style.cssText = `background:${snap.isCurrent ? 'rgba(23,32,81,0.08)' : 'var(--bg)'}; border:1px solid ${snap.isCurrent ? 'var(--primary)' : 'var(--bd)'}; border-radius:10px; padding:7px 10px; display:flex; justify-content:space-between; align-items:center;`;
+    el.innerHTML = `
+      <div style="display:flex; align-items:center; gap:6px;">
+        ${snap.isCurrent ? '<span style="width:7px;height:7px;border-radius:50%;background:var(--ok)"></span>' : ''}
+        <div>
+          <div style="font-size:0.75rem; font-weight:700; color:var(--tx);">${snap.date} | ${e2p(snap.time)}</div>
+          <div style="font-size:0.68rem; color:var(--tx2);">${e2p(snap.count)} تراکنش</div>
+        </div>
+      </div>
+      <div>
+        ${snap.isCurrent ? '<span class="badge sale" style="font-size:0.65rem;">نسخه فعلی ✓</span>' : `<button class="pay-chip tap" style="font-size:0.68rem; color:var(--primary);" onclick="restorePwaSnapshot('${snap.id}')"><i class="ph ph-arrow-counter-clockwise"></i> بازیابی</button>`}
+      </div>
+    `;
+    cont.appendChild(el);
+  });
+}
+
+/* Dynamic Font Slider */
+window.onFontSlider = (val)=>{
+  val = Number(val);
+  S.fontSize = val;
+  document.documentElement.style.setProperty('--font-size', val+'px');
+  document.getElementById('fs-val').textContent = e2p(val) + 'px';
+  document.getElementById('preview-badge').textContent = e2p(val) + 'px';
+  const sl = document.getElementById('fs-slider');
+  if(sl) sl.value = val;
+  save();
 };
 
-const hInput=(e,mx)=>{
-  let eng=p2e(e.target.value.replace(/,/g,'')).replace(/[٫،,]/g,'.').replace(/[^0-9.]/g,'');
-  let pts=eng.split('.');
-  if(pts.length>2)pts=[pts[0],pts.slice(1).join('')];
-  let dec=pts.length>1?'.'+pts[1].substring(0,mx+1):'';
-  let int=pts[0]!==''?Number(pts[0]).toLocaleString('en-US'):'';
-  e.target.value=e2p(int+dec);
+
+
+  let count=0,newPos=formatted.length;
+  for(let i=0;i<formatted.length;i++){
+    if(/[0-9۰-۹٠-٩.]/.test(formatted[i])){
+      count++;
+      if(count===beforeRaw){newPos=i+1;break;}
+    }
+  }
+  if(beforeRaw===0)newPos=0;
+  el.setSelectionRange(newPos,newPos);
   calc();
 };
 
@@ -2194,8 +2654,9 @@ const saveH=(type,data)=>{
     let it=S.history.find(i=>i.id===editId);
     if(it){
       if(!it.edits)it.edits=[];
-      it.edits.unshift({time:it.time,date:it.date,calc:{...it.calc}});
+      it.edits.unshift({time:it.time,date:it.date,calc:{...it.calc},customer:{...it.customer}});
       it.calc={...data};
+      it.customer={...activeCustomer};
       it.time=gTime();it.date=gDate();it.iso=gISO();it.type=type;
     }
     cancelEdit();
@@ -2203,16 +2664,15 @@ const saveH=(type,data)=>{
   }else{
     if(type==='draft'){
       if(S.history.length>0&&S.history[0].type==='draft'){
-        S.history[0]={id:S.history[0].id,type:'draft',time:gTime(),date:gDate(),iso:gISO(),calc:{...data},edits:[]};
+        S.history[0]={id:S.history[0].id,type:'draft',time:gTime(),date:gDate(),iso:gISO(),calc:{...data},customer:{...activeCustomer},edits:[]};
       }else{
-        S.history.unshift({id:Date.now(),type:'draft',time:gTime(),date:gDate(),iso:gISO(),calc:{...data},edits:[]});
+        S.history.unshift({id:Date.now(),type:'draft',time:gTime(),date:gDate(),iso:gISO(),calc:{...data},customer:{...activeCustomer},edits:[]});
       }
     }else if(type==='sale'){
-      // Remove any auto-drafts so the sale replaces them cleanly
       S.history=S.history.filter(i=>i.type!=='draft');
-      S.history.unshift({id:Date.now(),type:'sale',time:gTime(),date:gDate(),iso:gISO(),calc:{...data},edits:[]});
+      S.history.unshift({id:Date.now(),type:'sale',time:gTime(),date:gDate(),iso:gISO(),calc:{...data},customer:{...activeCustomer},edits:[]});
     }else{
-      S.history.unshift({id:Date.now(),type,time:gTime(),date:gDate(),iso:gISO(),calc:{...data},edits:[]});
+      S.history.unshift({id:Date.now(),type,time:gTime(),date:gDate(),iso:gISO(),calc:{...data},customer:{...activeCustomer},edits:[]});
     }
   }
   if(S.history.length>200)S.history.pop();
@@ -2346,11 +2806,47 @@ const renderH=()=>{
     const el=document.createElement('div');
     el.className='swc';
     const ed=it.edits&&it.edits.length>0;
+
+    let custBadge = '';
+    if(it.customer && it.customer.name){
+      custBadge = `<span class="badge" style="background:rgba(23,32,81,.1);color:var(--primary)">${it.customer.name}</span>`;
+    }
+
+    let custCard = '';
+    if(it.customer && (it.customer.name || it.customer.phone || it.customer.paymentMethod)){
+      custCard = `
+        <div style="background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:8px 10px;margin-bottom:8px;">
+          <div style="font-size:.74rem;font-weight:800;color:var(--primary);margin-bottom:4px;display:flex;align-items:center;gap:4px">
+            <i class="ph-fill ph-user-circle"></i> مشخصات خریدار و پرداخت
+          </div>
+          ${it.customer.name ? `<div style="display:flex;justify-content:space-between;font-size:.7rem;margin-bottom:2px"><span style="color:var(--tx2)">نام خریدار:</span><span style="font-weight:700">${it.customer.name}</span></div>` : ''}
+          ${it.customer.phone ? `<div style="display:flex;justify-content:space-between;font-size:.7rem;margin-bottom:2px"><span style="color:var(--tx2)">شماره تماس:</span><span>${e2p(it.customer.phone)}</span></div>` : ''}
+          ${it.customer.paymentMethod ? `<div style="display:flex;justify-content:space-between;font-size:.7rem;margin-bottom:2px"><span style="color:var(--tx2)">روش پرداخت:</span><span>${it.customer.paymentMethod} ${it.customer.bankName ? '('+it.customer.bankName+')' : ''}</span></div>` : ''}
+          ${it.customer.trackingCode ? `<div style="display:flex;justify-content:space-between;font-size:.7rem;"><span style="color:var(--tx2)">کد پیگیری:</span><span>${e2p(it.customer.trackingCode)}</span></div>` : ''}
+        </div>
+      `;
+    }
+
     let trH='';
     if(ed){
-      trH=`<div class="trace"><div class="trace-t"><i class="ph ph-clock-clockwise"></i> ویرایش‌ها</div>`;
+      trH=`<div class="trace"><div class="trace-t"><i class="ph-fill ph-clock-counter-clockwise"></i> تاریخچه ویرایش‌ها (${e2p(it.edits.length)})</div>`;
       it.edits.forEach(e=>{
-        trH+=`<div class="trace-i"><span>${e.date} ${e.time}</span><span>${fmt(e.calc.K)} ت</span></div>`;
+        let diffs = [];
+        if(e.calc.B !== it.calc.B) diffs.push(`وزن: ${fmt(e.calc.B,3)} ➔ ${fmt(it.calc.B,3)} گرم`);
+        if(e.calc.A !== it.calc.A) diffs.push(`طلا: ${fmt(e.calc.A)} ➔ ${fmt(it.calc.A)} ت`);
+        if(e.calc.D !== it.calc.D) diffs.push(`اجرت: ${fmt(e.calc.D,2)}٪ ➔ ${fmt(it.calc.D,2)}٪`);
+        if(e.calc.F !== it.calc.F) diffs.push(`سود: ${fmt(e.calc.F,2)}٪ ➔ ${fmt(it.calc.F,2)}٪`);
+        if(e.calc.H !== it.calc.H) diffs.push(`مالیات: ${fmt(e.calc.H,2)}٪ ➔ ${fmt(it.calc.H,2)}٪`);
+
+        trH+=`
+          <div style="background:var(--sf);border-radius:8px;padding:6px 8px;margin-bottom:6px;border:1px solid var(--bd);">
+            <div style="display:flex;justify-content:space-between;font-size:.72rem;font-weight:700;color:var(--primary);margin-bottom:3px">
+              <span>${e.date} ${e.time}</span>
+              <span>${fmt(e.calc.K)} تومان</span>
+            </div>
+            ${diffs.map(d=>`<div style="font-size:.68rem;color:var(--warn);font-weight:700;margin-top:2px;">${d}</div>`).join('')}
+          </div>
+        `;
       });
       trH+=`</div>`;
     }
@@ -2370,6 +2866,7 @@ const renderH=()=>{
         <div class="hh" id="hh-${it.id}">
           <div class="ht">
             <span class="badge ${it.type}">${it.type==='sale'?'فروش':'پیش‌نویس'}</span>
+            ${custBadge}
             ${ed?'<span class="edited-dot"></span>':''}
             ${fmt(it.calc.K)} ت
           </div>
@@ -2385,14 +2882,17 @@ const renderH=()=>{
           </div>
         </div>
         <div class="hb-body">
-          <div class="hd">
-            <div class="hdi"><span>وزن:</span><span>${fmt(it.calc.B,3)} گ</span></div>
-            <div class="hdi"><span>طلا:</span><span>${fmt(it.calc.A)}</span></div>
-            <div class="hdi"><span>اجرت:</span><span>${fmt(it.calc.E)}</span></div>
-            <div class="hdi"><span>سود:</span><span>${fmt(it.calc.G)}</span></div>
-            <div class="hdi"><span>مالیات:</span><span>${fmt(it.calc.I)}</span></div>
-            <div class="hdi"><span>مجموع هزینه‌ها:</span><span>${fmt((it.calc.E||0) + (it.calc.G||0) + (it.calc.I||0))}</span></div>
-            <div class="hdi"><span>درصد نهایی:</span><span style="color:var(--primary)">${fmt(it.calc.J,2)}٪</span></div>
+          <div style="padding:10px 12px; background:var(--bg);">
+            ${custCard}
+            <div class="hd" style="border-radius:10px; margin-bottom:6px;">
+              <div class="hdi"><span>وزن:</span><span>${fmt(it.calc.B,3)} گ</span></div>
+              <div class="hdi"><span>طلا:</span><span>${fmt(it.calc.A)}</span></div>
+              <div class="hdi"><span>اجرت:</span><span>${fmt(it.calc.E)}</span></div>
+              <div class="hdi"><span>سود:</span><span>${fmt(it.calc.G)}</span></div>
+              <div class="hdi"><span>مالیات:</span><span>${fmt(it.calc.I)}</span></div>
+              <div class="hdi"><span>مجموع هزینه‌ها:</span><span>${fmt((it.calc.E||0) + (it.calc.G||0) + (it.calc.I||0))}</span></div>
+              <div class="hdi"><span>درصد نهایی:</span><span style="color:var(--primary)">${fmt(it.calc.J,2)}٪</span></div>
+            </div>
           </div>
           ${trH}
         </div>
