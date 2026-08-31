@@ -24,17 +24,14 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-
-      - name: Generate Wrapper if needed
-        run: |
-          cd android
-          gradle wrapper --gradle-version 8.9 || true
-          chmod +x gradlew || true
+        with:
+          gradle-version: '8.9'
+          cache-read-only: false
 
       - name: Build Debug APK
         run: |
           cd android
-          ./gradlew assembleDebug --stacktrace || gradle assembleDebug --stacktrace
+          gradle assembleDebug --no-daemon
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
