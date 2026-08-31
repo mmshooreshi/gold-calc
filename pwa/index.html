@@ -10,6 +10,11 @@
 <meta name="mobile-web-app-capable" content="yes">
 <title>مهوا گالری</title>
 
+<!-- PWA Manifest & App Icons -->
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" type="image/png" href="./favicon.png">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+
 <!-- Google Fonts: Vazirmatn Persian Typography -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1170,6 +1175,182 @@ background: var(--bg);}
 
 .sw-action-inner span { display: none !important; }
 .sw-action-inner i { font-size: 1.8rem !important; }
+
+/* ============================
+   UPDATE NOTIFICATION BANNER
+   ============================ */
+.update-banner {
+  position: fixed;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-80px);
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 10px 30px rgba(16,185,129,0.38);
+  z-index: 99999;
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.4s var(--bounce), opacity 0.3s;
+  font-family: var(--font-main);
+  font-size: 0.82rem;
+  font-weight: 700;
+  max-width: 92%;
+  border: 1px solid rgba(255,255,255,0.25);
+}
+.update-banner.on {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+  pointer-events: all;
+}
+.ub-text { display: flex; align-items: center; gap: 6px; }
+.ub-text i { font-size: 1.15rem; color: #fef08a; }
+.ub-btn {
+  background: #ffffff;
+  color: #065f46;
+  border: none;
+  padding: 5px 14px;
+  border-radius: 14px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s, background 0.15s;
+}
+.ub-btn:active { transform: scale(0.92); }
+.ub-close {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.85);
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 2px;
+}
+
+/* ============================
+   RESPONSIVE DESKTOP & TABLET LAYOUT
+   ============================ */
+@media (min-width: 768px) {
+  body {
+    background: #0b1122;
+    overflow-y: auto;
+    height: auto;
+    min-height: 100vh;
+  }
+  .app {
+    max-width: 1120px;
+    height: auto;
+    min-height: 100vh;
+    box-shadow: 0 0 60px rgba(0,0,0,.45);
+    border-left: 1px solid var(--bd);
+    border-right: 1px solid var(--bd);
+    border-radius: 0;
+  }
+  header {
+    height: 66px;
+    padding: 0 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 0 0 16px 16px;
+  }
+  .desktop-nav {
+    display: flex !important;
+    gap: 8px;
+    align-items: center;
+  }
+  .desktop-nav-item {
+    color: rgba(255,255,255,0.76);
+    font-size: 0.88rem;
+    font-weight: 700;
+    padding: 8px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s var(--bounce);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    user-select: none;
+  }
+  .desktop-nav-item i { font-size: 1.15rem; }
+  .desktop-nav-item:hover {
+    color: #fff;
+    background: rgba(255,255,255,0.12);
+    transform: translateY(-1px);
+  }
+  .desktop-nav-item.on {
+    color: #fff;
+    background: rgba(255,255,255,0.22);
+    box-shadow: 0 3px 12px rgba(0,0,0,0.18);
+  }
+  /* Hide bottom bar on desktop */
+  .bnav {
+    display: none !important;
+  }
+  .view {
+    padding: 24px 32px 60px;
+    height: auto;
+    overflow: visible;
+  }
+  /* Desktop 2-Column Calculator Grid */
+  .calc-desktop-grid {
+    display: grid !important;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 28px;
+    align-items: start;
+  }
+  .calc-side-panel {
+    display: block !important;
+    background: var(--sf);
+    border: 1.5px solid var(--bd);
+    border-radius: 18px;
+    padding: 22px;
+    box-shadow: 0 4px 24px rgba(0,0,0,.04);
+    position: sticky;
+    top: 20px;
+  }
+  /* Desktop 2-Column Stats Grid */
+  .stats-desktop-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+  /* Desktop 2-Column Settings Grid */
+  .settings-desktop-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  /* Desktop History List (2-column cards) */
+  .h-list {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 14px;
+  }
+}
+@media (max-width: 767px) {
+  .desktop-nav {
+    display: none !important;
+  }
+  .calc-desktop-grid {
+    display: block;
+  }
+  .calc-side-panel {
+    display: none !important;
+  }
+  .stats-desktop-grid {
+    display: block;
+  }
+  .settings-desktop-grid {
+    display: block;
+  }
+}
 </style>
 </head>
 <body>
@@ -1330,109 +1511,162 @@ background: var(--bg);}
 
 <div class="toast" id="toast"></div>
 
+<!-- ========== UPDATE BANNER ========== -->
+<div class="update-banner" id="update-banner">
+  <div class="ub-text">
+    <i class="ph-fill ph-sparkle"></i>
+    <span>نسخه جدید مهوا گالری آماده است!</span>
+  </div>
+  <button class="ub-btn tap" onclick="applyAppUpdate()">بروزرسانی فوری</button>
+  <button class="ub-close" onclick="dismissUpdateBanner()"><i class="ph ph-x"></i></button>
+</div>
+
 <!-- ========== APP ========== -->
 <div class="app" id="app">
-  <header><img src="https://i.ibb.co/zWjXFxJP/IMG-9427-1.png" alt="مهوا"></header>
+  <header>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <img src="https://i.ibb.co/zWjXFxJP/IMG-9427-1.png" alt="مهوا">
+      <span style="color:#fff; font-weight:800; font-size:1.05rem; letter-spacing:-0.4px;">مهوا گالری</span>
+    </div>
+    <div class="desktop-nav">
+      <div class="desktop-nav-item on" data-t="calc" onclick="go('calc',this)"><i class="ph ph-calculator"></i><span>محاسبه</span></div>
+      <div class="desktop-nav-item" data-t="history" onclick="go('history',this)"><i class="ph ph-clock-counter-clockwise"></i><span>تاریخچه</span></div>
+      <div class="desktop-nav-item" data-t="stats" onclick="go('stats',this)"><i class="ph ph-chart-bar"></i><span>آمار</span></div>
+      <div class="desktop-nav-item" data-t="settings" onclick="go('settings',this)"><i class="ph ph-gear-six"></i><span>تنظیمات</span></div>
+    </div>
+  </header>
 
   <!-- ===== CALC VIEW ===== -->
   <main id="v-calc" class="view active visible">
+    <div class="calc-desktop-grid">
+      <div class="calc-form-pane">
+        <!-- Edit Bar -->
+        <div class="edit-bar" id="ebar">
+          <div class="eb-text"><i class="ph-fill ph-pencil-simple"></i> در حال ویرایش تراکنش</div>
+          <button class="eb-cancel" id="cancel-btn" onclick="cancelEdit()">لغو ویرایش</button>
+        </div>
 
-    <!-- Edit Bar -->
-    <div class="edit-bar" id="ebar">
-      <div class="eb-text"><i class="ph-fill ph-pencil-simple"></i> در حال ویرایش تراکنش</div>
-      <button class="eb-cancel" id="cancel-btn" onclick="cancelEdit()">لغو ویرایش</button>
-    </div>
+        <!-- PWA Banner -->
+        <div class="pwa-bar" id="pwa-bar">
+          <div class="pwa-icon"><i class="ph-fill ph-device-mobile"></i></div>
+          <div class="pwa-txt"><b>نصب مهوا</b><span id="pwa-guide">برای دسترسی سریع نصب کنید</span></div>
+          <button class="pwa-install tap" id="pwa-btn" onclick="installPWA()">نصب</button>
+          <button class="pwa-close" onclick="dismissPWA()"><i class="ph ph-x"></i></button>
+        </div>
 
-    <!-- PWA Banner -->
-    <div class="pwa-bar" id="pwa-bar">
-      <div class="pwa-icon"><i class="ph-fill ph-device-mobile"></i></div>
-      <div class="pwa-txt"><b>نصب مهوا</b><span id="pwa-guide">برای دسترسی سریع نصب کنید</span></div>
-      <button class="pwa-install tap" id="pwa-btn" onclick="installPWA()">نصب</button>
-      <button class="pwa-close" onclick="dismissPWA()"><i class="ph ph-x"></i></button>
-    </div>
+        <!-- Form Rows -->
+        <div class="row">
+          <div class="rl">قیمت طلا</div>
+          <div class="rw">
+            <div class="ib bt"><span class="u">تومان</span><input type="text" id="vA" inputmode="decimal" placeholder="۰"></div>
+            <button class="lk" id="lA" onclick="tLock('A')"><i class="ph ph-lock-key-open"></i></button>
+          </div>
+        </div>
 
-    <!-- Form Rows -->
-    <div class="row">
-      <div class="rl">قیمت طلا</div>
-      <div class="rw">
-        <div class="ib bt"><span class="u">تومان</span><input type="text" id="vA" inputmode="decimal" placeholder="۰"></div>
-        <button class="lk" id="lA" onclick="tLock('A')"><i class="ph ph-lock-key-open"></i></button>
+        <div class="row">
+          <div class="rl">وزن</div>
+          <div class="rw">
+            <div class="ib bt"><span class="u">گرم</span><input type="text" id="vB" inputmode="decimal" placeholder="۰.۰۰۰"></div>
+            <div style="width:26px"></div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="rl">قیمت خام</div>
+          <div class="rw">
+            <div class="ib bt off"><span class="u">تومان</span><input type="text" id="vC" disabled></div>
+            <div style="width:26px"></div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="rl">اجرت <button class="ib-info tap" onclick="showInfo('اجرت ساخت','درصد اجرت ساخت طلا روی قیمت خام محاسبه می‌شود.')"><i class="ph ph-info"></i></button></div>
+          <div class="rw">
+            <div class="ib bp"><span class="u">٪</span><input type="text" id="vD" inputmode="decimal"></div>
+            <div class="ib bt off"><span class="u">تومان</span><input type="text" id="vE" disabled></div>
+            <button class="lk" id="lD" onclick="tLock('D')"><i class="ph ph-lock-key-open"></i></button>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="rl">سود <button class="ib-info tap" onclick="showInfo('سود فروشنده','سود بر مجموع قیمت خام و اجرت محاسبه می‌شود.')"><i class="ph ph-info"></i></button></div>
+          <div class="rw">
+            <div class="ib bp"><span class="u">٪</span><input type="text" id="vF" inputmode="decimal"></div>
+            <div class="ib bt off"><span class="u">تومان</span><input type="text" id="vG" disabled></div>
+            <button class="lk" id="lF" onclick="tLock('F')"><i class="ph ph-lock-key-open"></i></button>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="rl">مالیات <button class="ib-info tap" onclick="showInfo('مالیات','مالیات بر ارزش افزوده روی مجموع اجرت و سود.')"><i class="ph ph-info"></i></button></div>
+          <div class="rw">
+            <div class="ib bp"><span class="u">٪</span><input type="text" id="vH" inputmode="decimal"></div>
+            <div class="ib bt off"><span class="u">تومان</span><input type="text" id="vI" disabled></div>
+            <button class="lk" id="lH" onclick="tLock('H')"><i class="ph ph-lock-key-open"></i></button>
+          </div>
+        </div>
+
+        <div class="dash-divider"></div>
+
+        <div class="row" style="margin-top:4px">
+          <div class="rl hl">قیمت کل</div>
+          <div class="rw">
+            <div class="ib bt hb off"><span class="u" style="color:var(--primary)">تومان</span><input type="text" id="vK" disabled style="color:var(--primary);font-size:1.08rem;font-weight:900;"></div>
+            <div style="width:26px"></div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="rl">مجموع هزینه‌ها</div>
+          <div class="rw">
+            <div class="ib bt off"><span class="u">تومان</span><input type="text" id="vCosts" disabled></div>
+            <div style="width:26px"></div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="rl">درصد نهایی</div>
+          <div class="rw">
+            <div class="ib bt off"><span class="u">٪</span><input type="text" id="vJ" disabled></div>
+            <div style="width:26px"></div>
+          </div>
+        </div>
+
+        <div class="acts">
+          <button class="rcpt-btn tap" id="btn-rcpt" onclick="showFormReceipt()"><i class="ph ph-receipt"></i><div class="rcpt-fill"></div></button>
+          <button class="btn btn-o tap" id="btn-clr"><i class="ph ph-eraser"></i> پاک کردن</button>
+          <button class="btn btn-p tap" id="btn-save"><i class="ph ph-check-circle"></i> ثبت فروش</button>
+        </div>
       </div>
-    </div>
 
-    <div class="row">
-      <div class="rl">وزن</div>
-      <div class="rw">
-        <div class="ib bt"><span class="u">گرم</span><input type="text" id="vB" inputmode="decimal" placeholder="۰.۰۰۰"></div>
-        <div style="width:26px"></div>
+      <!-- Desktop Side Live Invoice Summary -->
+      <div class="calc-side-panel">
+        <div style="font-size: 1.05rem; font-weight: 800; color: var(--primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+          <i class="ph-fill ph-receipt"></i>
+          <span>پیش‌نمایش زنده محاسبه</span>
+        </div>
+        <div style="background: var(--bg); border-radius: 14px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--bd);">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.82rem;">
+            <span style="color: var(--tx2);">قیمت خام طلا:</span>
+            <span id="side-raw-price" style="font-weight: 700;">۰ تومان</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.82rem;">
+            <span style="color: var(--tx2);">اجرت + سود + مالیات:</span>
+            <span id="side-costs" style="font-weight: 700; color: var(--warn);">۰ تومان</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.82rem;">
+            <span style="color: var(--tx2);">درصد نهایی مؤثر:</span>
+            <span id="side-final-percent" style="font-weight: 800; color: var(--primary);">۰٪</span>
+          </div>
+          <div style="border-top: 1.5px dashed var(--bd); padding-top: 10px; margin-top: 10px; display: flex; justify-content: space-between; align-items: baseline;">
+            <span style="font-weight: 800; font-size: 0.95rem;">مبلغ نهایی:</span>
+            <span id="side-total-price" style="font-weight: 900; font-size: 1.3rem; color: var(--primary);">۰ تومان</span>
+          </div>
+        </div>
+        <button class="btn btn-p tap" style="width: 100%; height: 42px;" onclick="showFormReceipt()">
+          <i class="ph ph-printer"></i> مشاهده و چاپ فاکتور
+        </button>
       </div>
-    </div>
-
-    <div class="row">
-      <div class="rl">قیمت خام</div>
-      <div class="rw">
-        <div class="ib bt off"><span class="u">تومان</span><input type="text" id="vC" disabled></div>
-        <div style="width:26px"></div>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="rl">اجرت <button class="ib-info tap" onclick="showInfo('اجرت ساخت','درصد اجرت ساخت طلا روی قیمت خام محاسبه می‌شود.')"><i class="ph ph-info"></i></button></div>
-      <div class="rw">
-        <div class="ib bp"><span class="u">٪</span><input type="text" id="vD" inputmode="decimal"></div>
-        <div class="ib bt off"><span class="u">تومان</span><input type="text" id="vE" disabled></div>
-        <button class="lk" id="lD" onclick="tLock('D')"><i class="ph ph-lock-key-open"></i></button>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="rl">سود <button class="ib-info tap" onclick="showInfo('سود فروشنده','سود بر مجموع قیمت خام و اجرت محاسبه می‌شود.')"><i class="ph ph-info"></i></button></div>
-      <div class="rw">
-        <div class="ib bp"><span class="u">٪</span><input type="text" id="vF" inputmode="decimal"></div>
-        <div class="ib bt off"><span class="u">تومان</span><input type="text" id="vG" disabled></div>
-        <button class="lk" id="lF" onclick="tLock('F')"><i class="ph ph-lock-key-open"></i></button>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="rl">مالیات <button class="ib-info tap" onclick="showInfo('مالیات','مالیات بر ارزش افزوده روی مجموع اجرت و سود.')"><i class="ph ph-info"></i></button></div>
-      <div class="rw">
-        <div class="ib bp"><span class="u">٪</span><input type="text" id="vH" inputmode="decimal"></div>
-        <div class="ib bt off"><span class="u">تومان</span><input type="text" id="vI" disabled></div>
-        <button class="lk" id="lH" onclick="tLock('H')"><i class="ph ph-lock-key-open"></i></button>
-      </div>
-    </div>
-
-    <div class="dash-divider"></div>
-
-    <div class="row" style="margin-top:4px">
-      <div class="rl hl">قیمت کل</div>
-      <div class="rw">
-        <div class="ib bt hb off"><span class="u" style="color:var(--primary)">تومان</span><input type="text" id="vK" disabled style="color:var(--primary);font-size:1.08rem;font-weight:900;"></div>
-        <div style="width:26px"></div>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="rl">مجموع هزینه‌ها</div>
-      <div class="rw">
-        <div class="ib bt off"><span class="u">تومان</span><input type="text" id="vCosts" disabled></div>
-        <div style="width:26px"></div>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="rl">درصد نهایی</div>
-      <div class="rw">
-        <div class="ib bt off"><span class="u">٪</span><input type="text" id="vJ" disabled></div>
-        <div style="width:26px"></div>
-      </div>
-    </div>
-
-    <div class="acts">
-      <button class="rcpt-btn tap" id="btn-rcpt" onclick="showFormReceipt()"><i class="ph ph-receipt"></i><div class="rcpt-fill"></div></button>
-      <button class="btn btn-o tap" id="btn-clr"><i class="ph ph-eraser"></i> پاک کردن</button>
-      <button class="btn btn-p tap" id="btn-save"><i class="ph ph-check-circle"></i> ثبت فروش</button>
     </div>
   </main>
 
@@ -1776,15 +2010,15 @@ window.go=(id,el,upHash=true)=>{
       requestAnimationFrame(()=>requestAnimationFrame(()=>v.classList.add('visible')));
     }
   },prev&&prev.id!=='v-'+id?85:0);
-  document.querySelectorAll('.ni').forEach(e=>e.classList.remove('on'));
-  el.classList.add('on');
+  document.querySelectorAll('.ni, .desktop-nav-item').forEach(e=>{
+    e.classList.toggle('on', e.dataset.t === id);
+  });
   if(upHash)history.pushState(null,null,'#'+id);
   if(id==='history')renderH();
   if(id==='stats'){renderStats();renderCharts();}
   if(id==='settings'){
     document.getElementById('t-dark').classList.toggle('on',S.dark);
     document.getElementById('t-bold').classList.toggle('on',S.bold);
-    // Update font picker active state
     document.querySelectorAll('.font-opt').forEach(o=>{
       o.classList.toggle('on',o.dataset.font===S.fontFamily);
     });
@@ -1813,6 +2047,16 @@ const calc=()=>{
   setV('vCosts', E + G + I);
   setV('vK',K);
   document.getElementById('vJ').value=C>0?fmt(((K/C)-1)*100,2):'';
+
+  // Update Desktop side live preview panel
+  const sideRaw = document.getElementById('side-raw-price');
+  const sideCosts = document.getElementById('side-costs');
+  const sideFinal = document.getElementById('side-final-percent');
+  const sideTotal = document.getElementById('side-total-price');
+  if(sideRaw) sideRaw.textContent = C > 0 ? fmt(C) + ' تومان' : '۰ تومان';
+  if(sideCosts) sideCosts.textContent = (E + G + I) > 0 ? fmt(E + G + I) + ' تومان' : '۰ تومان';
+  if(sideFinal) sideFinal.textContent = C > 0 ? fmt(((K/C)-1)*100, 2) + '٪' : '۰٪';
+  if(sideTotal) sideTotal.textContent = K > 0 ? fmt(K) + ' تومان' : '۰ تومان';
 
   // Persist locked values
   ['A','D','F','H'].forEach(k=>{
@@ -2705,22 +2949,65 @@ if(!S.pwaDismissed&&!window.matchMedia('(display-mode:standalone)').matches){
 }
 
 /* ============================================================
-   SERVICE WORKER + MANIFEST (BLOB)
+   SERVICE WORKER & AUTO-UPDATE ENGINE
    ============================================================ */
-const mData={name:'مهوا گالری',short_name:'مهوا',description:'سیستم فروش گالری مهوا',start_url:location.pathname+'#calc',display:'standalone',background_color:'#172051',theme_color:'#172051',orientation:'portrait',icons:[{src:'https://i.ibb.co/zWjXFxJP/IMG-9427-1.png',sizes:'192x192',type:'image/png'},{src:'https://i.ibb.co/zWjXFxJP/IMG-9427-1.png',sizes:'512x512',type:'image/png'}]};
-const mBlob=new Blob([JSON.stringify(mData)],{type:'application/json'});
-const mLink=document.createElement('link');mLink.rel='manifest';mLink.href=URL.createObjectURL(mBlob);
-document.head.appendChild(mLink);
+let newWorkerWaiting = null;
 
-if('serviceWorker' in navigator){
-  const swCode=`
-const CACHE='mahva-v6';
-const ASSETS=['/'];
-self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting()));});
-self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
-self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(res=>{if(res.ok){const cl=res.clone();caches.open(CACHE).then(c=>c.put(e.request,cl));}return res;}).catch(()=>caches.match('/'))));});`;
-  const swBlob=new Blob([swCode],{type:'application/javascript'});
-  navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(()=>{});
+function showUpdateBanner() {
+  const b = document.getElementById('update-banner');
+  if (b) b.classList.add('on');
+}
+
+window.dismissUpdateBanner = () => {
+  const b = document.getElementById('update-banner');
+  if (b) b.classList.remove('on');
+};
+
+window.applyAppUpdate = () => {
+  if (newWorkerWaiting) {
+    newWorkerWaiting.postMessage({ action: 'skipWaiting' });
+  } else {
+    window.location.reload();
+  }
+};
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').then((reg) => {
+    // If there's an active waiting worker
+    if (reg.waiting) {
+      newWorkerWaiting = reg.waiting;
+      showUpdateBanner();
+    }
+
+    // Triggered whenever a new service worker is installing
+    reg.addEventListener('updatefound', () => {
+      const newWorker = reg.installing;
+      if (newWorker) {
+        newWorker.addEventListener('statechange', () => {
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            newWorkerWaiting = newWorker;
+            showUpdateBanner();
+            logPwa('نسخه جدید اپلیکیشن دریافت شد');
+          }
+        });
+      }
+    });
+
+    // Check for updates every 30s and when window gains focus
+    setInterval(() => reg.update(), 30000);
+    window.addEventListener('focus', () => reg.update());
+  }).catch((err) => {
+    console.log('SW Registration error:', err);
+  });
+
+  // Seamless reload when new service worker takes control
+  let refreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!refreshing) {
+      refreshing = true;
+      window.location.reload();
+    }
+  });
 }
 
 
