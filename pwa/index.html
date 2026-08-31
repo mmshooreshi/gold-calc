@@ -386,8 +386,6 @@ input:disabled { color: var(--primary); opacity: .85; }
 [data-theme="dark"] input:disabled { color: #93c5fd; }
 /* Cold, Frosted Locked State */
 .ib.locked {
-  background: rgba(30, 58, 138, 0.05) !important;
-.ib.locked {
   background: rgba(23, 32, 81, 0.03) !important;
   border-color: var(--primary) !important;
 }
@@ -3130,7 +3128,21 @@ let isPassLocked=false;
 
 try{
   const sv=localStorage.getItem('mahva_v6');
-  if(sv){const p=JSON.parse(sv);S={...S,...p};}
+  if(sv){
+    const p=JSON.parse(sv);
+    if(p.snapshots && Array.isArray(p.snapshots)){
+      p.snapshots = p.snapshots.slice(0, 4).map(s => {
+        try {
+          const d = JSON.parse(s.data);
+          delete d.snapshots;
+          return { ...s, data: JSON.stringify(d) };
+        } catch(err) {
+          return null;
+        }
+      }).filter(Boolean);
+    }
+    S={...S,...p};
+  }
   if(!S.fontFamily)S.fontFamily='Peyda';
   if(!S.skin || ['royal-gold','emerald','ruby','midnight-titanium'].includes(S.skin))S.skin='pearl-white';
   if(!S.soundPreset || ['mechanical','bubble','digital'].includes(S.soundPreset))S.soundPreset='taptic';
@@ -3138,7 +3150,25 @@ try{
   if(!S.snapshots)S.snapshots=[];
 }catch(e){}
 
-const save=()=>localStorage.setItem('mahva_v6',JSON.stringify(S));
+const save=()=>{
+  try {
+    localStorage.setItem('mahva_v6', JSON.stringify(S));
+  } catch (err) {
+    try {
+      if (S.snapshots && S.snapshots.length > 2) {
+        S.snapshots = S.snapshots.slice(0, 2);
+      }
+      localStorage.setItem('mahva_v6', JSON.stringify(S));
+    } catch (err2) {
+      try {
+        S.snapshots = [];
+        localStorage.setItem('mahva_v6', JSON.stringify(S));
+      } catch (err3) {
+        console.warn('Storage quota limit reached');
+      }
+    }
+  }
+};
 
 /* ============================================================
    HIFI AUDIO SYNTHESIZER & TACTILE HAPTICS ENGINE
@@ -3545,7 +3575,7 @@ window.handleCustPhotoSelect = (e) => {
   const files = e.target.files;
   if (!files || !files.length) return;
   
-  const maxDim = 1000;
+  const maxDim = 480;
   Array.from(files).forEach(file => {
     const reader = new FileReader();
     reader.onload = (ev) => {
@@ -3561,7 +3591,7 @@ window.handleCustPhotoSelect = (e) => {
         canvas.height = h;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, w, h);
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
         activeModalCustImages.push(dataUrl);
         renderCustModalPhotos();
         toast('عکس رسید اضافه شد ✓');
@@ -3722,9 +3752,27 @@ window.confirmCloud = (targetEl, message, onConfirm) => {
 };
 
 /* Snapshots History Logic */
+function getSafeSnapshotPayload(){
+  const safeState = {
+    locks: S.locks,
+    defaults: S.defaults,
+    savedDefs: S.savedDefs,
+    history: S.history,
+    dark: S.dark,
+    bold: S.bold,
+    fontSize: S.fontSize,
+    fontFamily: S.fontFamily,
+    skin: S.skin,
+    soundPreset: S.soundPreset,
+    hapticLevel: S.hapticLevel,
+    passcode: S.passcode
+  };
+  return JSON.stringify(safeState);
+}
+
 function autoUpdateSnapshot(){
   if(!S.snapshots) S.snapshots=[];
-  const payload = JSON.stringify(S);
+  const payload = getSafeSnapshotPayload();
   const nowTime = gTime(), nowDate = gDate();
   const curIdx = S.snapshots.findIndex(s=>s.isCurrent);
   if(curIdx !== -1){
@@ -3746,7 +3794,7 @@ function autoUpdateSnapshot(){
       data: payload
     });
   }
-  if(S.snapshots.length > 8) S.snapshots = S.snapshots.slice(0, 8);
+  if(S.snapshots.length > 4) S.snapshots = S.snapshots.slice(0, 4);
   save();
   renderSnapshots();
 }
@@ -3759,9 +3807,9 @@ function createPwaSnapshot(){
     time: gTime(),
     count: S.history.length,
     isCurrent: true,
-    data: JSON.stringify(S)
+    data: getSafeSnapshotPayload()
   });
-  if(S.snapshots.length > 8) S.snapshots = S.snapshots.slice(0, 8);
+  if(S.snapshots.length > 4) S.snapshots = S.snapshots.slice(0, 4);
   save();
   renderSnapshots();
   toast('نسخه پشتیبان جدید ثبت شد ✓');
