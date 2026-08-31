@@ -3,33 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>مهوا گالری</title>
+    <title>مهوا گالری - ماشین حساب طلا</title>
     
-    <!-- iOS / PWA App Meta Tags -->
+    <!-- PWA & Mobile Meta Tags -->
+    <meta name="application-name" content="مهوا گالری">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="مهوا گالری">
     <meta name="theme-color" content="#172051">
-    <link rel="apple-touch-icon" href="logo-dark.png">
+    <meta name="msapplication-TileColor" content="#172051">
+    
+    <!-- Icons & Manifest -->
+    <link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <link rel="manifest" href="manifest.json">
     
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+
     <style>
         :root {
             --primary-dark: #172051;
+            --primary-dark-hover: #1f2b6c;
             --bg-light: #f4f6f8;
             --white: #ffffff;
             --border-color: #e2e8f0;
+            --border-focus: #94a3b8;
             --text-dark: #1e293b;
             --text-muted: #64748b;
+            --shadow-sm: 0 2px 8px rgba(23, 32, 81, 0.06);
+            --shadow-lg: 0 10px 30px rgba(23, 32, 81, 0.08);
+            --radius-md: 12px;
+            --radius-sm: 10px;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Vazirmatn', sans-serif;
+            font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
 
         body {
@@ -37,19 +52,26 @@
             color: var(--text-dark);
             display: flex;
             justify-content: center;
+            align-items: flex-start;
             min-height: 100dvh;
+            min-height: -webkit-fill-available;
+            padding: 0;
+            margin: 0;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
-        /* Mobile First Container */
+        /* App Container */
         .app-container {
             width: 100%;
             max-width: 480px;
             background-color: var(--white);
             display: flex;
             flex-direction: column;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
             min-height: 100dvh;
             position: relative;
+            box-shadow: var(--shadow-lg);
+            padding-bottom: env(safe-area-inset-bottom, 0px);
         }
 
         /* Header */
@@ -57,20 +79,34 @@
             background-color: var(--primary-dark);
             color: var(--white);
             text-align: center;
-            padding: 20px 0;
-            font-size: 1.4rem;
+            padding: max(20px, calc(16px + env(safe-area-inset-top, 0px))) 20px 18px 20px;
+            font-size: 1.35rem;
             font-weight: 700;
-            border-bottom-left-radius: 12px;
-            border-bottom-right-radius: 12px;
-            margin-bottom: 20px;
+            border-bottom-left-radius: var(--radius-md);
+            border-bottom-right-radius: var(--radius-md);
+            margin-bottom: 16px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            letter-spacing: -0.3px;
         }
 
-        /* Form Layout */
+        header img {
+            width: 30px;
+            height: 30px;
+            object-fit: contain;
+            border-radius: 6px;
+        }
+
+        /* Form Content */
         .form-content {
-            padding: 0 20px 80px 20px; /* 80px bottom padding for sticky button */
+            padding: 0 18px 90px 18px;
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 13px;
+            flex: 1;
         }
 
         .row {
@@ -81,8 +117,10 @@
 
         .row-label {
             font-weight: 600;
-            font-size: 0.95rem;
-            width: 30%;
+            font-size: 0.92rem;
+            width: 32%;
+            color: var(--text-dark);
+            white-space: nowrap;
         }
 
         .input-group {
@@ -91,21 +129,22 @@
             display: flex;
             background-color: var(--white);
             border: 1px solid var(--border-color);
-            border-radius: 10px;
+            border-radius: var(--radius-sm);
             overflow: hidden;
-            transition: all 0.2s;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
         }
 
         .input-group:focus-within {
-            border-color: var(--text-muted);
-            box-shadow: 0 0 0 2px rgba(10, 19, 36, 0.1);
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 2px rgba(23, 32, 81, 0.12);
         }
 
         .input-group.disabled-group {
             background-color: var(--bg-light);
+            border-color: var(--border-color);
         }
 
-        /* Split inputs (Percentage + Value) */
+        /* Split Row (Percent + Value) */
         .split-container {
             width: 68%;
             display: flex;
@@ -120,60 +159,83 @@
             width: 100%;
             border: none;
             outline: none;
-            padding: 14px 12px;
-            font-size: 1rem;
-            text-align: left; /* Numbers usually look better LTR inside RTL */
+            padding: 13px 12px;
+            font-size: 0.98rem;
+            text-align: left;
             direction: ltr;
             background: transparent;
             color: var(--text-dark);
-            font-weight: 600;
+            font-weight: 700;
+            user-select: text;
+            -webkit-user-select: text;
+        }
+
+        input::placeholder {
+            color: #cbd5e1;
+            font-weight: 400;
         }
 
         input:disabled {
             color: var(--primary-dark);
+            opacity: 1;
+            -webkit-text-fill-color: var(--primary-dark);
+            cursor: default;
         }
 
         .unit {
-
             position: absolute;
-            left: 12px;
+            left: 10px;
             top: 50%;
             transform: translateY(-50%);
             color: var(--text-muted);
-            font-size: 0.85rem;
+            font-size: 0.8rem;
+            font-weight: 500;
             pointer-events: none;
         }
 
-        /* Bottom Sticky Button */
+        .unit-right {
+            left: auto;
+            right: 10px;
+        }
+
+        /* Sticky Footer */
         .footer-action {
             position: fixed;
             bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
             width: 100%;
             max-width: 480px;
             background-color: var(--white);
-            padding: 16px 20px;
+            padding: 12px 18px max(14px, calc(10px + env(safe-area-inset-bottom, 0px))) 18px;
             border-top: 1px solid var(--border-color);
+            box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.04);
+            z-index: 100;
         }
 
         .btn-reset {
             background-color: var(--primary-dark);
             color: var(--white);
             width: 100%;
-            padding: 16px;
+            padding: 15px;
             border: none;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            font-weight: 600;
+            border-radius: var(--radius-md);
+            font-size: 1.05rem;
+            font-weight: 700;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            transition: opacity 0.2s;
+            transition: background-color 0.15s ease, transform 0.08s ease;
+        }
+
+        .btn-reset:hover {
+            background-color: var(--primary-dark-hover);
         }
 
         .btn-reset:active {
-            opacity: 0.8;
+            transform: scale(0.98);
         }
 
         .btn-reset svg {
@@ -181,20 +243,55 @@
             height: 20px;
             fill: currentColor;
         }
+
+        /* PWA Install Banner */
+        #pwa-install-banner {
+            display: none;
+            background: #eef2ff;
+            border: 1px solid #c7d2fe;
+            color: var(--primary-dark);
+            padding: 10px 16px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 12px;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.88rem;
+            font-weight: 600;
+        }
+
+        #pwa-install-banner button {
+            background: var(--primary-dark);
+            color: #fff;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <header>مهوا گالری</header>
+    <header>
+        <img src="logo-dark.png" alt="Mahva Gallery">
+        <span>مهوا گالری</span>
+    </header>
 
     <div class="form-content">
+        <!-- Install Banner on Desktop/Mobile Chrome -->
+        <div id="pwa-install-banner">
+            <span>نصب آسان برنامه</span>
+            <button id="pwa-install-btn">نصب</button>
+        </div>
+
         <!-- ردیف ۱: قیمت طلای خام -->
         <div class="row">
             <div class="row-label">قیمت طلای خام:</div>
             <div class="input-group">
                 <span class="unit">تومان</span>
-                <input type="text" id="val-A" inputmode="numeric" placeholder="">
+                <input type="text" id="val-A" inputmode="numeric" placeholder="مثلاً ۳,۵۰۰,۰۰۰" autocomplete="off">
             </div>
         </div>
 
@@ -202,8 +299,8 @@
         <div class="row">
             <div class="row-label">وزن:</div>
             <div class="input-group">
-                <span class="unit" style="left: auto; right: 12px;">گرم</span>
-                <input type="text" id="val-B" inputmode="decimal" placeholder="" style="padding-left: 80px; text-align: left;">
+                <span class="unit unit-right">گرم</span>
+                <input type="text" id="val-B" inputmode="decimal" placeholder="۰.۰۰۰" autocomplete="off" style="padding-left: 12px; padding-right: 48px; text-align: left;">
             </div>
         </div>
 
@@ -212,7 +309,7 @@
             <div class="row-label">قیمت خام:</div>
             <div class="input-group disabled-group">
                 <span class="unit">تومان</span>
-                <input type="text" id="val-C" disabled>
+                <input type="text" id="val-C" disabled readonly tabindex="-1">
             </div>
         </div>
 
@@ -222,11 +319,11 @@
             <div class="split-container">
                 <div class="input-group">
                     <span class="unit">درصد</span>
-                    <input type="text" id="val-D" inputmode="decimal">
+                    <input type="text" id="val-D" inputmode="decimal" placeholder="درصد" autocomplete="off">
                 </div>
                 <div class="input-group disabled-group">
                     <span class="unit">تومان</span>
-                    <input type="text" id="val-E" disabled>
+                    <input type="text" id="val-E" disabled readonly tabindex="-1">
                 </div>
             </div>
         </div>
@@ -237,11 +334,11 @@
             <div class="split-container">
                 <div class="input-group">
                     <span class="unit">درصد</span>
-                    <input type="text" id="val-F" inputmode="decimal">
+                    <input type="text" id="val-F" inputmode="decimal" placeholder="درصد" autocomplete="off">
                 </div>
                 <div class="input-group disabled-group">
                     <span class="unit">تومان</span>
-                    <input type="text" id="val-G" disabled>
+                    <input type="text" id="val-G" disabled readonly tabindex="-1">
                 </div>
             </div>
         </div>
@@ -252,21 +349,21 @@
             <div class="split-container">
                 <div class="input-group">
                     <span class="unit">درصد</span>
-                    <input type="text" id="val-H" inputmode="decimal">
+                    <input type="text" id="val-H" inputmode="decimal" placeholder="درصد" autocomplete="off">
                 </div>
                 <div class="input-group disabled-group">
                     <span class="unit">تومان</span>
-                    <input type="text" id="val-I" disabled>
+                    <input type="text" id="val-I" disabled readonly tabindex="-1">
                 </div>
             </div>
         </div>
 
         <!-- ردیف ۷: قیمت کل (محاسباتی) -->
-        <div class="row" style="margin-top: 10px;">
+        <div class="row" style="margin-top: 4px;">
             <div class="row-label">قیمت کل:</div>
             <div class="input-group disabled-group">
                 <span class="unit">تومان</span>
-                <input type="text" id="val-K" disabled>
+                <input type="text" id="val-K" disabled readonly tabindex="-1" style="font-size: 1.05rem;">
             </div>
         </div>
 
@@ -275,14 +372,14 @@
             <div class="row-label">درصد نهایی:</div>
             <div class="input-group disabled-group">
                 <span class="unit">%</span>
-                <input type="text" id="val-J" disabled>
+                <input type="text" id="val-J" disabled readonly tabindex="-1">
             </div>
         </div>
     </div>
 
     <!-- Footer Action -->
     <div class="footer-action">
-        <button class="btn-reset" id="reset-btn">
+        <button class="btn-reset" id="reset-btn" type="button">
             <svg viewBox="0 0 24 24">
                 <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
             </svg>
@@ -292,15 +389,34 @@
 </div>
 
 <script>
-    // Utility functions for formatting numbers
+    // Normalize Persian and Arabic numerals to Latin 0-9
+    const normalizeDigits = (str) => {
+        if (!str) return '';
+        return str
+            .replace(/[۰٠]/g, '0')
+            .replace(/[۱١]/g, '1')
+            .replace(/[۲٢]/g, '2')
+            .replace(/[۳٣]/g, '3')
+            .replace(/[۴٤]/g, '4')
+            .replace(/[۵٥]/g, '5')
+            .replace(/[۶٦]/g, '6')
+            .replace(/[۷٧]/g, '7')
+            .replace(/[۸٨]/g, '8')
+            .replace(/[۹٩]/g, '9')
+            .replace(/٫/g, '.')
+            .replace(/،/g, ',');
+    };
+
+    // Format numbers with comma separators
     const formatNumber = (num) => {
         if (!num || isNaN(num)) return "";
-        return Number(num).toLocaleString('en-US');
+        return Math.round(Number(num)).toLocaleString('en-US');
     };
 
     const unformatNumber = (str) => {
         if (!str) return 0;
-        return parseFloat(str.replace(/,/g, ''));
+        const normalized = normalizeDigits(str).replace(/,/g, '').trim();
+        return parseFloat(normalized) || 0;
     };
 
     // DOM Elements
@@ -317,14 +433,14 @@
     const outputJ = document.getElementById('val-J'); // درصد نهایی
     const resetBtn = document.getElementById('reset-btn');
 
-    // Load saved percentages from LocalStorage (Smart Defaults)
+    // Load saved defaults from LocalStorage
     window.addEventListener('DOMContentLoaded', () => {
         if(localStorage.getItem('mahva_D')) inputD.value = localStorage.getItem('mahva_D');
         if(localStorage.getItem('mahva_F')) inputF.value = localStorage.getItem('mahva_F');
         if(localStorage.getItem('mahva_H')) inputH.value = localStorage.getItem('mahva_H');
     });
 
-    // Core Calculation Logic (Based exactly on your requested formulas)
+    // Core Calculation Logic
     const calculate = () => {
         const A = unformatNumber(inputA.value);
         const B = unformatNumber(inputB.value);
@@ -332,32 +448,42 @@
         const F = unformatNumber(inputF.value);
         const H = unformatNumber(inputH.value);
 
-        // Save percentages to LocalStorage for future sessions
+        // Save percentages to LocalStorage
         if(inputD.value) localStorage.setItem('mahva_D', inputD.value);
         if(inputF.value) localStorage.setItem('mahva_F', inputF.value);
         if(inputH.value) localStorage.setItem('mahva_H', inputH.value);
 
+        if (A <= 0 || B <= 0) {
+            outputC.value = "";
+            outputE.value = "";
+            outputG.value = "";
+            outputI.value = "";
+            outputK.value = "";
+            outputJ.value = "";
+            return;
+        }
+
         // C = A × B
         const C = A * B;
-        outputC.value = formatNumber(Math.round(C));
+        outputC.value = formatNumber(C);
 
         // E = D × C ÷ 100
         const E = (D * C) / 100;
-        outputE.value = formatNumber(Math.round(E));
+        outputE.value = formatNumber(E);
 
         // G = F × E ÷ 100
         const G = (F * E) / 100;
-        outputG.value = formatNumber(Math.round(G));
+        outputG.value = formatNumber(G);
 
         // I = (E + G) × H ÷ 100
         const I = ((E + G) * H) / 100;
-        outputI.value = formatNumber(Math.round(I));
+        outputI.value = formatNumber(I);
 
         // K = C + E + G + I
         const K = C + E + G + I;
-        outputK.value = formatNumber(Math.round(K));
+        outputK.value = formatNumber(K);
 
-        // J = ((K ÷ C) - 1) × 100 (2 decimal places)
+        // J = ((K ÷ C) - 1) × 100
         if (C > 0) {
             const J = (((K / C) - 1) * 100).toFixed(2);
             outputJ.value = J;
@@ -366,25 +492,27 @@
         }
     };
 
-    // Input Formatting logic (adds commas while typing for currency)
+    // Input Formatting logic
     const handleInput = (e) => {
-        // Only allow numbers and decimal point
-        let val = e.target.value.replace(/[^0-9.]/g, '');
+        let val = normalizeDigits(e.target.value).replace(/[^0-9.]/g, '');
 
-        // Formatting for specific fields
         if (e.target.id === 'val-A') {
-            e.target.value = formatNumber(unformatNumber(val));
+            const cleanVal = val.replace(/\./g, '');
+            e.target.value = cleanVal ? Number(cleanVal).toLocaleString('en-US') : '';
         } else if (e.target.id === 'val-B') {
-            // Keep up to 3 decimal places for weight
-            if(val.includes('.')) {
+            if (val.includes('.')) {
                 const parts = val.split('.');
                 e.target.value = parts[0] + '.' + parts[1].substring(0, 3);
             } else {
                 e.target.value = val;
             }
         } else {
-             // For percentages, just raw numbers/decimals
-             e.target.value = val;
+            if (val.includes('.')) {
+                const parts = val.split('.');
+                e.target.value = parts[0] + '.' + parts.slice(1).join('');
+            } else {
+                e.target.value = val;
+            }
         }
 
         calculate();
@@ -395,14 +523,43 @@
         input.addEventListener('input', handleInput);
     });
 
-    // Reset functionality
+    // Reset functionality with tactile feedback
     resetBtn.addEventListener('click', () => {
+        if (navigator.vibrate) navigator.vibrate(15);
         inputA.value = '';
         inputB.value = '';
-        // We do NOT clear D, F, H because they are defaults, but we trigger calc to clear outputs
         calculate();
+        inputA.focus();
     });
 
+    // Register Service Worker for Instant Offline Launch
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js').catch(() => {});
+        });
+    }
+
+    // PWA Install Prompt Handler
+    let deferredPrompt;
+    const installBanner = document.getElementById('pwa-install-banner');
+    const installBtn = document.getElementById('pwa-install-btn');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        if (installBanner) installBanner.style.display = 'flex';
+    });
+
+    if (installBtn) {
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                deferredPrompt = null;
+                if (installBanner) installBanner.style.display = 'none';
+            }
+        });
+    }
 </script>
 </body>
 </html>
