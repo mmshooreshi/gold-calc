@@ -1207,6 +1207,26 @@ background: var(--bg);}
   opacity: 1;
   pointer-events: all;
 }
+.header-update-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #fff;
+  font-size: 0.76rem;
+  font-weight: 800;
+  padding: 4px 11px;
+  border-radius: 18px;
+  cursor: pointer;
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.6);
+  animation: pulseUpdate 1.8s infinite;
+  border: 1px solid rgba(255,255,255,0.35);
+  font-family: var(--font-main);
+}
+@keyframes pulseUpdate {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 8px rgba(16, 185, 129, 0.4); }
+  50% { transform: scale(1.06); box-shadow: 0 0 16px rgba(16, 185, 129, 0.85); }
+}
 .ub-text { display: flex; align-items: center; gap: 6px; }
 .ub-text i { font-size: 1.15rem; color: #fef08a; }
 .ub-btn {
@@ -1574,6 +1594,10 @@ background: var(--bg);}
     <div style="display:flex; align-items:center; gap:10px;">
       <img src="https://i.ibb.co/zWjXFxJP/IMG-9427-1.png" alt="مهوا">
       <span style="color:#fff; font-weight:800; font-size:1.05rem; letter-spacing:-0.4px;">مهوا گالری</span>
+      <div id="header-update-badge" class="header-update-badge" onclick="applyAppUpdate()" style="display:none;">
+        <i class="ph-fill ph-arrow-circle-up"></i>
+        <span>بروزرسانی جدید</span>
+      </div>
     </div>
     <div class="desktop-nav">
       <div class="desktop-nav-item on" data-t="calc" onclick="go('calc',this)"><i class="ph ph-calculator"></i><span>محاسبه</span></div>
@@ -3020,6 +3044,8 @@ let newWorkerWaiting = null;
 function showUpdateBanner() {
   const b = document.getElementById('update-banner');
   if (b) b.classList.add('on');
+  const badge = document.getElementById('header-update-badge');
+  if (badge) badge.style.display = 'inline-flex';
 }
 
 window.dismissUpdateBanner = () => {
@@ -3027,16 +3053,30 @@ window.dismissUpdateBanner = () => {
   if (b) b.classList.remove('on');
 };
 
-window.applyAppUpdate = () => {
-  if (newWorkerWaiting) {
-    newWorkerWaiting.postMessage({ action: 'skipWaiting' });
-  } else {
-    window.location.reload();
+window.applyAppUpdate = async () => {
+  try {
+    if (newWorkerWaiting) {
+      newWorkerWaiting.postMessage({ action: 'skipWaiting' });
+    }
+    if ('caches' in window) {
+      const keys = await caches.keys();
+      await Promise.all(keys.map(k => caches.delete(k)));
+    }
+  } catch (e) {
+    console.error(e);
   }
+  window.location.reload(true);
 };
 
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js').then((reg) => {
+  navigator.serviceWorker.addEventListener('message', (event) => {
+    if (event.data && (event.data.type === 'APP_UPDATE_AVAILABLE' || event.data.action === 'update')) {
+      showUpdateBanner();
+      logPwa('نسخه جدید اپلیکیشن دریافت شد');
+    }
+  });
+
+  navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then((reg) => {
     // If there's an active waiting worker
     if (reg.waiting) {
       newWorkerWaiting = reg.waiting;
@@ -3057,9 +3097,24 @@ if ('serviceWorker' in navigator) {
       }
     });
 
-    // Check for updates every 30s and when window gains focus
-    setInterval(() => reg.update(), 30000);
-    window.addEventListener('focus', () => reg.update());
+    const checkUpdatesNow = () => {
+      reg.update().catch(() => {});
+      // Direct checksum/version check
+      fetch('./sw.js?check=' + Date.now(), { cache: 'no-store' })
+        .then(r => r.text())
+        .then(content => {
+          if (window._cachedSwText && content !== window._cachedSwText) {
+            showUpdateBanner();
+          }
+          window._cachedSwText = content;
+        }).catch(() => {});
+    };
+
+    // Check on load, periodically, and on window focus/online
+    checkUpdatesNow();
+    setInterval(checkUpdatesNow, 15000);
+    window.addEventListener('focus', checkUpdatesNow);
+    window.addEventListener('online', checkUpdatesNow);
   }).catch((err) => {
     console.log('SW Registration error:', err);
   });

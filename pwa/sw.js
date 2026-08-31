@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mahva-gold-calc-v8';
+const CACHE_NAME = 'mahva-gold-calc-v9.1';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -19,6 +19,8 @@ const ASSETS_TO_CACHE = [
 ];
 
 self.addEventListener('install', (event) => {
+  // Immediately activate new service worker without waiting
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(ASSETS_TO_CACHE).catch(() => {});
@@ -36,7 +38,16 @@ self.addEventListener('activate', (event) => {
           }
         })
       );
-    }).then(() => self.clients.claim())
+    }).then(() => {
+      return self.clients.claim();
+    }).then(() => {
+      // Broadcast update notice to all open tabs
+      return self.clients.matchAll({ type: 'window' }).then((clients) => {
+        clients.forEach((client) => {
+          client.postMessage({ type: 'APP_UPDATE_AVAILABLE' });
+        });
+      });
+    })
   );
 });
 
