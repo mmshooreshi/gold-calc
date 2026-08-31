@@ -439,6 +439,24 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         showToast("لاگ‌ها پاک‌سازی شدند")
     }
 
+    fun showClearAllDataConfirmation() {
+        _showClearDataModal.value = true
+    }
+
+    fun exportBackupJson(context: Context) {
+        val json = repository.exportBackupJson()
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "application/json"
+            putExtra(Intent.EXTRA_TEXT, json)
+            putExtra(Intent.EXTRA_TITLE, "mahva-backup.json")
+        }
+        context.startActivity(Intent.createChooser(intent, "دانلود یا ارسال پشتیبان JSON"))
+    }
+
+    fun importBackupJson(context: Context) {
+        showToast("فایل پشتیبان JSON را انتخاب یا وارد کنید")
+    }
+
     fun showToast(msg: String) {
         _toastMessage.value = msg
     }
